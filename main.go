@@ -30,10 +30,9 @@ func loginPage(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 
 	user := new(User)
-	err := decoder.Decode(user)
-	if err != nil {
+	if err := decoder.Decode(user); err != nil {
 		log.Printf("error while unmarshalling JSON: %s", err)
-		w.Write([]byte("{}"))
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
