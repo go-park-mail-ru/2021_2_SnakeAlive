@@ -1,89 +1,142 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
+
+	"github.com/valyala/fasthttp"
 )
 
-var auth = map[string]string{
-	"alex@mail.ru": "pass",
-}
-
 type User struct {
+	Name     string `json:"name,omitempty"`
+	Surname  string `json:"surname,omitempty"`
 	Email    string `json:"email,omitempty"`
 	Password string `json:"password,omitempty"`
+}
+
+var auth = map[string]User{
+	"alex@mail.ru": {Name: "alex", Surname: "surname", Email: "alex@mail.ru", Password: "pass"},
 }
 
 type Token struct {
 	Token string `json:"token,omitempty"`
 }
 
-func loginPage(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
+func handlerDecorator(handler func(ctx *fasthttp.RequestCtx)) func(ctx *fasthttp.RequestCtx) {
+	return func(ctx *fasthttp.RequestCtx) {
+		ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")
+		ctx.Response.Header.Set("Content-Type", "application/json; charset=utf8")
+		ctx.Response.Header.Set("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
+		ctx.Response.Header.Set("Access-Control-Allow-Headers", "Origin, Content-Type, Authorization, Request-ID")
+		ctx.Response.Header.Set("Access-Control-Expose-Headers", "Authorization")
+		ctx.Response.Header.Set("Access-Control-Allow-Credentials", "true")
+		ctx.Response.Header.Set("Access-Control-Max-Age", "3600")
+
+		if bytes.Equal(ctx.Method(), []byte(fasthttp.MethodOptions)) {
+			ctx.SetStatusCode(fasthttp.StatusOK)
+			return
+		}
+
+		handler(ctx)
+	}
+}
+
+func loginPage(ctx *fasthttp.RequestCtx) {
+	if !bytes.Equal(ctx.Method(), []byte(fasthttp.MethodPost)) {
+		ctx.SetStatusCode(fasthttp.StatusMethodNotAllowed)
 		return
 	}
-
-	defer r.Body.Close()
-	decoder := json.NewDecoder(r.Body)
 
 	user := new(User)
-	if err := decoder.Decode(user); err != nil {
-		log.Printf("error while unmarshalling JSON: %s", err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
 
-	password, found := auth[user.Email]
-	if !found {
-		w.WriteHeader(http.StatusNotFound)
+	if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {
+		log.Printf("error while unmarshalling JSON: %s", err)
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
+	if _, found := auth[user.Email]; !found {
+		ctx.SetStatusCode(fasthttp.StatusNotFound)
+		return
+	}
+	password := auth[user.Email].Password
 
 	if password != user.Password {
-		w.WriteHeader(http.StatusBadRequest)
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	ctx.SetStatusCode(fasthttp.StatusOK)
 	t := Token{"token"}
 	bytes, err := json.Marshal(t)
 
 	if err != nil {
 		log.Printf("error while marshalling JSON: %s", err)
-		w.Write([]byte("{}"))
+		ctx.Write([]byte("{}"))
 		return
 	}
 
-	w.Write(bytes)
+	ctx.Write(bytes)
 }
 
-func handlerDecorator(handler func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Content-Type", "application/json; charset=utf8")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Authorization, Request-ID")
-		w.Header().Set("Access-Control-Expose-Headers", "Authorization")
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Max-Age", "3600")
+func registrationPage(ctx *fasthttp.RequestCtx) {
 
-		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
+	if !bytes.Equal(ctx.Method(), []byte(fasthttp.MethodPost)) {
+		ctx.SetStatusCode(fasthttp.StatusMethodNotAllowed)
+		return
+	}
 
-		handler(w, r)
+	user := new(User)
+
+	if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {
+		log.Printf("error while unmarshalling JSON: %s", err)
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	if _, found := auth[user.Email]; found {
+		log.Printf("User with this email already exists")
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+	auth[user.Email] = *user
+
+	ctx.SetStatusCode(fasthttp.StatusOK)
+	t := Token{"token"}
+	bytes, err := json.Marshal(t)
+
+	if err != nil {
+		log.Printf("error while marshalling JSON: %s", err)
+		ctx.Write([]byte("{}"))
+		return
+	}
+
+	ctx.Write(bytes)
+}
+
+func SetCookie(ctx *fasthttp.RequestCtx) {
+	// Set cookies
+	var c fasthttp.Cookie
+	c.SetKey("cookie-name")
+	c.SetValue("cookie-value")
+	ctx.Response.Header.SetCookie(&c)
+}
+
+func requestHandler(ctx *fasthttp.RequestCtx) {
+	switch string(ctx.Path()) {
+	case "/login":
+		loginPage(ctx)
+	case "/register":
+		registrationPage(ctx)
+	default:
+		fmt.Println("no rout")
 	}
 }
 
 func main() {
-	http.HandleFunc("/login", handlerDecorator(loginPage))
-
 	fmt.Println("starting server at :8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	if err := fasthttp.ListenAndServe(":8080", handlerDecorator(requestHandler)); err != nil {
 		fmt.Println("failed to start server:", err)
 		return
 	}
