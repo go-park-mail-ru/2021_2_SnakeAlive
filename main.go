@@ -6,25 +6,17 @@ import (
 	"fmt"
 	"log"
 
+	"snakealive/m/auth"
+	"snakealive/m/validate"
+
 	"github.com/valyala/fasthttp"
 )
 
-type User struct {
-	Name     string `json:"name,omitempty"`
-	Surname  string `json:"surname,omitempty"`
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password,omitempty"`
-}
-
-var auth = map[string]User{
+var authdb = map[string]auth.User{
 	"alex@mail.ru": {Name: "alex", Surname: "surname", Email: "alex@mail.ru", Password: "pass"},
 }
 
-type Token struct {
-	Token string `json:"token,omitempty"`
-}
-
-func handlerDecorator(handler func(ctx *fasthttp.RequestCtx)) func(ctx *fasthttp.RequestCtx) {
+func corsMiddleware(handler func(ctx *fasthttp.RequestCtx)) func(ctx *fasthttp.RequestCtx) {
 	return func(ctx *fasthttp.RequestCtx) {
 		ctx.Response.Header.Set("Access-Control-Allow-Origin", "*")
 		ctx.Response.Header.Set("Content-Type", "application/json; charset=utf8")
@@ -49,19 +41,18 @@ func login(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	user := new(User)
-	//err := validate.Validate(User)
+	user := new(auth.User)
 
 	if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {
 		log.Printf("error while unmarshalling JSON: %s", err)
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
-	if _, found := auth[user.Email]; !found {
+	if _, found := authdb[user.Email]; !found {
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
 		return
 	}
-	password := auth[user.Email].Password
+	password := authdb[user.Email].Password
 
 	if password != user.Password {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
@@ -69,7 +60,7 @@ func login(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	t := Token{"token"}
+	t := auth.Token{Token: "token"}
 	bytes, err := json.Marshal(t)
 
 	if err != nil {
@@ -88,8 +79,7 @@ func registration(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	user := new(User)
-	//err := validate.Validate(User)
+	user := new(auth.User)
 
 	if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {
 		log.Printf("error while unmarshalling JSON: %s", err)
@@ -97,15 +87,21 @@ func registration(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if _, found := auth[user.Email]; found {
+	if !validate.Validate(*user) {
+		log.Printf("error while validate user:")
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	if _, found := authdb[user.Email]; found {
 		log.Printf("User with this email already exists")
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
-	auth[user.Email] = *user
+	authdb[user.Email] = *user
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	t := Token{"token"}
+	t := auth.Token{Token: "token"}
 	bytes, err := json.Marshal(t)
 
 	if err != nil {
@@ -126,7 +122,6 @@ func SetCookie(ctx *fasthttp.RequestCtx) {
 }
 
 func requestHandler(ctx *fasthttp.RequestCtx) {
-	fmt.Println(auth)
 	switch string(ctx.Path()) {
 	case "/login":
 		login(ctx)
@@ -139,7 +134,7 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 
 func main() {
 	fmt.Println("starting server at :8080")
-	if err := fasthttp.ListenAndServe(":8080", handlerDecorator(requestHandler)); err != nil {
+	if err := fasthttp.ListenAndServe(":8080", corsMiddleware(requestHandler)); err != nil {
 		fmt.Println("failed to start server:", err)
 		return
 	}
