@@ -12,7 +12,7 @@ import (
 type User struct {
 	Name     string `json:"name,omitempty"`
 	Surname  string `json:"surname,omitempty"`
-	Email    string `json:"email,omitempty"`
+	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password,omitempty"`
 }
 
@@ -43,13 +43,14 @@ func handlerDecorator(handler func(ctx *fasthttp.RequestCtx)) func(ctx *fasthttp
 	}
 }
 
-func loginPage(ctx *fasthttp.RequestCtx) {
+func login(ctx *fasthttp.RequestCtx) {
 	if !bytes.Equal(ctx.Method(), []byte(fasthttp.MethodPost)) {
 		ctx.SetStatusCode(fasthttp.StatusMethodNotAllowed)
 		return
 	}
 
 	user := new(User)
+	//err := validate.Validate(User)
 
 	if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {
 		log.Printf("error while unmarshalling JSON: %s", err)
@@ -80,7 +81,7 @@ func loginPage(ctx *fasthttp.RequestCtx) {
 	ctx.Write(bytes)
 }
 
-func registrationPage(ctx *fasthttp.RequestCtx) {
+func registration(ctx *fasthttp.RequestCtx) {
 
 	if !bytes.Equal(ctx.Method(), []byte(fasthttp.MethodPost)) {
 		ctx.SetStatusCode(fasthttp.StatusMethodNotAllowed)
@@ -88,6 +89,7 @@ func registrationPage(ctx *fasthttp.RequestCtx) {
 	}
 
 	user := new(User)
+	//err := validate.Validate(User)
 
 	if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {
 		log.Printf("error while unmarshalling JSON: %s", err)
@@ -124,11 +126,12 @@ func SetCookie(ctx *fasthttp.RequestCtx) {
 }
 
 func requestHandler(ctx *fasthttp.RequestCtx) {
+	fmt.Println(auth)
 	switch string(ctx.Path()) {
 	case "/login":
-		loginPage(ctx)
+		login(ctx)
 	case "/register":
-		registrationPage(ctx)
+		registration(ctx)
 	default:
 		fmt.Println("no rout")
 	}
