@@ -9,6 +9,7 @@ import (
 	"snakealive/m/auth"
 	"snakealive/m/validate"
 
+	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
 )
 
@@ -121,20 +122,19 @@ func SetCookie(ctx *fasthttp.RequestCtx) {
 	ctx.Response.Header.SetCookie(&c)
 }
 
-func requestHandler(ctx *fasthttp.RequestCtx) {
-	switch string(ctx.Path()) {
-	case "/login":
-		login(ctx)
-	case "/register":
-		registration(ctx)
-	default:
-		fmt.Println("no rout")
-	}
+func Router() *router.Router {
+	r := router.New()
+	r.POST("/login", login)
+	r.POST("/register", registration)
+	return r
 }
 
 func main() {
 	fmt.Println("starting server at :8080")
-	if err := fasthttp.ListenAndServe(":8080", corsMiddleware(requestHandler)); err != nil {
+
+	r := Router()
+
+	if err := fasthttp.ListenAndServe(":8080", corsMiddleware(r.Handler)); err != nil {
 		fmt.Println("failed to start server:", err)
 		return
 	}
