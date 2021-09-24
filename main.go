@@ -56,20 +56,10 @@ func login(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	t := auth.Token{Token: "token"}
-	bytes, err := json.Marshal(t)
-
-	if err != nil {
-		log.Printf("error while marshalling JSON: %s", err)
-		ctx.Write([]byte("{}"))
-		return
-	}
-
-	ctx.Write(bytes)
+	SetCookie(ctx, user.Email)
 }
 
 func registration(ctx *fasthttp.RequestCtx) {
-
 	user := new(auth.User)
 
 	if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {
@@ -92,23 +82,13 @@ func registration(ctx *fasthttp.RequestCtx) {
 	authdb[user.Email] = *user
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	t := auth.Token{Token: "token"}
-	bytes, err := json.Marshal(t)
-
-	if err != nil {
-		log.Printf("error while marshalling JSON: %s", err)
-		ctx.Write([]byte("{}"))
-		return
-	}
-
-	ctx.Write(bytes)
+	SetCookie(ctx, user.Email)
 }
 
-func SetCookie(ctx *fasthttp.RequestCtx) {
-	// Set cookies
+func SetCookie(ctx *fasthttp.RequestCtx, cookie string) {
 	var c fasthttp.Cookie
-	c.SetKey("cookie-name")
-	c.SetValue("cookie-value")
+	c.SetKey("SnakeAlive")
+	c.SetValue(cookie)
 	ctx.Response.Header.SetCookie(&c)
 }
 
