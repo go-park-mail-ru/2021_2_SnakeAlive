@@ -12,23 +12,23 @@ var AuthDB = map[string]ent.User{
 var PlacesDB = map[string][]ent.Place{
 	"Russia": {
 		{
-			Name: "Собор Василия Блаженного", Tags: []string{"Церкви и соборы"}, Photos: []string{""},
+			Name: "Собор Василия Блаженного", Tags: []string{"Церкви и соборы"}, Photos: []string{"https://i.ibb.co/QmfGC6t/flsdkfj.jpg", "https://i.ibb.co/BCrP43N/photo0jpg.jpg"},
 			Author: "Александра Волынец", Review: "Лучшее место для фоточек",
 		},
 		{
-			Name: "Государственный Эрмитаж", Tags: []string{"Музеи исскуств"}, Photos: []string{""},
+			Name: "Государственный Эрмитаж", Tags: []string{"Музеи исскуств"}, Photos: []string{"https://i.ibb.co/PZvRvCq/es-casi-imposible-tomar.jpg"},
 			Author: "Никита Черных", Review: "Вкусно кормят",
 		},
 		{
-			Name: "Сочи Парк", Tags: []string{"Парки равлечений"}, Photos: []string{""},
+			Name: "Сочи Парк", Tags: []string{"Парки равлечений"}, Photos: []string{"https://i.ibb.co/sWJzx0f/caption.jpg", "https://i.ibb.co/CHK7YP6/sdf.jpg"},
 			Author: "Ксения Самойлова", Review: "Не хватает каруселей :(",
 		},
 		{
-			Name: "Kazan Kremlin", Tags: []string{"Специализированные музеи", "Исторические достопримечательности"}, Photos: []string{""},
+			Name: "Kazan Kremlin", Tags: []string{"Специализированные музеи", "Исторические достопримечательности"}, Photos: []string{"https://i.ibb.co/JvWrY0J/qol-shariff-mosque.jpg"},
 			Author: "Андрей Кравцов", Review: "Я думал это бассеин",
 		},
 		{
-			Name: "Ганина Яма мужской монастырь", Tags: []string{"Культурные объекты и достопримечательности"}, Photos: []string{""},
+			Name: "Ганина Яма мужской монастырь", Tags: []string{"Культурные объекты и достопримечательности"}, Photos: []string{"https://i.ibb.co/ZKHX76g/dfkjsk.jpg"},
 			Author: "Никита Черных", Review: "Спасите меня пожалуйста",
 		},
 	},
