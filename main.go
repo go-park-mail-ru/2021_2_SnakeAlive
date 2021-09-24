@@ -37,11 +37,6 @@ func corsMiddleware(handler func(ctx *fasthttp.RequestCtx)) func(ctx *fasthttp.R
 }
 
 func login(ctx *fasthttp.RequestCtx) {
-	if !bytes.Equal(ctx.Method(), []byte(fasthttp.MethodPost)) {
-		ctx.SetStatusCode(fasthttp.StatusMethodNotAllowed)
-		return
-	}
-
 	user := new(auth.User)
 
 	if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {
@@ -74,11 +69,6 @@ func login(ctx *fasthttp.RequestCtx) {
 }
 
 func registration(ctx *fasthttp.RequestCtx) {
-
-	if !bytes.Equal(ctx.Method(), []byte(fasthttp.MethodPost)) {
-		ctx.SetStatusCode(fasthttp.StatusMethodNotAllowed)
-		return
-	}
 
 	user := new(auth.User)
 
