@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"hash/fnv"
 	"log"
+	"strconv"
 
 	"snakealive/m/auth"
 	"snakealive/m/validate"
@@ -15,6 +17,14 @@ import (
 
 var authdb = map[string]auth.User{
 	"alex@mail.ru": {Name: "alex", Surname: "surname", Email: "alex@mail.ru", Password: "pass"},
+}
+
+var CookieDB = map[string]auth.User{}
+
+func Hash(s string) string {
+	h := fnv.New32a()
+	h.Write([]byte(s))
+	return strconv.FormatUint(uint64(h.Sum32()), 10)
 }
 
 func corsMiddleware(handler func(ctx *fasthttp.RequestCtx)) func(ctx *fasthttp.RequestCtx) {
@@ -56,7 +66,7 @@ func login(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	SetCookie(ctx, user.Email)
+	SetCookie(ctx, Hash(user.Email), authdb[user.Email])
 }
 
 func registration(ctx *fasthttp.RequestCtx) {
@@ -82,14 +92,16 @@ func registration(ctx *fasthttp.RequestCtx) {
 	authdb[user.Email] = *user
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	SetCookie(ctx, user.Email)
+	SetCookie(ctx, Hash(user.Email), authdb[user.Email])
 }
 
-func SetCookie(ctx *fasthttp.RequestCtx, cookie string) {
+func SetCookie(ctx *fasthttp.RequestCtx, cookie string, user auth.User) {
 	var c fasthttp.Cookie
 	c.SetKey("SnakeAlive")
 	c.SetValue(cookie)
 	ctx.Response.Header.SetCookie(&c)
+
+	CookieDB[cookie] = user
 }
 
 func Router() *router.Router {
