@@ -151,7 +151,7 @@ func main() {
 
 	r := Router()
 
-	if err := fasthttp.ListenAndServe(":8081", corsMiddleware(r.Handler)); err != nil {
+	if err := fasthttp.ListenAndServe(":8080", corsMiddleware(r.Handler)); err != nil {
 		fmt.Println("failed to start server:", err)
 		return
 	}
