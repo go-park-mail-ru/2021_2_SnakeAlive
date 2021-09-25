@@ -56,13 +56,6 @@ func TestRegister(t *testing.T) {
 	}
 }
 
-type User struct {
-	Name     string `json:"name"`
-	Surname  string `json:"surname"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
 func TestPlacesList(t *testing.T) {
 
 	tests := []test{
