@@ -1,10 +1,10 @@
 package validate
 
 import (
-	"snakealive/m/auth"
+	ent "snakealive/m/entities"
 )
 
-func Validate(user auth.User) bool {
+func Validate(user ent.User) bool {
 	if user.Email == "" {
 		return false
 	}

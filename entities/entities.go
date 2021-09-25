@@ -1,4 +1,4 @@
-package auth
+package entities
 
 type User struct {
 	Name     string `json:"name"`
@@ -7,6 +7,10 @@ type User struct {
 	Password string `json:"password"`
 }
 
-type Token struct {
-	Token string `json:"token,omitempty"`
+type Place struct {
+	Name   string
+	Tags   []string
+	Photos []string
+	Author string
+	Review string
 }
