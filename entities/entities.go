@@ -8,9 +8,9 @@ type User struct {
 }
 
 type Place struct {
-	Name   string
-	Tags   []string
-	Photos []string
-	Author string
-	Review string
+	Name   string   `json:"name"`
+	Tags   []string `json:"tags"`
+	Photos []string `json:"photos"`
+	Author string   `json:"author"`
+	Review string   `json:"review"`
 }
