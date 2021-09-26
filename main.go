@@ -9,6 +9,7 @@ import (
 	"snakealive/m/auth"
 	"snakealive/m/validate"
 
+	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
 )
 
@@ -36,11 +37,6 @@ func corsMiddleware(handler func(ctx *fasthttp.RequestCtx)) func(ctx *fasthttp.R
 }
 
 func login(ctx *fasthttp.RequestCtx) {
-	if !bytes.Equal(ctx.Method(), []byte(fasthttp.MethodPost)) {
-		ctx.SetStatusCode(fasthttp.StatusMethodNotAllowed)
-		return
-	}
-
 	user := new(auth.User)
 
 	if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {
@@ -73,11 +69,6 @@ func login(ctx *fasthttp.RequestCtx) {
 }
 
 func registration(ctx *fasthttp.RequestCtx) {
-
-	if !bytes.Equal(ctx.Method(), []byte(fasthttp.MethodPost)) {
-		ctx.SetStatusCode(fasthttp.StatusMethodNotAllowed)
-		return
-	}
 
 	user := new(auth.User)
 
@@ -121,20 +112,19 @@ func SetCookie(ctx *fasthttp.RequestCtx) {
 	ctx.Response.Header.SetCookie(&c)
 }
 
-func requestHandler(ctx *fasthttp.RequestCtx) {
-	switch string(ctx.Path()) {
-	case "/login":
-		login(ctx)
-	case "/register":
-		registration(ctx)
-	default:
-		fmt.Println("no rout")
-	}
+func Router() *router.Router {
+	r := router.New()
+	r.POST("/login", login)
+	r.POST("/register", registration)
+	return r
 }
 
 func main() {
 	fmt.Println("starting server at :8080")
-	if err := fasthttp.ListenAndServe(":8080", corsMiddleware(requestHandler)); err != nil {
+
+	r := Router()
+
+	if err := fasthttp.ListenAndServe(":8080", corsMiddleware(r.Handler)); err != nil {
 		fmt.Println("failed to start server:", err)
 		return
 	}
