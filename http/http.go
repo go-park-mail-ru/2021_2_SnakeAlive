@@ -15,7 +15,10 @@ import (
 const CookieName = "SnakeAlive"
 
 type placesListJSON struct {
-	Places []ent.Place
+	Name    string
+	Surname string
+	Email   string
+	Places  []ent.Place
 }
 
 func Hash(s string) string {
@@ -28,6 +31,8 @@ func SetCookie(ctx *fasthttp.RequestCtx, cookie string, user ent.User) {
 	var c fasthttp.Cookie
 	c.SetKey(CookieName)
 	c.SetValue(cookie)
+	c.SetMaxAge(36000)
+	c.SetSameSite(fasthttp.CookieSameSiteNoneMode)
 	ctx.Response.Header.SetCookie(&c)
 
 	DB.CookieDB[cookie] = user
@@ -104,7 +109,8 @@ func PlacesList(ctx *fasthttp.RequestCtx) {
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
 
-	response := placesListJSON{DB.PlacesDB[param]}
+	user := DB.CookieDB[string(ctx.Request.Header.Cookie(CookieName))]
+	response := placesListJSON{user.Name, user.Surname, user.Email, DB.PlacesDB[param]}
 	bytes, err := json.Marshal(response)
 	if err != nil {
 		log.Printf("error while marshalling JSON: %s", err)
