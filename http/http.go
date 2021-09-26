@@ -31,6 +31,19 @@ func SetCookie(ctx *fasthttp.RequestCtx, cookie string, user ent.User) {
 	DB.CookieDB[cookie] = user
 }
 
+func SetToken(ctx *fasthttp.RequestCtx, hash string) {
+	t := ent.Token{Token: hash}
+	bytes, err := json.Marshal(t)
+
+	if err != nil {
+		log.Printf("error while marshalling JSON: %s", err)
+		ctx.Write([]byte("{}"))
+		return
+	}
+
+	ctx.Write(bytes)
+}
+
 func CheckCookie(ctx *fasthttp.RequestCtx) bool {
 	if _, found := DB.CookieDB[string(ctx.Request.Header.Cookie(CookieName))]; !found {
 		return false
@@ -60,6 +73,7 @@ func Login(ctx *fasthttp.RequestCtx) {
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	SetCookie(ctx, Hash(user.Email), DB.AuthDB[user.Email])
+	SetToken(ctx, Hash(user.Email))
 }
 
 func Registration(ctx *fasthttp.RequestCtx) {
@@ -86,6 +100,7 @@ func Registration(ctx *fasthttp.RequestCtx) {
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	SetCookie(ctx, Hash(user.Email), DB.AuthDB[user.Email])
+	SetToken(ctx, Hash(user.Email))
 }
 
 func PlacesList(ctx *fasthttp.RequestCtx) {
