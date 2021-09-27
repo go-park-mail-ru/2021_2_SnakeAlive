@@ -3,6 +3,9 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"hash/fnv"
+	"log"
+	"strconv"
 
 	"snakealive/m/http"
 
@@ -17,6 +20,14 @@ func Router() *router.Router {
 	r.POST("/register", http.Registration)
 	r.GET("/country/{name}", http.PlacesList)
 	return r
+}
+
+var CookieDB = map[string]auth.User{}
+
+func Hash(s string) string {
+	h := fnv.New32a()
+	h.Write([]byte(s))
+	return strconv.FormatUint(uint64(h.Sum32()), 10)
 }
 
 func corsMiddleware(handler func(ctx *fasthttp.RequestCtx)) func(ctx *fasthttp.RequestCtx) {
@@ -38,6 +49,74 @@ func corsMiddleware(handler func(ctx *fasthttp.RequestCtx)) func(ctx *fasthttp.R
 	}
 }
 
+<<<<<<< HEAD
+=======
+func login(ctx *fasthttp.RequestCtx) {
+	user := new(auth.User)
+
+	if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {
+		log.Printf("error while unmarshalling JSON: %s", err)
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+	if _, found := authdb[user.Email]; !found {
+		ctx.SetStatusCode(fasthttp.StatusNotFound)
+		return
+	}
+	password := authdb[user.Email].Password
+
+	if password != user.Password {
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	ctx.SetStatusCode(fasthttp.StatusOK)
+	SetCookie(ctx, Hash(user.Email), authdb[user.Email])
+}
+
+func registration(ctx *fasthttp.RequestCtx) {
+	user := new(auth.User)
+
+	if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {
+		log.Printf("error while unmarshalling JSON: %s", err)
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	if !validate.Validate(*user) {
+		log.Printf("error while validate user:")
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	if _, found := authdb[user.Email]; found {
+		log.Printf("User with this email already exists")
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+	authdb[user.Email] = *user
+
+	ctx.SetStatusCode(fasthttp.StatusOK)
+	SetCookie(ctx, Hash(user.Email), authdb[user.Email])
+}
+
+func SetCookie(ctx *fasthttp.RequestCtx, cookie string, user auth.User) {
+	var c fasthttp.Cookie
+	c.SetKey("SnakeAlive")
+	c.SetValue(cookie)
+	ctx.Response.Header.SetCookie(&c)
+
+	CookieDB[cookie] = user
+}
+
+func Router() *router.Router {
+	r := router.New()
+	r.POST("/login", login)
+	r.POST("/register", registration)
+	return r
+}
+
+>>>>>>> b8efd1cde80a7e9ed66d6cdce93857c1a01fa41d
 func main() {
 	fmt.Println("starting server at :8080")
 
