@@ -25,7 +25,7 @@ func SetCookie(ctx *fasthttp.RequestCtx, cookie string, user ent.User) {
 	c.SetKey(CookieName)
 	c.SetValue(cookie)
 	c.SetMaxAge(36000)
-	c.SetSameSite(fasthttp.CookieSameSiteNoneMode)
+	c.SetSameSite(fasthttp.CookieSameSiteStrictMode)
 	ctx.Response.Header.SetCookie(&c)
 
 	DB.CookieDB[cookie] = user
