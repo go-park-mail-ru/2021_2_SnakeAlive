@@ -7,8 +7,12 @@ type User struct {
 	Password string `json:"password"`
 }
 
-type Token struct {
-	Token string `json:"token,omitempty"`
+type Place struct {
+	Name   string
+	Tags   []string
+	Photos []string
+	Author string
+	Review string
 }
 
 type Place struct {
