@@ -7,7 +7,17 @@ type User struct {
 	Password string `json:"password"`
 }
 
-type UserJSON struct {
+func (u *User) Validate() bool {
+	if u.Email == "" {
+		return false
+	}
+	if u.Password == "" {
+		return false
+	}
+	return true
+}
+
+type PublicUser struct {
 	Name    string `json:"name"`
 	Surname string `json:"surname"`
 }

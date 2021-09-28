@@ -6,7 +6,6 @@ import (
 	"log"
 	ent "snakealive/m/entities"
 	DB "snakealive/m/storage"
-	"snakealive/m/validate"
 	"strconv"
 	"time"
 
@@ -98,7 +97,7 @@ func Registration(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	if !validate.Validate(*user) {
+	if !user.Validate() {
 		log.Printf("error while validate user:")
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
@@ -146,7 +145,7 @@ func Profile(ctx *fasthttp.RequestCtx) {
 	ctx.SetStatusCode(fasthttp.StatusOK)
 
 	user := DB.CookieDB[string(ctx.Request.Header.Cookie(CookieName))]
-	response := ent.UserJSON{Name: user.Name, Surname: user.Surname}
+	response := ent.User{Name: user.Name, Surname: user.Surname}
 	bytes, err := json.Marshal(response)
 	if err != nil {
 		log.Printf("error while marshalling JSON: %s", err)
