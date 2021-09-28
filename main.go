@@ -16,7 +16,7 @@ func Router() *router.Router {
 	r.POST("/register", http.Registration)
 	r.GET("/country/{name}", http.PlacesList)
 	r.GET("/profile", http.Profile)
-	r.GET("/logout", http.Logout)
+	r.DELETE("/logout", http.Logout)
 	return r
 }
 

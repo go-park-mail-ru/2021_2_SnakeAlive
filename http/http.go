@@ -119,7 +119,7 @@ func Registration(ctx *fasthttp.RequestCtx) {
 func PlacesList(ctx *fasthttp.RequestCtx) {
 	param, _ := ctx.UserValue("name").(string)
 	if _, found := DB.PlacesDB[param]; !found {
-		log.Printf("country nor found")
+		log.Printf("country not found")
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
 		return
 	}
