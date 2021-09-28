@@ -12,18 +12,18 @@ type test struct {
 	want  int
 }
 
-func TestLogin(t *testing.T) {
+// Test_{Название Функции Которую тестируете}_{Success/False}_{Почему тест имеет такое поведение?}
+func Test_Login_Success_HttpResponseCode(t *testing.T) {
 	tests := []test{
-		{(`{"name": "name2", "surname": "surname2", "email": "alex@mail.ru", "password": "password"}`),
+		{`{"name": "name2", "surname": "surname2", "email": "alex@mail.ru", "password": "password"}`,
 			fasthttp.StatusOK},
-		{(`{"name": "name2", "surname": "surname2", "email": "alextest@mail.ru", "password": "password"}`),
+		{`{"name": "name2", "surname": "surname2", "email": "alextest@mail.ru", "password": "password"}`,
 			fasthttp.StatusNotFound},
-		{(`{"name": "name2", "surname": "surname2", "email": "alex@mail.ru", "password": "xxxxxxxx"}`),
+		{`{"name": "name2", "surname": "surname2", "email": "alex@mail.ru", "password": "xxxxxxxx"}`,
 			fasthttp.StatusBadRequest},
-		{(`xxxxx`), fasthttp.StatusBadRequest},
+		{`xxxxx`, fasthttp.StatusBadRequest},
 	}
-	var c fasthttp.RequestCtx
-	ctx := (*fasthttp.RequestCtx)(&c)
+	ctx := &fasthttp.RequestCtx{}
 
 	for _, tc := range tests {
 		ctx.Request.SetBody(nil)
@@ -45,8 +45,8 @@ func TestRegister(t *testing.T) {
 			fasthttp.StatusBadRequest},
 		{(`xxxxx`), fasthttp.StatusBadRequest},
 	}
-	var c fasthttp.RequestCtx
-	ctx := (*fasthttp.RequestCtx)(&c)
+	ctx := &fasthttp.RequestCtx{}
+
 
 	for _, tc := range tests {
 		ctx.Request.SetBody(nil)
@@ -63,8 +63,8 @@ func TestPlacesList(t *testing.T) {
 		{"Nicaragua", fasthttp.StatusOK},
 		{"Germany", fasthttp.StatusNotFound},
 	}
-	var c fasthttp.RequestCtx
-	ctx := (*fasthttp.RequestCtx)(&c)
+	ctx := &fasthttp.RequestCtx{}
+
 
 	for _, tc := range tests {
 		ctx.Request.Header.SetCookie("SnakeAlive", "3259306991")

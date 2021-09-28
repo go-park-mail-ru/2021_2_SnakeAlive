@@ -3,10 +3,10 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"snakealive/m/http"
 
 	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
+	"snakealive/m/http"
 )
 
 func Router() *router.Router {
@@ -43,6 +43,8 @@ func main() {
 	fmt.Println("starting server at :8080")
 
 	r := Router()
+
+	//ss := http_a.NewSessionServer(storage.NewUserSyncStorage())
 
 	if err := fasthttp.ListenAndServe(":8080", corsMiddleware(r.Handler)); err != nil {
 		fmt.Println("failed to start server:", err)
