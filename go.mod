@@ -19,6 +19,7 @@ require (
 )
 
 require github.com/savsgio/gotils v0.0.0-20210907153846-c06938798b52 // indirect
+
 require (
 	github.com/savsgio/gotils v0.0.0-20210907153846-c06938798b52 // indirect
 	github.com/stretchr/testify v1.7.0

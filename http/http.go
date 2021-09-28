@@ -127,3 +127,23 @@ func PlacesList(ctx *fasthttp.RequestCtx) {
 
 	ctx.Write(bytes)
 }
+
+func Profile(ctx *fasthttp.RequestCtx) {
+	if !CheckCookie(ctx) {
+		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
+		return
+	}
+
+	ctx.SetStatusCode(fasthttp.StatusOK)
+
+	user := DB.CookieDB[string(ctx.Request.Header.Cookie(CookieName))]
+	response := ent.UserJSON{Name: user.Name, Surname: user.Surname}
+	bytes, err := json.Marshal(response)
+	if err != nil {
+		log.Printf("error while marshalling JSON: %s", err)
+		ctx.Write([]byte("{}"))
+		return
+	}
+
+	ctx.Write(bytes)
+}
