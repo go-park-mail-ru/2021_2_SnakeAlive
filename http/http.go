@@ -117,13 +117,9 @@ func Registration(ctx *fasthttp.RequestCtx) {
 }
 
 func PlacesList(ctx *fasthttp.RequestCtx) {
-	if !CheckCookie(ctx) {
-		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
-		return
-	}
-
 	param, _ := ctx.UserValue("name").(string)
 	if _, found := DB.PlacesDB[param]; !found {
+		log.Printf("country nor found")
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
 		return
 	}
