@@ -60,17 +60,11 @@ func TestPlacesList(t *testing.T) {
 
 	tests := []test{
 		{"Russia", fasthttp.StatusOK},
+		{"Nicaragua", fasthttp.StatusOK},
 		{"Germany", fasthttp.StatusNotFound},
 	}
 	var c fasthttp.RequestCtx
 	ctx := (*fasthttp.RequestCtx)(&c)
-
-	ctx.Request.AppendBody([]byte(`{"name": "name2", "surname": "surname2", "email": "alex@mail.ru", "password": "password"}`))
-	Login(ctx)
-	assert.Equal(t, fasthttp.StatusOK, ctx.Response.Header.StatusCode())
-
-	PlacesList(ctx)
-	assert.Equal(t, fasthttp.StatusUnauthorized, ctx.Response.Header.StatusCode())
 
 	for _, tc := range tests {
 		ctx.Request.Header.SetCookie("SnakeAlive", "3259306991")
