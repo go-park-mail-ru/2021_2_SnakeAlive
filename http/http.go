@@ -8,6 +8,7 @@ import (
 	DB "snakealive/m/storage"
 	"snakealive/m/validate"
 	"strconv"
+	"time"
 
 	"github.com/valyala/fasthttp"
 )
@@ -29,6 +30,18 @@ func SetCookie(ctx *fasthttp.RequestCtx, cookie string, user ent.User) {
 	ctx.Response.Header.SetCookie(&c)
 
 	DB.CookieDB[cookie] = user
+}
+
+func DeleteCookie(ctx *fasthttp.RequestCtx, cookie string) {
+	var c fasthttp.Cookie
+	c.SetKey(CookieName)
+	c.SetValue("")
+	c.SetMaxAge(0)
+	c.SetExpire(time.Now().Add(-1))
+	c.SetSameSite(fasthttp.CookieSameSiteStrictMode)
+	ctx.Response.Header.SetCookie(&c)
+
+	delete(DB.CookieDB, cookie)
 }
 
 func SetToken(ctx *fasthttp.RequestCtx, hash string) {
@@ -146,4 +159,14 @@ func Profile(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.Write(bytes)
+}
+
+func Logout(ctx *fasthttp.RequestCtx) {
+	if !CheckCookie(ctx) {
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	ctx.SetStatusCode(fasthttp.StatusOK)
+	DeleteCookie(ctx, string(ctx.Request.Header.Cookie(CookieName)))
 }
