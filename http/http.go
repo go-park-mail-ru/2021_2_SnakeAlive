@@ -2,23 +2,17 @@ package http
 
 import (
 	"encoding/json"
-	"hash/fnv"
+	"fmt"
 	"log"
 	ent "snakealive/m/entities"
 	DB "snakealive/m/storage"
-	"strconv"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/valyala/fasthttp"
 )
 
 const CookieName = "SnakeAlive"
-
-func Hash(s string) string {
-	h := fnv.New32a()
-	h.Write([]byte(s))
-	return strconv.FormatUint(uint64(h.Sum32()), 10)
-}
 
 func SetCookie(ctx *fasthttp.RequestCtx, cookie string, user ent.User) {
 	var c fasthttp.Cookie
@@ -72,6 +66,12 @@ func Login(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
+	if !user.Validate() {
+		log.Printf("error while validate user:")
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
 	if _, found := DB.AuthDB[user.Email]; !found {
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
 		return
@@ -84,8 +84,9 @@ func Login(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	SetCookie(ctx, Hash(user.Email), DB.AuthDB[user.Email])
-	SetToken(ctx, Hash(user.Email))
+	с := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
+	SetCookie(ctx, с, DB.AuthDB[user.Email])
+	SetToken(ctx, с)
 }
 
 func Registration(ctx *fasthttp.RequestCtx) {
@@ -111,8 +112,9 @@ func Registration(ctx *fasthttp.RequestCtx) {
 	DB.AuthDB[user.Email] = *user
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	SetCookie(ctx, Hash(user.Email), DB.AuthDB[user.Email])
-	SetToken(ctx, Hash(user.Email))
+	с := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
+	SetCookie(ctx, с, DB.AuthDB[user.Email])
+	SetToken(ctx, с)
 }
 
 func PlacesList(ctx *fasthttp.RequestCtx) {

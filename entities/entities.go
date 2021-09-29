@@ -1,5 +1,9 @@
 package entities
 
+import (
+	"regexp"
+)
+
 type User struct {
 	Name     string `json:"name"`
 	Surname  string `json:"surname"`
@@ -8,10 +12,14 @@ type User struct {
 }
 
 func (u *User) Validate() bool {
-	if u.Email == "" {
+	ok, err := regexp.Match(`^\w+[.\w]+@\w+[.\w]+$`, []byte(u.Email))
+	if err != nil {
 		return false
 	}
-	if u.Password == "" {
+	if !ok || u.Email == "" {
+		return false
+	}
+	if len(u.Password) < 8 || u.Password == "" {
 		return false
 	}
 	return true

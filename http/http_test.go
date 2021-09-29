@@ -20,10 +20,11 @@ func TestLogin(t *testing.T) {
 			fasthttp.StatusNotFound},
 		{(`{"name": "name2", "surname": "surname2", "email": "alex@mail.ru", "password": "xxxxxxxx"}`),
 			fasthttp.StatusBadRequest},
+		{(`{"name": "name2", "surname": "surname2", "email": "alexmail.ru", "password": "xxxxxxxx"}`),
+			fasthttp.StatusBadRequest},
 		{(`xxxxx`), fasthttp.StatusBadRequest},
 	}
-	var c fasthttp.RequestCtx
-	ctx := (*fasthttp.RequestCtx)(&c)
+	ctx := &fasthttp.RequestCtx{}
 
 	for _, tc := range tests {
 		ctx.Request.SetBody(nil)
@@ -35,18 +36,21 @@ func TestLogin(t *testing.T) {
 
 func TestRegister(t *testing.T) {
 	tests := []test{
-		{(`{"name": "name2", "surname": "surname2", "email": "asdf@mail.ru", "password": "pass"}`),
+		{(`{"name": "name2", "surname": "surname2", "email": "asdf@mail.ru", "password": "12345678"}`),
 			fasthttp.StatusOK},
-		{(`{"name": "name2", "surname": "surname2", "email": "alex@mail.ru", "password": "pass"}`),
+		{(`{"name": "name2", "surname": "surname2", "email": "alex@mail.ru", "password": "12345678"}`),
 			fasthttp.StatusBadRequest},
 		{(`{"name": "name2", "surname": "surname2", "email": "alex@mail.ru", "xxxxx": "xxxxxxxx"}`),
 			fasthttp.StatusBadRequest},
 		{(`{"name": "name2", "surname": "surname2", "xxxx": "alex@mail.ru", "password": "xxxxxxxx"}`),
 			fasthttp.StatusBadRequest},
+		{(`{"name": "name2", "surname": "surname2", "xxxx": "alex@mail.ru", "password": "1234567"}`),
+			fasthttp.StatusBadRequest},
+		{(`{"name": "name2", "surname": "surname2", "xxxx": "alexmail.ru", "password": "1234567"}`),
+			fasthttp.StatusBadRequest},
 		{(`xxxxx`), fasthttp.StatusBadRequest},
 	}
-	var c fasthttp.RequestCtx
-	ctx := (*fasthttp.RequestCtx)(&c)
+	ctx := &fasthttp.RequestCtx{}
 
 	for _, tc := range tests {
 		ctx.Request.SetBody(nil)
@@ -63,8 +67,7 @@ func TestPlacesList(t *testing.T) {
 		{"Nicaragua", fasthttp.StatusOK},
 		{"Germany", fasthttp.StatusNotFound},
 	}
-	var c fasthttp.RequestCtx
-	ctx := (*fasthttp.RequestCtx)(&c)
+	ctx := &fasthttp.RequestCtx{}
 
 	for _, tc := range tests {
 		ctx.Request.Header.SetCookie("SnakeAlive", "3259306991")
