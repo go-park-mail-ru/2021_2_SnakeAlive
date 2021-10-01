@@ -19,6 +19,7 @@ func SetCookie(ctx *fasthttp.RequestCtx, cookie string, user ent.User) {
 	c.SetKey(CookieName)
 	c.SetValue(cookie)
 	c.SetMaxAge(36000)
+	c.SetHTTPOnly(true)
 	c.SetSameSite(fasthttp.CookieSameSiteStrictMode)
 	ctx.Response.Header.SetCookie(&c)
 

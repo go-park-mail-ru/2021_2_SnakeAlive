@@ -19,7 +19,7 @@ func (u *User) Validate() bool {
 	if !ok || u.Email == "" {
 		return false
 	}
-	if len(u.Password) < 8 || u.Password == "" {
+	if len(u.Password) < 8 || u.Password == "" || len(u.Password) > 254 || len(u.Email) > 254 {
 		return false
 	}
 	return true

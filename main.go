@@ -25,7 +25,7 @@ func corsMiddleware(handler func(ctx *fasthttp.RequestCtx)) func(ctx *fasthttp.R
 		ctx.Response.Header.Set("Access-Control-Allow-Origin", "http://194.58.104.204") // set domain
 		ctx.Response.Header.Set("Content-Type", "application/json; charset=utf8")
 		ctx.Response.Header.Set("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
-		ctx.Response.Header.Set("Access-Control-Allow-Headers", "Origin, Content-Type, Authorization, Request-ID")
+		ctx.Response.Header.Set("Access-Control-Allow-Headers", "Origin, Content-Type")
 		ctx.Response.Header.Set("Access-Control-Expose-Headers", "Authorization")
 		ctx.Response.Header.Set("Access-Control-Allow-Credentials", "true")
 		ctx.Response.Header.Set("Access-Control-Max-Age", "3600")
