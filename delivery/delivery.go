@@ -14,25 +14,12 @@ import (
 
 const CookieName = "SnakeAlive"
 
-///////////
-
-// type userHandler struct {
-// 	usecase user.Usecase
-// }
-
-// func NewUserHandler(us user.Usecase) {
-// 	handler := userHandler{usecase: us}
-// }
-
-///////////
-
 type SessionServer interface {
 	Login(ctx *fasthttp.RequestCtx)
 	Registration(ctx *fasthttp.RequestCtx)
 }
 
 type sessionServer struct {
-	//userStorage domain.UserStorage
 	usecase domain.Usecase
 }
 
@@ -53,13 +40,11 @@ func (s *sessionServer) Login(ctx *fasthttp.RequestCtx) {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
-	//DB.AuthDB[user.Email]
 	u, found := s.usecase.Get(user.Email)
 	if !found {
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
 		return
 	}
-	//password := DB.AuthDB[user.Email].Password
 
 	if u.Password != user.Password {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
@@ -93,6 +78,7 @@ func (s *sessionServer) Registration(ctx *fasthttp.RequestCtx) {
 		return
 	}
 	u = *user
+	s.usecase.Add(u.Email, u)
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	с := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
 	SetCookie(ctx, с, u)

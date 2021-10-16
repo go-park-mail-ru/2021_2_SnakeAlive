@@ -56,6 +56,7 @@ func (u *userStorage) Get(key string) (value User, exist bool) {
 
 type Usecase interface {
 	Get(key string) (User, bool)
+	Add(key string, value User)
 }
 
 // type UserUsecase interface {
