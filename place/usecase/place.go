@@ -1,4 +1,4 @@
-package usecase
+package placeUseCase
 
 import (
 	"snakealive/m/domain"

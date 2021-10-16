@@ -1,7 +1,8 @@
-package repository
+package placeRepository
 
 import (
 	"snakealive/m/domain"
+	ent "snakealive/m/entities"
 	"sync"
 )
 
@@ -12,7 +13,7 @@ type placeStorage struct {
 
 func NewPlaceStorage() domain.PlaceStorage {
 	return &placeStorage{
-		dataHolder: PlacesDB,
+		dataHolder: ent.PlacesDB,
 		mu:         &sync.RWMutex{},
 	}
 }

@@ -1,7 +1,8 @@
-package repository
+package userRepository
 
 import (
 	"snakealive/m/domain"
+	ent "snakealive/m/entities"
 	"sync"
 )
 
@@ -13,7 +14,7 @@ type userStorage struct {
 
 func NewUserStorage() domain.UserStorage {
 	return &userStorage{
-		dataHolder: AuthDB,
+		dataHolder: ent.AuthDB,
 		mu:         &sync.RWMutex{},
 	}
 }
