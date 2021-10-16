@@ -1,13 +1,15 @@
-package domain
+package repository
 
-var AuthDB = map[string]User{
+import "snakealive/m/domain"
+
+var AuthDB = map[string]domain.User{
 	"alex@mail.ru":   {Name: "Александра", Surname: "Волынец", Email: "alex@mail.ru", Password: "password"},
 	"nikita@mail.ru": {Name: "Никита", Surname: "Черных", Email: "nikita@mail.ru", Password: "frontend123"},
 	"ksenia@mail.ru": {Name: "Ксения", Surname: "Самойлова", Email: "ksenia@mail.ru", Password: "12345678"},
 	"andrew@mail.ru": {Name: "Андрей", Surname: "Кравцов", Email: "andrew@mail.ru", Password: "000111000"},
 }
 
-var PlacesDB = map[string][]Place{
+var PlacesDB = map[string][]domain.Place{
 	"Russia": {
 		{
 			Name: "Собор Василия Блаженного", Tags: []string{"Церкви и соборы"},
@@ -64,4 +66,4 @@ var PlacesDB = map[string][]Place{
 	},
 }
 
-var CookieDB = map[string]User{}
+var CookieDB = map[string]domain.User{}

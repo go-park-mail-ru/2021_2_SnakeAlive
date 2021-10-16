@@ -7,3 +7,11 @@ type Place struct {
 	Author string   `json:"author"`
 	Review string   `json:"review"`
 }
+
+type PlaceStorage interface {
+	Get(name string) (value []Place, exist bool)
+}
+
+type PlaceUseCase interface {
+	Get(key string) ([]Place, bool)
+}

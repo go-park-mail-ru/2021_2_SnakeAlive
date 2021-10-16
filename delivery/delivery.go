@@ -6,6 +6,8 @@ import (
 	"log"
 	"regexp"
 	"snakealive/m/domain"
+	"snakealive/m/entities"
+	"snakealive/m/repository"
 	"time"
 
 	"github.com/google/uuid"
@@ -17,14 +19,19 @@ const CookieName = "SnakeAlive"
 type SessionServer interface {
 	Login(ctx *fasthttp.RequestCtx)
 	Registration(ctx *fasthttp.RequestCtx)
+	PlacesList(ctx *fasthttp.RequestCtx)
 }
 
 type sessionServer struct {
-	usecase domain.Usecase
+	UserUseCase  domain.UserUseCase
+	PlaceUseCase domain.PlaceUseCase
 }
 
-func NewSessionServer(userCase domain.Usecase) SessionServer {
-	return &sessionServer{usecase: userCase}
+func NewSessionServer(UserUseCase domain.UserUseCase, PlaceUseCase domain.PlaceUseCase) SessionServer {
+	return &sessionServer{
+		UserUseCase:  UserUseCase,
+		PlaceUseCase: PlaceUseCase,
+	}
 }
 
 func (s *sessionServer) Login(ctx *fasthttp.RequestCtx) {
@@ -40,7 +47,9 @@ func (s *sessionServer) Login(ctx *fasthttp.RequestCtx) {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
-	u, found := s.usecase.Get(user.Email)
+	u, found := s.UserUseCase.Get(user.Email)
+
+	u = *user
 	if !found {
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
 		return
@@ -71,14 +80,14 @@ func (s *sessionServer) Registration(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	u, found := s.usecase.Get(user.Email)
+	u, found := s.UserUseCase.Get(user.Email)
 	if found {
 		log.Printf("User with this email already exists")
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
 	u = *user
-	s.usecase.Add(u.Email, u)
+	s.UserUseCase.Add(u)
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	с := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
 	SetCookie(ctx, с, u)
@@ -100,56 +109,56 @@ func Validate(u *domain.User) bool {
 	return true
 }
 
-// func PlacesList(ctx *fasthttp.RequestCtx) {
-// 	param, _ := ctx.UserValue("name").(string)
-// 	if _, found := DB.PlacesDB[param]; !found {
-// 		log.Printf("country not found")
-// 		ctx.SetStatusCode(fasthttp.StatusNotFound)
-// 		return
-// 	}
+func (s *sessionServer) PlacesList(ctx *fasthttp.RequestCtx) {
+	param, _ := ctx.UserValue("name").(string)
+	if _, found := s.PlaceUseCase.Get(param); !found {
+		log.Printf("country not found")
+		ctx.SetStatusCode(fasthttp.StatusNotFound)
+		return
+	}
 
-// 	ctx.SetStatusCode(fasthttp.StatusOK)
+	ctx.SetStatusCode(fasthttp.StatusOK)
 
-// 	response := DB.PlacesDB[param]
-// 	bytes, err := json.Marshal(response)
-// 	if err != nil {
-// 		log.Printf("error while marshalling JSON: %s", err)
-// 		ctx.Write([]byte("{}"))
-// 		return
-// 	}
+	response, _ := s.PlaceUseCase.Get(param)
+	bytes, err := json.Marshal(response)
+	if err != nil {
+		log.Printf("error while marshalling JSON: %s", err)
+		ctx.Write([]byte("{}"))
+		return
+	}
 
-// 	ctx.Write(bytes)
-// }
+	ctx.Write(bytes)
+}
 
-// func Profile(ctx *fasthttp.RequestCtx) {
-// 	if !CheckCookie(ctx) {
-// 		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
-// 		return
-// 	}
+func Profile(ctx *fasthttp.RequestCtx) {
+	if !CheckCookie(ctx) {
+		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
+		return
+	}
 
-// 	ctx.SetStatusCode(fasthttp.StatusOK)
+	ctx.SetStatusCode(fasthttp.StatusOK)
 
-// 	user := DB.CookieDB[string(ctx.Request.Header.Cookie(CookieName))]
-// 	response := ent.User{Name: user.Name, Surname: user.Surname}
-// 	bytes, err := json.Marshal(response)
-// 	if err != nil {
-// 		log.Printf("error while marshalling JSON: %s", err)
-// 		ctx.Write([]byte("{}"))
-// 		return
-// 	}
+	user := repository.CookieDB[string(ctx.Request.Header.Cookie(CookieName))]
+	response := domain.User{Name: user.Name, Surname: user.Surname}
+	bytes, err := json.Marshal(response)
+	if err != nil {
+		log.Printf("error while marshalling JSON: %s", err)
+		ctx.Write([]byte("{}"))
+		return
+	}
 
-// 	ctx.Write(bytes)
-// }
+	ctx.Write(bytes)
+}
 
-// func Logout(ctx *fasthttp.RequestCtx) {
-// 	if !CheckCookie(ctx) {
-// 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
-// 		return
-// 	}
+func Logout(ctx *fasthttp.RequestCtx) {
+	if !CheckCookie(ctx) {
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
 
-// 	ctx.SetStatusCode(fasthttp.StatusOK)
-// 	DeleteCookie(ctx, string(ctx.Request.Header.Cookie(CookieName)))
-// }
+	ctx.SetStatusCode(fasthttp.StatusOK)
+	DeleteCookie(ctx, string(ctx.Request.Header.Cookie(CookieName)))
+}
 
 func SetCookie(ctx *fasthttp.RequestCtx, cookie string, user domain.User) {
 	var c fasthttp.Cookie
@@ -160,7 +169,7 @@ func SetCookie(ctx *fasthttp.RequestCtx, cookie string, user domain.User) {
 	c.SetSameSite(fasthttp.CookieSameSiteStrictMode)
 	ctx.Response.Header.SetCookie(&c)
 
-	domain.CookieDB[cookie] = user
+	repository.CookieDB[cookie] = user
 }
 
 func DeleteCookie(ctx *fasthttp.RequestCtx, cookie string) {
@@ -172,11 +181,11 @@ func DeleteCookie(ctx *fasthttp.RequestCtx, cookie string) {
 	c.SetSameSite(fasthttp.CookieSameSiteStrictMode)
 	ctx.Response.Header.SetCookie(&c)
 
-	delete(domain.CookieDB, cookie)
+	delete(repository.CookieDB, cookie)
 }
 
 func SetToken(ctx *fasthttp.RequestCtx, hash string) {
-	t := domain.Token{Token: hash}
+	t := entities.Token{Token: hash}
 	bytes, err := json.Marshal(t)
 
 	if err != nil {
@@ -189,7 +198,7 @@ func SetToken(ctx *fasthttp.RequestCtx, hash string) {
 }
 
 func CheckCookie(ctx *fasthttp.RequestCtx) bool {
-	if _, found := domain.CookieDB[string(ctx.Request.Header.Cookie(CookieName))]; !found {
+	if _, found := repository.CookieDB[string(ctx.Request.Header.Cookie(CookieName))]; !found {
 		return false
 	}
 	return true

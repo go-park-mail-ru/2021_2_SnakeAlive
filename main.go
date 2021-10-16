@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"snakealive/m/delivery"
-	"snakealive/m/domain"
+	"snakealive/m/repository"
 	"snakealive/m/usecase"
 
 	"github.com/fasthttp/router"
@@ -16,7 +16,7 @@ func Router(ss delivery.SessionServer) *router.Router {
 	r := router.New()
 	r.POST("/login", ss.Login)
 	r.POST("/register", ss.Registration)
-	// r.GET("/country/{name}", delivery.PlacesList)
+	r.GET("/country/{name}", ss.PlacesList)
 	// r.GET("/profile", delivery.Profile)
 	// r.DELETE("/logout", delivery.Logout)
 	return r
@@ -45,8 +45,9 @@ func main() {
 	fmt.Println("starting server at :8080")
 
 	//userhttp.NewUserHandler(e, usecase.NewUserUsecase(repository.NewUserMemoryRepository()))
-
-	r := Router(delivery.NewSessionServer(usecase.NewUseCase(domain.NewUserStorage())))
+	userL := usecase.NewUserUseCase(repository.NewUserStorage())
+	placeL := usecase.NewPlaceUseCase(repository.NewPlaceStorage())
+	r := Router(delivery.NewSessionServer(userL, placeL))
 
 	if err := fasthttp.ListenAndServe(":8080", corsMiddleware(r.Handler)); err != nil {
 		fmt.Println("failed to start server:", err)
