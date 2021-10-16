@@ -3,20 +3,22 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"snakealive/m/http"
+	"snakealive/m/delivery"
+	"snakealive/m/domain"
+	"snakealive/m/usecase"
 
 	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
 )
 
-func Router() *router.Router {
-	r := router.New()
+func Router(ss delivery.SessionServer) *router.Router {
 
-	r.POST("/login", http.Login)
-	r.POST("/register", http.Registration)
-	r.GET("/country/{name}", http.PlacesList)
-	r.GET("/profile", http.Profile)
-	r.DELETE("/logout", http.Logout)
+	r := router.New()
+	r.POST("/login", ss.Login)
+	r.POST("/register", ss.Registration)
+	// r.GET("/country/{name}", delivery.PlacesList)
+	// r.GET("/profile", delivery.Profile)
+	// r.DELETE("/logout", delivery.Logout)
 	return r
 }
 
@@ -42,7 +44,9 @@ func corsMiddleware(handler func(ctx *fasthttp.RequestCtx)) func(ctx *fasthttp.R
 func main() {
 	fmt.Println("starting server at :8080")
 
-	r := Router()
+	//userhttp.NewUserHandler(e, usecase.NewUserUsecase(repository.NewUserMemoryRepository()))
+
+	r := Router(delivery.NewSessionServer(usecase.NewUseCase(domain.NewUserStorage())))
 
 	if err := fasthttp.ListenAndServe(":8080", corsMiddleware(r.Handler)); err != nil {
 		fmt.Println("failed to start server:", err)

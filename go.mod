@@ -2,7 +2,7 @@ module snakealive/m
 
 go 1.17
 
-require github.com/valyala/fasthttp v1.30.0
+require github.com/valyala/fasthttp v1.31.0
 
 require (
 	github.com/andybalholm/brotli v1.0.2 // indirect

@@ -1,15 +1,13 @@
-package storage
+package domain
 
-import ent "snakealive/m/entities"
-
-var AuthDB = map[string]ent.User{
+var AuthDB = map[string]User{
 	"alex@mail.ru":   {Name: "Александра", Surname: "Волынец", Email: "alex@mail.ru", Password: "password"},
 	"nikita@mail.ru": {Name: "Никита", Surname: "Черных", Email: "nikita@mail.ru", Password: "frontend123"},
 	"ksenia@mail.ru": {Name: "Ксения", Surname: "Самойлова", Email: "ksenia@mail.ru", Password: "12345678"},
 	"andrew@mail.ru": {Name: "Андрей", Surname: "Кравцов", Email: "andrew@mail.ru", Password: "000111000"},
 }
 
-var PlacesDB = map[string][]ent.Place{
+var PlacesDB = map[string][]Place{
 	"Russia": {
 		{
 			Name: "Собор Василия Блаженного", Tags: []string{"Церкви и соборы"},
@@ -66,4 +64,4 @@ var PlacesDB = map[string][]ent.Place{
 	},
 }
 
-var CookieDB = map[string]ent.User{}
+var CookieDB = map[string]User{}
