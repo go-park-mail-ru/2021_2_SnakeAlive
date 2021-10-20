@@ -41,3 +41,10 @@ func (u *userStorage) Get(key string) (value domain.User, exist bool) {
 	value, exist = u.dataHolder[key]
 	return
 }
+
+func (u *userStorage) Update(key string, value domain.User) {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+
+	u.dataHolder[key] = value
+}
