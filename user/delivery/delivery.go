@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"regexp"
 	"snakealive/m/domain"
 	ent "snakealive/m/entities"
 	"time"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/fasthttp/router"
 	"github.com/google/uuid"
 	"github.com/valyala/fasthttp"
@@ -43,8 +43,10 @@ func (s *userHandler) Login(ctx *fasthttp.RequestCtx) {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
-	if !Validate(user) {
-		log.Printf("error while validate user:")
+
+	valid := validateLogin(user)
+	if !valid {
+		log.Printf("error while validating user")
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
@@ -75,15 +77,17 @@ func (s *userHandler) Registration(ctx *fasthttp.RequestCtx) {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
-	if !Validate(user) {
-		log.Printf("error while validate user:")
+
+	_, err := govalidator.ValidateStruct(user)
+	if err != nil {
+		log.Printf("error while validating user")
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
 
 	u, found := s.UserUseCase.Get(user.Email)
 	if found {
-		log.Printf("User with this email already exists")
+		log.Printf("user with this email already exists")
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
@@ -125,21 +129,6 @@ func (s *userHandler) Logout(ctx *fasthttp.RequestCtx) {
 	DeleteCookie(ctx, string(ctx.Request.Header.Cookie(CookieName)))
 }
 
-func Validate(u *domain.User) bool {
-	ok, err := regexp.Match(`^\w+[.\w]+@\w+[.\w]+$`, []byte(u.Email))
-
-	if err != nil {
-		return false
-	}
-	if !ok || u.Email == "" {
-		return false
-	}
-	if len(u.Password) < 8 || u.Password == "" || len(u.Password) > 254 || len(u.Email) > 254 {
-		return false
-	}
-	return true
-}
-
 func SetCookie(ctx *fasthttp.RequestCtx, cookie string, user domain.User) {
 	var c fasthttp.Cookie
 	c.SetKey(CookieName)
@@ -179,6 +168,14 @@ func SetToken(ctx *fasthttp.RequestCtx, hash string) {
 
 func CheckCookie(ctx *fasthttp.RequestCtx) bool {
 	if _, found := ent.CookieDB[string(ctx.Request.Header.Cookie(CookieName))]; !found {
+		return false
+	}
+	return true
+}
+
+func validateLogin(user *domain.User) bool {
+	if !govalidator.IsEmail(user.Email) || !govalidator.StringLength(user.Password, "8", "254") ||
+		!govalidator.MaxStringLength(user.Email, "254") {
 		return false
 	}
 	return true

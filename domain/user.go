@@ -1,10 +1,10 @@
 package domain
 
 type User struct {
-	Name     string `json:"name"`
-	Surname  string `json:"surname"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Name     string `json:"name" valid:"required,alpha"`
+	Surname  string `json:"surname" valid:"required,alpha"`
+	Email    string `json:"email" valid:"required,email,maxstringlength(254)"`
+	Password string `json:"password" valid:"required,stringlength(8|254)"`
 }
 
 type UserStorage interface {

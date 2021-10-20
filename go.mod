@@ -23,6 +23,7 @@ require github.com/savsgio/gotils v0.0.0-20210907153846-c06938798b52 // indirect
 require github.com/stretchr/testify v1.7.0
 
 require (
+	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
