@@ -8,8 +8,7 @@ import (
 
 type userStorage struct {
 	dataHolder map[string]domain.User
-
-	mu *sync.RWMutex
+	mu         *sync.RWMutex
 }
 
 func NewUserStorage() domain.UserStorage {

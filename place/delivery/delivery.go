@@ -5,6 +5,7 @@ import (
 	"log"
 	"snakealive/m/domain"
 
+	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
 )
 
@@ -18,10 +19,10 @@ type placeHandler struct {
 	PlaceUseCase domain.PlaceUseCase
 }
 
-func NewPlaceHandler(PlaceUseCase domain.PlaceUseCase) PlaceHandler {
-	return &placeHandler{
-		PlaceUseCase: PlaceUseCase,
-	}
+func NewPlaceHandler(PlaceUseCase domain.PlaceUseCase, r *router.Router) {
+	placeHandler := placeHandler{PlaceUseCase: PlaceUseCase}
+
+	r.GET("/country/{name}", placeHandler.PlacesList)
 }
 
 func (s *placeHandler) PlacesList(ctx *fasthttp.RequestCtx) {

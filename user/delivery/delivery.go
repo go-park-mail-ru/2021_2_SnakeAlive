@@ -9,6 +9,7 @@ import (
 	ent "snakealive/m/entities"
 	"time"
 
+	"github.com/fasthttp/router"
 	"github.com/google/uuid"
 	"github.com/valyala/fasthttp"
 )
@@ -26,10 +27,13 @@ type userHandler struct {
 	UserUseCase domain.UserUseCase
 }
 
-func NewUserHandler(UserUseCase domain.UserUseCase) UserHandler {
-	return &userHandler{
-		UserUseCase: UserUseCase,
-	}
+func NewUserHandler(UserUseCase domain.UserUseCase, r *router.Router) {
+	userHandler := userHandler{UserUseCase: UserUseCase}
+
+	r.POST("/login", userHandler.Login)
+	r.POST("/register", userHandler.Registration)
+	r.GET("/profile", userHandler.Profile)
+	r.DELETE("/logout", userHandler.Logout)
 }
 
 func (s *userHandler) Login(ctx *fasthttp.RequestCtx) {
