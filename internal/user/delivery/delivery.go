@@ -60,6 +60,7 @@ func (s *userHandler) Login(ctx *fasthttp.RequestCtx) {
 	if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {
 		log.Printf("error while unmarshalling JSON: %s", err)
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		fmt.Println("!found")
 		return
 	}
 
@@ -70,18 +71,16 @@ func (s *userHandler) Login(ctx *fasthttp.RequestCtx) {
 		return
 	}
 	u, found := s.UserUseCase.Get(user.Email)
-
-	u = *user
+	fmt.Println(u.Password, user.Password)
 	if !found {
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
 		return
 	}
-
 	if u.Password != user.Password {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
-
+	fmt.Println(u.Password, user.Password)
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	с := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
 	SetCookie(ctx, с, u)
