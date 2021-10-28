@@ -1,50 +1,88 @@
 package userRepository
 
 import (
+	"context"
+	"fmt"
 	"snakealive/m/domain"
-	ent "snakealive/m/entities"
-	"sync"
+
+	pgxpool "github.com/jackc/pgx/v4/pgxpool"
 )
 
 type userStorage struct {
-	dataHolder map[string]domain.User
-	mu         *sync.RWMutex
+	dataHolder *pgxpool.Pool
 }
 
-func NewUserStorage() domain.UserStorage {
-	return &userStorage{
-		dataHolder: ent.AuthDB,
-		mu:         &sync.RWMutex{},
+func NewUserStorage(DB *pgxpool.Pool) domain.UserStorage {
+	return &userStorage{dataHolder: DB}
+}
+
+func (u *userStorage) Add(value domain.User) error {
+	conn, err := u.dataHolder.Acquire(context.Background())
+	if err != nil {
+		fmt.Printf("Connection error while adding user ", err)
+		return err
 	}
+	defer conn.Release()
+
+	_, err = conn.Exec(context.Background(),
+		`INSERT INTO Users ("name", "surname", "password", "email") VALUES ($1, $2, $3, $4)`,
+		value.Name,
+		value.Surname,
+		value.Password,
+		value.Email,
+	)
+	return err
 }
 
-func (u *userStorage) Add(key string, value domain.User) {
-	u.mu.Lock()
-	defer u.mu.Unlock()
-
-	u.dataHolder[key] = value
-}
-
-func (u *userStorage) Delete(key string) {
-	u.mu.Lock()
-	defer u.mu.Unlock()
-
-	if _, exist := u.dataHolder[key]; exist {
-		delete(u.dataHolder, key)
+func (u *userStorage) Delete(id int) error {
+	conn, err := u.dataHolder.Acquire(context.Background())
+	if err != nil {
+		fmt.Printf("Connection error while adding user ", err)
+		return err
 	}
+	defer conn.Release()
+
+	_, err = conn.Exec(context.Background(),
+		`DELETE FROM Users WHERE id = $1`,
+		id,
+	)
+	return err
 }
 
-func (u *userStorage) Get(key string) (value domain.User, exist bool) {
-	u.mu.RLock()
-	defer u.mu.RUnlock()
+func (u *userStorage) Get(key string) (value domain.User, err error) {
+	var user domain.User
 
-	value, exist = u.dataHolder[key]
-	return
+	conn, err := u.dataHolder.Acquire(context.Background())
+	if err != nil {
+		fmt.Printf("Error while adding user")
+		return user, err
+	}
+	defer conn.Release()
+
+	err = conn.QueryRow(context.Background(),
+		`SELECT id, name, surname, password, email
+		FROM Users WHERE email = $1`,
+		key,
+	).Scan(&user.Id, &user.Name, &user.Surname, &user.Password, &user.Email)
+
+	return user, err
 }
 
-func (u *userStorage) Update(key string, value domain.User) {
-	u.mu.Lock()
-	defer u.mu.Unlock()
+func (u *userStorage) Update(id int, value domain.User) error {
+	conn, err := u.dataHolder.Acquire(context.Background())
+	if err != nil {
+		fmt.Printf("Connection error while adding user ", err)
+		return err
+	}
+	defer conn.Release()
 
-	u.dataHolder[key] = value
+	_, err = conn.Exec(context.Background(),
+		`UPDATE Users SET "name" = $1, "surname" = $2, "email" = $3, "password" = $4 WHERE id = $5`,
+		value.Name,
+		value.Surname,
+		value.Email,
+		value.Password,
+		id,
+	)
+	return err
 }

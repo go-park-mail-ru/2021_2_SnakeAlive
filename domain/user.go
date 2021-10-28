@@ -1,6 +1,7 @@
 package domain
 
 type User struct {
+	Id       int    `json:"-"`
 	Name     string `json:"name" valid:"required,alpha"`
 	Surname  string `json:"surname" valid:"required,alpha"`
 	Email    string `json:"email" valid:"required,email,maxstringlength(254)"`
@@ -8,15 +9,15 @@ type User struct {
 }
 
 type UserStorage interface {
-	Add(key string, value User)
-	Get(key string) (value User, exist bool)
-	Delete(key string)
-	Update(key string, value User)
+	Add(value User) error
+	Get(key string) (value User, err error)
+	Delete(id int) error
+	Update(id int, value User) error
 }
 
 type UserUseCase interface {
-	Get(key string) (User, bool)
-	Add(user User)
-	Delete(key string)
-	Update(currentUser User, updatedUser User) bool
+	Add(user User) error
+	Get(key string) (value User, err error)
+	Delete(id int) error
+	Update(currentUser User, updatedUser User) error
 }

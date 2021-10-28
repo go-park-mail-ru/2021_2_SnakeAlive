@@ -1,6 +1,7 @@
 package userUseCase
 
 import (
+	"errors"
 	"snakealive/m/domain"
 )
 
@@ -12,26 +13,24 @@ type userUseCase struct {
 	userStorage domain.UserStorage
 }
 
-func (u userUseCase) Get(key string) (domain.User, bool) {
+func (u userUseCase) Get(key string) (value domain.User, err error) {
 	return u.userStorage.Get(key)
 }
 
-func (u userUseCase) Add(user domain.User) {
-	u.userStorage.Add(user.Email, user)
+func (u userUseCase) Add(user domain.User) error {
+	return u.userStorage.Add(user)
 }
 
-func (u userUseCase) Update(currentUser domain.User, updatedUser domain.User) bool {
-	/*
-		user, err := u.Get(updatedUser.Email)
-		if !err && user.id != currentUser.id {
-			return false
-		}
-	*/
+func (u userUseCase) Update(currentUser domain.User, updatedUser domain.User) error {
 
-	u.userStorage.Update(currentUser.Email, updatedUser)
-	return true
+	user, err := u.Get(updatedUser.Email)
+	if err == nil && user.Id != currentUser.Id {
+		return errors.New("user with this email already exists") // change later
+	}
+
+	return u.userStorage.Update(currentUser.Id, updatedUser)
 }
 
-func (u userUseCase) Delete(key string) {
-	u.userStorage.Delete(key)
+func (u userUseCase) Delete(id int) error {
+	return u.userStorage.Delete(id)
 }
