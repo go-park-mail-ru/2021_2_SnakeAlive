@@ -14,11 +14,15 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-func Router() *router.Router {
+func Router(user interface{}, place interface{}) *router.Router {
 	r := router.New()
-	ud.NewUserHandler(uu.NewUserUseCase(ur.NewUserStorage()), r)
-	pd.NewPlaceHandler(pu.NewPlaceUseCase(pr.NewPlaceStorage()), r)
-
+	userHandler := user.(ud.UserHandler)
+	placeHandler := place.(pd.PlaceHandler)
+	r.POST("/login", userHandler.Login)
+	r.POST("/register", userHandler.Registration)
+	r.GET("/country/{name}", placeHandler.PlacesList)
+	r.GET("/profile", userHandler.Profile)
+	r.DELETE("/logout", userHandler.Logout)
 	return r
 }
 
@@ -43,8 +47,9 @@ func corsMiddleware(handler func(ctx *fasthttp.RequestCtx)) func(ctx *fasthttp.R
 
 func main() {
 	fmt.Println("starting server at :8080")
-
-	r := Router()
+	userLayer := ud.NewUserHandler(uu.NewUserUseCase(ur.NewUserStorage()))
+	placeLayer := pd.NewPlaceHandler(pu.NewPlaceUseCase(pr.NewPlaceStorage()))
+	r := Router(userLayer, placeLayer)
 
 	if err := fasthttp.ListenAndServe(":8080", corsMiddleware(r.Handler)); err != nil {
 		fmt.Println("failed to start server:", err)
