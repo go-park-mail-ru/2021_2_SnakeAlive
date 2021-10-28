@@ -1,8 +1,8 @@
 package placeRepository
 
 import (
-	"snakealive/m/domain"
-	ent "snakealive/m/entities"
+	ent "snakealive/m/internal/entities"
+	"snakealive/m/pkg/domain"
 	"sync"
 )
 

@@ -3,26 +3,17 @@ package main
 import (
 	"bytes"
 	"fmt"
-	pd "snakealive/m/place/delivery"
-	pr "snakealive/m/place/repository"
-	pu "snakealive/m/place/usecase"
-	ud "snakealive/m/user/delivery"
-	ur "snakealive/m/user/repository"
-	uu "snakealive/m/user/usecase"
+	pd "snakealive/m/internal/place/delivery"
+	ud "snakealive/m/internal/user/delivery"
 
 	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
 )
 
-func Router(user interface{}, place interface{}) *router.Router {
+func SetUpRouter() *router.Router {
 	r := router.New()
-	userHandler := user.(ud.UserHandler)
-	placeHandler := place.(pd.PlaceHandler)
-	r.POST("/login", userHandler.Login)
-	r.POST("/register", userHandler.Registration)
-	r.GET("/country/{name}", placeHandler.PlacesList)
-	r.GET("/profile", userHandler.Profile)
-	r.DELETE("/logout", userHandler.Logout)
+	r = ud.SetUpUserRouter(r)
+	r = pd.SetUpPlaceRouter(r)
 	return r
 }
 
@@ -47,9 +38,8 @@ func corsMiddleware(handler func(ctx *fasthttp.RequestCtx)) func(ctx *fasthttp.R
 
 func main() {
 	fmt.Println("starting server at :8080")
-	userLayer := ud.NewUserHandler(uu.NewUserUseCase(ur.NewUserStorage()))
-	placeLayer := pd.NewPlaceHandler(pu.NewPlaceUseCase(pr.NewPlaceStorage()))
-	r := Router(userLayer, placeLayer)
+
+	r := SetUpRouter()
 
 	if err := fasthttp.ListenAndServe(":8080", corsMiddleware(r.Handler)); err != nil {
 		fmt.Println("failed to start server:", err)

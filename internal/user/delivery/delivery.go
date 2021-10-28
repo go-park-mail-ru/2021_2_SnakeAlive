@@ -4,11 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"snakealive/m/domain"
-	ent "snakealive/m/entities"
+	ent "snakealive/m/internal/entities"
+	cnst "snakealive/m/pkg/constants"
+	"snakealive/m/pkg/domain"
 	"time"
 
+	ur "snakealive/m/internal/user/repository"
+	uu "snakealive/m/internal/user/usecase"
+
 	"github.com/asaskevich/govalidator"
+	"github.com/fasthttp/router"
 	"github.com/google/uuid"
 	"github.com/valyala/fasthttp"
 )
@@ -31,6 +36,21 @@ func NewUserHandler(UserUseCase domain.UserUseCase) UserHandler {
 		UserUseCase: UserUseCase,
 	}
 }
+
+func CreateDelivery() UserHandler {
+	userLayer := NewUserHandler(uu.NewUserUseCase(ur.NewUserStorage()))
+	return userLayer
+}
+
+func SetUpUserRouter(r *router.Router) *router.Router {
+	userHandler := CreateDelivery()
+	r.POST(cnst.LOGIN, userHandler.Login)
+	r.POST(cnst.REGISTER, userHandler.Registration)
+	r.GET(cnst.PROFILE, userHandler.Profile)
+	r.DELETE(cnst.LOGOUT, userHandler.Logout)
+	return r
+}
+
 func (s *userHandler) Login(ctx *fasthttp.RequestCtx) {
 	user := new(domain.User)
 	if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {

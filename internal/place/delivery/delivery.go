@@ -3,8 +3,13 @@ package placeDelivery
 import (
 	"encoding/json"
 	"log"
-	"snakealive/m/domain"
+	"snakealive/m/pkg/domain"
 
+	pr "snakealive/m/internal/place/repository"
+	pu "snakealive/m/internal/place/usecase"
+	cnst "snakealive/m/pkg/constants"
+
+	"github.com/fasthttp/router"
 	"github.com/valyala/fasthttp"
 )
 
@@ -22,6 +27,17 @@ func NewPlaceHandler(PlaceUseCase domain.PlaceUseCase) PlaceHandler {
 	return &placeHandler{
 		PlaceUseCase: PlaceUseCase,
 	}
+}
+
+func CreateDelivery() PlaceHandler {
+	placeLayer := NewPlaceHandler(pu.NewPlaceUseCase(pr.NewPlaceStorage()))
+	return placeLayer
+}
+
+func SetUpPlaceRouter(r *router.Router) *router.Router {
+	placeHandler := CreateDelivery()
+	r.GET(cnst.COUNTRY, placeHandler.PlacesList)
+	return r
 }
 
 func (s *placeHandler) PlacesList(ctx *fasthttp.RequestCtx) {

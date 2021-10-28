@@ -1,7 +1,7 @@
 package constants
 
 var LOGIN = "/login"
-var REFISTER = "/register"
+var REGISTER = "/register"
 var PROFILE = "/profile"
 var LOGOUT = "/logout"
 
