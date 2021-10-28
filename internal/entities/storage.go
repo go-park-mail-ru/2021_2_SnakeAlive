@@ -1,6 +1,6 @@
 package entities
 
-import "snakealive/m/domain"
+import "snakealive/m/pkg/domain"
 
 var AuthDB = map[string]domain.User{
 	"alex@mail.ru":   {Name: "Александра", Surname: "Волынец", Email: "alex@mail.ru", Password: "password"},

@@ -1,7 +1,7 @@
 package userUseCase
 
 import (
-	"snakealive/m/domain"
+	"snakealive/m/pkg/domain"
 )
 
 func NewUserUseCase(userStorage domain.UserStorage) domain.UserUseCase {

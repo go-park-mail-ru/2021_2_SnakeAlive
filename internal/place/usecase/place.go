@@ -1,7 +1,7 @@
 package placeUseCase
 
 import (
-	"snakealive/m/domain"
+	"snakealive/m/pkg/domain"
 )
 
 type PlaceUseCase interface {
