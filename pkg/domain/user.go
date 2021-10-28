@@ -11,9 +11,12 @@ type UserStorage interface {
 	Add(key string, value User)
 	Get(key string) (value User, exist bool)
 	Delete(key string)
+	Update(key string, value User)
 }
 
 type UserUseCase interface {
 	Get(key string) (User, bool)
 	Add(user User)
+	Delete(key string)
+	Update(currentUser User, updatedUser User) bool
 }

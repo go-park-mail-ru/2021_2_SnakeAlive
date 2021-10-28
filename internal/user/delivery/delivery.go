@@ -23,8 +23,10 @@ const CookieName = "SnakeAlive"
 type UserHandler interface {
 	Login(ctx *fasthttp.RequestCtx)
 	Registration(ctx *fasthttp.RequestCtx)
-	Profile(ctx *fasthttp.RequestCtx)
 	Logout(ctx *fasthttp.RequestCtx)
+	GetProfile(ctx *fasthttp.RequestCtx)
+	UpdateProfile(ctx *fasthttp.RequestCtx)
+	DeleteProfile(ctx *fasthttp.RequestCtx)
 }
 
 type userHandler struct {
@@ -46,7 +48,9 @@ func SetUpUserRouter(r *router.Router) *router.Router {
 	userHandler := CreateDelivery()
 	r.POST(cnst.LOGIN, userHandler.Login)
 	r.POST(cnst.REGISTER, userHandler.Registration)
-	r.GET(cnst.PROFILE, userHandler.Profile)
+	r.GET(cnst.PROFILE, userHandler.GetProfile)
+	r.PATCH(cnst.PROFILE, userHandler.UpdateProfile)
+	r.DELETE(cnst.PROFILE, userHandler.DeleteProfile)
 	r.DELETE(cnst.LOGOUT, userHandler.Logout)
 	return r
 }
@@ -114,7 +118,7 @@ func (s *userHandler) Registration(ctx *fasthttp.RequestCtx) {
 	SetToken(ctx, с)
 }
 
-func (s *userHandler) Profile(ctx *fasthttp.RequestCtx) {
+func (s *userHandler) GetProfile(ctx *fasthttp.RequestCtx) {
 	if !CheckCookie(ctx) {
 		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
 		return
@@ -132,6 +136,58 @@ func (s *userHandler) Profile(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.Write(bytes)
+}
+
+func (s *userHandler) UpdateProfile(ctx *fasthttp.RequestCtx) {
+	if !CheckCookie(ctx) {
+		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
+		return
+	}
+
+	updatedUser := new(domain.User)
+	if err := json.Unmarshal(ctx.PostBody(), &updatedUser); err != nil {
+		log.Printf("error while unmarshalling JSON: %s", err)
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	_, err := govalidator.ValidateStruct(updatedUser)
+	if err != nil {
+		log.Printf("error while validating user")
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	currentUser := ent.CookieDB[string(ctx.Request.Header.Cookie(CookieName))]
+
+	if !s.UserUseCase.Update(currentUser, *updatedUser) {
+		log.Printf("user with this email already exists")
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	ctx.SetStatusCode(fasthttp.StatusOK)
+	bytes, err := json.Marshal(updatedUser)
+	if err != nil {
+		log.Printf("error while marshalling JSON: %s", err)
+		ctx.Write([]byte("{}"))
+		return
+	}
+
+	ctx.Write(bytes)
+}
+
+func (s *userHandler) DeleteProfile(ctx *fasthttp.RequestCtx) {
+	if !CheckCookie(ctx) {
+		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
+		return
+	}
+
+	ctx.SetStatusCode(fasthttp.StatusOK)
+
+	user := ent.CookieDB[string(ctx.Request.Header.Cookie(CookieName))]
+	s.UserUseCase.Delete(user.Email)
+	DeleteCookie(ctx, string(ctx.Request.Header.Cookie(CookieName)))
 }
 
 func (s *userHandler) Logout(ctx *fasthttp.RequestCtx) {
