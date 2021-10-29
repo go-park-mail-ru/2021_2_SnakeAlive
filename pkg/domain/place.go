@@ -8,10 +8,12 @@ type Place struct {
 	Review string   `json:"review"`
 }
 
+type Places []Place
+
 type PlaceStorage interface {
-	Get(name string) (value []Place, exist bool)
+	Get(name string) (value Places, exist bool)
 }
 
 type PlaceUseCase interface {
-	Get(key string) ([]Place, bool)
+	Get(key string) (Places, bool)
 }

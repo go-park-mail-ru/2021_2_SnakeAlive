@@ -9,7 +9,7 @@ var AuthDB = map[string]domain.User{
 	"andrew@mail.ru": {Name: "Андрей", Surname: "Кравцов", Email: "andrew@mail.ru", Password: "000111000"},
 }
 
-var PlacesDB = map[string][]domain.Place{
+var PlacesDB = map[string]domain.Places{
 	"Russia": {
 		{
 			Name: "Собор Василия Блаженного", Tags: []string{"Церкви и соборы"},

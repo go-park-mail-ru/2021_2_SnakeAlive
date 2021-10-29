@@ -7,7 +7,7 @@ import (
 )
 
 type placeStorage struct {
-	dataHolder map[string][]domain.Place
+	dataHolder map[string]domain.Places
 	mu         *sync.RWMutex
 }
 
@@ -18,7 +18,7 @@ func NewPlaceStorage() domain.PlaceStorage {
 	}
 }
 
-func (u *placeStorage) Get(key string) (value []domain.Place, exist bool) {
+func (u *placeStorage) Get(key string) (value domain.Places, exist bool) {
 	u.mu.RLock()
 	defer u.mu.RUnlock()
 
