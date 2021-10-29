@@ -1,8 +1,10 @@
 package userUseCase
 
 import (
+	"encoding/json"
 	"errors"
 	"log"
+	ent "snakealive/m/internal/entities"
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/domain"
 
@@ -87,4 +89,63 @@ func (u userUseCase) Registration(user *domain.User) (int, error) {
 	}
 
 	return fasthttp.StatusOK, err
+}
+
+func (u userUseCase) GetProfile(hash string) (int, []byte) {
+	id := u.getIdByCookie(hash)
+	foundUser, err := u.GetById(id)
+	if err != nil {
+		return fasthttp.StatusNotFound, nil
+	}
+
+	response := map[string]string{"name": foundUser.Name, "surname": foundUser.Surname}
+	bytes, err := json.Marshal(response)
+	if err != nil {
+		log.Printf("error while marshalling JSON: %s", err)
+		return fasthttp.StatusOK, []byte("{}")
+	}
+	return fasthttp.StatusOK, bytes
+}
+
+func (u userUseCase) getIdByCookie(hash string) int {
+	return ent.CookieDB[hash]
+}
+
+func (u userUseCase) UpdateProfile(updatedUser *domain.User, hash string) (int, []byte) {
+	_, err := govalidator.ValidateStruct(updatedUser)
+	if err != nil {
+		log.Printf("error while validating user")
+		return fasthttp.StatusBadRequest, nil
+	}
+
+	id := u.getIdByCookie(hash)
+	foundUser, err := u.GetById(id)
+	if err != nil {
+		return fasthttp.StatusNotFound, nil
+	}
+
+	if err = u.Update(foundUser.Id, *updatedUser); err != nil {
+		log.Printf("user with this email already exists")
+		return fasthttp.StatusBadRequest, nil
+	}
+
+	response := map[string]string{"name": updatedUser.Name, "surname": updatedUser.Surname, "email": updatedUser.Email}
+	bytes, err := json.Marshal(response)
+	if err != nil {
+		log.Printf("error while marshalling JSON: %s", err)
+		return fasthttp.StatusOK, []byte("{}")
+	}
+
+	return fasthttp.StatusOK, bytes
+}
+
+func (u userUseCase) DeliteProfile(hash string) int {
+	id := u.getIdByCookie(hash)
+	foundUser, err := u.GetById(id)
+	if err != nil {
+		return fasthttp.StatusNotFound
+	}
+	u.Delete(foundUser.Id)
+
+	return fasthttp.StatusOK
 }

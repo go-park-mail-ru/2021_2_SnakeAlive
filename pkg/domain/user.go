@@ -25,4 +25,7 @@ type UserUseCase interface {
 	Validate(user *User) bool
 	Login(user *User) (int, error)
 	Registration(user *User) (int, error)
+	GetProfile(hash string) (int, []byte)
+	UpdateProfile(updatedUser *User, hash string) (int, []byte)
+	DeliteProfile(hash string) int
 }

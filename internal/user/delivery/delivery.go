@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	ent "snakealive/m/internal/entities"
 	cnst "snakealive/m/pkg/constants"
 	chttp "snakealive/m/pkg/customhttp"
 	"snakealive/m/pkg/domain"
@@ -12,7 +11,6 @@ import (
 	ur "snakealive/m/internal/user/repository"
 	uu "snakealive/m/internal/user/usecase"
 
-	"github.com/asaskevich/govalidator"
 	"github.com/fasthttp/router"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -100,23 +98,10 @@ func (s *userHandler) GetProfile(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	ctx.SetStatusCode(fasthttp.StatusOK)
+	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
+	code, bytes := s.UserUseCase.GetProfile(hash)
 
-	id := ent.CookieDB[string(ctx.Request.Header.Cookie(cnst.CookieName))]
-	foundUser, err := s.UserUseCase.GetById(id)
-	if err != nil {
-		ctx.SetStatusCode(fasthttp.StatusNotFound)
-		return
-	}
-
-	response := map[string]string{"name": foundUser.Name, "surname": foundUser.Surname}
-	bytes, err := json.Marshal(response)
-	if err != nil {
-		log.Printf("error while marshalling JSON: %s", err)
-		ctx.Write([]byte("{}"))
-		return
-	}
-
+	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
 }
 
@@ -133,36 +118,9 @@ func (s *userHandler) UpdateProfile(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	_, err := govalidator.ValidateStruct(updatedUser)
-	if err != nil {
-		log.Printf("error while validating user")
-		ctx.SetStatusCode(fasthttp.StatusBadRequest)
-		return
-	}
-
-	id := ent.CookieDB[string(ctx.Request.Header.Cookie(cnst.CookieName))]
-	foundUser, err := s.UserUseCase.GetById(id)
-	if err != nil {
-		ctx.SetStatusCode(fasthttp.StatusNotFound)
-		return
-	}
-
-	if err = s.UserUseCase.Update(foundUser.Id, *updatedUser); err != nil {
-		log.Printf("user with this email already exists")
-		ctx.SetStatusCode(fasthttp.StatusBadRequest)
-		return
-	}
-
-	ctx.SetStatusCode(fasthttp.StatusOK)
-
-	response := map[string]string{"name": updatedUser.Name, "surname": updatedUser.Surname, "email": updatedUser.Email}
-	bytes, err := json.Marshal(response)
-	if err != nil {
-		log.Printf("error while marshalling JSON: %s", err)
-		ctx.Write([]byte("{}"))
-		return
-	}
-
+	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
+	code, bytes := s.UserUseCase.UpdateProfile(updatedUser, hash)
+	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
 }
 
@@ -172,16 +130,8 @@ func (s *userHandler) DeleteProfile(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	ctx.SetStatusCode(fasthttp.StatusOK)
-
-	id := ent.CookieDB[string(ctx.Request.Header.Cookie(cnst.CookieName))]
-	foundUser, err := s.UserUseCase.GetById(id)
-	if err != nil {
-		ctx.SetStatusCode(fasthttp.StatusNotFound)
-		return
-	}
-
-	s.UserUseCase.Delete(foundUser.Id)
+	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
+	s.UserUseCase.DeliteProfile(hash)
 	chttp.DeleteCookie(ctx, string(ctx.Request.Header.Cookie(cnst.CookieName)))
 }
 
