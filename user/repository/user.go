@@ -49,7 +49,7 @@ func (u *userStorage) Delete(id int) error {
 	return err
 }
 
-func (u *userStorage) Get(key string) (value domain.User, err error) {
+func (u *userStorage) GetByEmail(key string) (value domain.User, err error) {
 	var user domain.User
 
 	conn, err := u.dataHolder.Acquire(context.Background())
@@ -63,6 +63,25 @@ func (u *userStorage) Get(key string) (value domain.User, err error) {
 		`SELECT id, name, surname, password, email
 		FROM Users WHERE email = $1`,
 		key,
+	).Scan(&user.Id, &user.Name, &user.Surname, &user.Password, &user.Email)
+
+	return user, err
+}
+
+func (u *userStorage) GetById(id int) (value domain.User, err error) {
+	var user domain.User
+
+	conn, err := u.dataHolder.Acquire(context.Background())
+	if err != nil {
+		fmt.Printf("Error while adding user")
+		return user, err
+	}
+	defer conn.Release()
+
+	err = conn.QueryRow(context.Background(),
+		`SELECT id, name, surname, password, email
+		FROM Users WHERE id = $1`,
+		id,
 	).Scan(&user.Id, &user.Name, &user.Surname, &user.Password, &user.Email)
 
 	return user, err

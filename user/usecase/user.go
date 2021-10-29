@@ -13,22 +13,26 @@ type userUseCase struct {
 	userStorage domain.UserStorage
 }
 
-func (u userUseCase) Get(key string) (value domain.User, err error) {
-	return u.userStorage.Get(key)
+func (u userUseCase) GetByEmail(key string) (value domain.User, err error) {
+	return u.userStorage.GetByEmail(key)
+}
+
+func (u userUseCase) GetById(id int) (value domain.User, err error) {
+	return u.userStorage.GetById(id)
 }
 
 func (u userUseCase) Add(user domain.User) error {
 	return u.userStorage.Add(user)
 }
 
-func (u userUseCase) Update(currentUser domain.User, updatedUser domain.User) error {
+func (u userUseCase) Update(id int, updatedUser domain.User) error {
 
-	user, err := u.Get(updatedUser.Email)
-	if err == nil && user.Id != currentUser.Id {
+	user, err := u.GetByEmail(updatedUser.Email)
+	if err == nil && user.Id != id {
 		return errors.New("user with this email already exists") // change later
 	}
 
-	return u.userStorage.Update(currentUser.Id, updatedUser)
+	return u.userStorage.Update(id, updatedUser)
 }
 
 func (u userUseCase) Delete(id int) error {

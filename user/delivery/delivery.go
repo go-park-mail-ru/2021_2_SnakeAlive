@@ -54,23 +54,21 @@ func (s *userHandler) Login(ctx *fasthttp.RequestCtx) {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
-	u, err := s.UserUseCase.Get(user.Email)
-	fmt.Printf("%v\n", u)
 
-	//u = *user
+	foundUser, err := s.UserUseCase.GetByEmail(user.Email)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
 		return
 	}
 
-	if u.Password != user.Password {
+	if foundUser.Password != user.Password {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	с := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
-	SetCookie(ctx, с, u)
+	SetCookie(ctx, с, foundUser.Id)
 	SetToken(ctx, с)
 }
 
@@ -90,19 +88,19 @@ func (s *userHandler) Registration(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	u, err := s.UserUseCase.Get(user.Email)
+	_, err = s.UserUseCase.GetByEmail(user.Email)
 	if err == nil {
 		log.Printf("user with this email already exists")
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
-	u = *user
-	s.UserUseCase.Add(u)
+
+	s.UserUseCase.Add(*user)
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	с := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
 
-	u, _ = s.UserUseCase.Get(u.Email)
-	SetCookie(ctx, с, u)
+	newUser, _ := s.UserUseCase.GetByEmail(user.Email)
+	SetCookie(ctx, с, newUser.Id)
 	SetToken(ctx, с)
 }
 
@@ -114,9 +112,14 @@ func (s *userHandler) GetProfile(ctx *fasthttp.RequestCtx) {
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
 
-	user := ent.CookieDB[string(ctx.Request.Header.Cookie(CookieName))]
-	fmt.Printf("%v\n", user)
-	response := domain.User{Name: user.Name, Surname: user.Surname}
+	id := ent.CookieDB[string(ctx.Request.Header.Cookie(CookieName))]
+	foundUser, err := s.UserUseCase.GetById(id)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusNotFound)
+		return
+	}
+
+	response := map[string]string{"name": foundUser.Name, "surname": foundUser.Surname}
 	bytes, err := json.Marshal(response)
 	if err != nil {
 		log.Printf("error while marshalling JSON: %s", err)
@@ -147,16 +150,23 @@ func (s *userHandler) UpdateProfile(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	currentUser := ent.CookieDB[string(ctx.Request.Header.Cookie(CookieName))]
+	id := ent.CookieDB[string(ctx.Request.Header.Cookie(CookieName))]
+	foundUser, err := s.UserUseCase.GetById(id)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusNotFound)
+		return
+	}
 
-	if err := s.UserUseCase.Update(currentUser, *updatedUser); err == nil {
+	if err = s.UserUseCase.Update(foundUser.Id, *updatedUser); err != nil {
 		log.Printf("user with this email already exists")
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	bytes, err := json.Marshal(updatedUser)
+
+	response := map[string]string{"name": updatedUser.Name, "surname": updatedUser.Surname, "email": updatedUser.Email}
+	bytes, err := json.Marshal(response)
 	if err != nil {
 		log.Printf("error while marshalling JSON: %s", err)
 		ctx.Write([]byte("{}"))
@@ -174,8 +184,14 @@ func (s *userHandler) DeleteProfile(ctx *fasthttp.RequestCtx) {
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
 
-	user := ent.CookieDB[string(ctx.Request.Header.Cookie(CookieName))]
-	s.UserUseCase.Delete(user.Id)
+	id := ent.CookieDB[string(ctx.Request.Header.Cookie(CookieName))]
+	foundUser, err := s.UserUseCase.GetById(id)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusNotFound)
+		return
+	}
+
+	s.UserUseCase.Delete(foundUser.Id)
 	DeleteCookie(ctx, string(ctx.Request.Header.Cookie(CookieName)))
 }
 
@@ -189,7 +205,7 @@ func (s *userHandler) Logout(ctx *fasthttp.RequestCtx) {
 	DeleteCookie(ctx, string(ctx.Request.Header.Cookie(CookieName)))
 }
 
-func SetCookie(ctx *fasthttp.RequestCtx, cookie string, user domain.User) {
+func SetCookie(ctx *fasthttp.RequestCtx, cookie string, id int) {
 	var c fasthttp.Cookie
 	c.SetKey(CookieName)
 	c.SetValue(cookie)
@@ -197,8 +213,7 @@ func SetCookie(ctx *fasthttp.RequestCtx, cookie string, user domain.User) {
 	c.SetHTTPOnly(true)
 	c.SetSameSite(fasthttp.CookieSameSiteStrictMode)
 	ctx.Response.Header.SetCookie(&c)
-	fmt.Printf("SET COOKIE %v\n", user)
-	ent.CookieDB[cookie] = user
+	ent.CookieDB[cookie] = id
 }
 
 func DeleteCookie(ctx *fasthttp.RequestCtx, cookie string) {

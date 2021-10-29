@@ -10,14 +10,16 @@ type User struct {
 
 type UserStorage interface {
 	Add(value User) error
-	Get(key string) (value User, err error)
+	GetById(id int) (value User, err error)
+	GetByEmail(key string) (value User, err error)
 	Delete(id int) error
 	Update(id int, value User) error
 }
 
 type UserUseCase interface {
 	Add(user User) error
-	Get(key string) (value User, err error)
+	GetById(id int) (value User, err error)
+	GetByEmail(key string) (value User, err error)
 	Delete(id int) error
-	Update(currentUser User, updatedUser User) error
+	Update(id int, updatedUser User) error
 }
