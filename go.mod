@@ -1,6 +1,6 @@
 module snakealive/m
 
-go 1.17
+go 1.16
 
 require github.com/valyala/fasthttp v1.31.0
 
@@ -18,7 +18,18 @@ require (
 	golang.org/x/text v0.3.6 // indirect
 )
 
-require github.com/savsgio/gotils v0.0.0-20210907153846-c06938798b52 // indirect
+require (
+	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
+	github.com/jackc/pgconn v1.10.0 // indirect
+	github.com/jackc/pgio v1.0.0 // indirect
+	github.com/jackc/pgpassfile v1.0.0 // indirect
+	github.com/jackc/pgproto3/v2 v2.1.1 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
+	github.com/jackc/pgtype v1.8.1 // indirect
+	github.com/jackc/pgx/v4 v4.13.0 // indirect
+	github.com/jackc/puddle v1.1.3 // indirect
+	github.com/savsgio/gotils v0.0.0-20210907153846-c06938798b52 // indirect
+)
 
 require github.com/stretchr/testify v1.7.0
 

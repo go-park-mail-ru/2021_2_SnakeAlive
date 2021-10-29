@@ -1,8 +1,8 @@
 package constants
 
-var LOGIN = "/login"
-var REGISTER = "/register"
-var PROFILE = "/profile"
-var LOGOUT = "/logout"
+const LoginURL = "/login"
+const RegisterURL = "/register"
+const ProfileURL = "/profile"
+const LogoutURL = "/logout"
 
-var COUNTRY = "/country/{name}"
+const CountryURL = "/country/{name}"

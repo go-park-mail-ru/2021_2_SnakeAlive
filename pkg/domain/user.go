@@ -1,22 +1,28 @@
 package domain
 
 type User struct {
-	Name     string `json:"name" valid:"required,alpha"`
-	Surname  string `json:"surname" valid:"required,alpha"`
+	Id       int    `json:"-"`
+	Name     string `json:"name" valid:"required"`
+	Surname  string `json:"surname" valid:"required"`
 	Email    string `json:"email" valid:"required,email,maxstringlength(254)"`
 	Password string `json:"password" valid:"required,stringlength(8|254)"`
 }
 
 type UserStorage interface {
-	Add(key string, value User)
-	Get(key string) (value User, exist bool)
-	Delete(key string)
-	Update(key string, value User)
+	Add(value User) error
+	GetById(id int) (value User, err error)
+	GetByEmail(key string) (value User, err error)
+	Delete(id int) error
+	Update(id int, value User) error
 }
 
 type UserUseCase interface {
-	Get(key string) (User, bool)
-	Add(user User)
-	Delete(key string)
-	Update(currentUser User, updatedUser User) bool
+	Add(user User) error
+	GetById(id int) (value User, err error)
+	GetByEmail(key string) (value User, err error)
+	Delete(id int) error
+	Update(id int, updatedUser User) error
+	Validate(user *User) bool
+	Login(user *User) (int, error)
+	Registration(user *User) (int, error)
 }

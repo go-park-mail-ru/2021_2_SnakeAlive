@@ -10,6 +10,7 @@ import (
 	cnst "snakealive/m/pkg/constants"
 
 	"github.com/fasthttp/router"
+	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/valyala/fasthttp"
 )
 
@@ -29,14 +30,14 @@ func NewPlaceHandler(PlaceUseCase domain.PlaceUseCase) PlaceHandler {
 	}
 }
 
-func CreateDelivery() PlaceHandler {
+func CreateDelivery(db *pgxpool.Pool) PlaceHandler {
 	placeLayer := NewPlaceHandler(pu.NewPlaceUseCase(pr.NewPlaceStorage()))
 	return placeLayer
 }
 
-func SetUpPlaceRouter(r *router.Router) *router.Router {
-	placeHandler := CreateDelivery()
-	r.GET(cnst.COUNTRY, placeHandler.PlacesList)
+func SetUpPlaceRouter(db *pgxpool.Pool, r *router.Router) *router.Router {
+	placeHandler := CreateDelivery(db)
+	r.GET(cnst.CountryURL, placeHandler.PlacesList)
 	return r
 }
 

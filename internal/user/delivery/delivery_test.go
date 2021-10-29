@@ -1,8 +1,12 @@
 package userDelivery
 
 import (
+	"context"
+	"fmt"
+	"os"
 	"testing"
 
+	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"github.com/valyala/fasthttp"
 )
@@ -10,6 +14,17 @@ import (
 type test struct {
 	input string
 	want  int
+}
+
+func SetUpDB() *pgxpool.Pool {
+	url := "postgres://tripadvisor:12345@localhost:5432/tripadvisor"
+	dbpool, err := pgxpool.Connect(context.Background(), url)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		os.Exit(1)
+	}
+	defer dbpool.Close()
+	return dbpool
 }
 
 func Test_Login_Success_HttpResponseCode(t *testing.T) {
@@ -28,7 +43,7 @@ func Test_Login_Success_HttpResponseCode(t *testing.T) {
 	for _, tc := range tests {
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.input))
-		userHandler := CreateDelivery()
+		userHandler := CreateDelivery(SetUpDB())
 		userHandler.Login(ctx)
 		assert.Equal(t, tc.want, ctx.Response.Header.StatusCode())
 	}
@@ -54,7 +69,7 @@ func Test_Login_False_HttpResponseCode(t *testing.T) {
 	for _, tc := range tests {
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.input))
-		userHandler := CreateDelivery()
+		userHandler := CreateDelivery(SetUpDB())
 		userHandler.Login(ctx)
 		assert.Equal(t, tc.want, ctx.Response.Header.StatusCode())
 	}
@@ -77,7 +92,7 @@ func Test_Register_Fail_HttpResponseCode(t *testing.T) {
 	for _, tc := range tests {
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.input))
-		userHandler := CreateDelivery()
+		userHandler := CreateDelivery(SetUpDB())
 		userHandler.Registration(ctx)
 		assert.Equal(t, tc.want, ctx.Response.Header.StatusCode())
 	}
@@ -95,7 +110,7 @@ func Test_Register_Success_HttpResponseCode(t *testing.T) {
 	for _, tc := range tests {
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.input))
-		userHandler := CreateDelivery()
+		userHandler := CreateDelivery(SetUpDB())
 		userHandler.Registration(ctx)
 		assert.Equal(t, tc.want, ctx.Response.Header.StatusCode())
 	}
