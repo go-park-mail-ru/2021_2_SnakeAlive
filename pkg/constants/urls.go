@@ -6,3 +6,4 @@ const ProfileURL = "/profile"
 const LogoutURL = "/logout"
 
 const CountryURL = "/country/{name}"
+const SightURL = "/sight/{id}"

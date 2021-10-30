@@ -1,9 +1,8 @@
 package placeDelivery
 
 import (
-	"encoding/json"
-	"log"
 	"snakealive/m/pkg/domain"
+	"strconv"
 
 	pr "snakealive/m/internal/place/repository"
 	pu "snakealive/m/internal/place/usecase"
@@ -17,7 +16,8 @@ import (
 const CookieName = "SnakeAlive"
 
 type PlaceHandler interface {
-	PlacesList(ctx *fasthttp.RequestCtx)
+	PlacesByCountry(ctx *fasthttp.RequestCtx)
+	Place(ctx *fasthttp.RequestCtx)
 }
 
 type placeHandler struct {
@@ -31,18 +31,19 @@ func NewPlaceHandler(PlaceUseCase domain.PlaceUseCase) PlaceHandler {
 }
 
 func CreateDelivery(db *pgxpool.Pool) PlaceHandler {
-	placeLayer := NewPlaceHandler(pu.NewPlaceUseCase(pr.NewPlaceStorage()))
+	placeLayer := NewPlaceHandler(pu.NewPlaceUseCase(pr.NewPlaceStorage(db)))
 	return placeLayer
 }
 
 func SetUpPlaceRouter(db *pgxpool.Pool, r *router.Router) *router.Router {
 	placeHandler := CreateDelivery(db)
-	r.GET(cnst.CountryURL, placeHandler.PlacesList)
+	r.GET(cnst.CountryURL, placeHandler.PlacesByCountry)
+	r.GET(cnst.SightURL, placeHandler.Place)
 	return r
 }
 
-func (s *placeHandler) PlacesList(ctx *fasthttp.RequestCtx) {
-	param, _ := ctx.UserValue("name").(string)
+func (s *placeHandler) PlacesByCountry(ctx *fasthttp.RequestCtx) {
+	/*param, _ := ctx.UserValue("name").(string)
 	if _, found := s.PlaceUseCase.Get(param); !found {
 		log.Printf("country not found")
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
@@ -59,5 +60,19 @@ func (s *placeHandler) PlacesList(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
+	ctx.Write(bytes)*/
+}
+
+func (s *placeHandler) Place(ctx *fasthttp.RequestCtx) {
+	param, _ := strconv.Atoi(ctx.UserValue("id").(string))
+
+	sight, err := s.PlaceUseCase.GetById(param)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusNotFound)
+		return
+	}
+
+	code, bytes := s.PlaceUseCase.GetSight(sight)
+	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
 }

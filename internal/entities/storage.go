@@ -1,7 +1,6 @@
 package entities
 
-import "snakealive/m/pkg/domain"
-
+/*
 var AuthDB = map[string]domain.User{
 	"alex@mail.ru":   {Name: "Александра", Surname: "Волынец", Email: "alex@mail.ru", Password: "password"},
 	"nikita@mail.ru": {Name: "Никита", Surname: "Черных", Email: "nikita@mail.ru", Password: "frontend123"},
@@ -66,4 +65,5 @@ var PlacesDB = map[string]domain.Places{
 	},
 }
 
-//var CookieDB = map[string]int{} // string - cookie hash; int - user id
+var CookieDB = map[string]int{} // string - cookie hash; int - user id
+*/

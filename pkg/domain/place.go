@@ -1,19 +1,21 @@
 package domain
 
 type Place struct {
-	Name   string   `json:"name"`
-	Tags   []string `json:"tags"`
-	Photos []string `json:"photos"`
-	Author string   `json:"author"`
-	Review string   `json:"review"`
+	Id          int      `json:"id"`
+	Name        string   `json:"name"`
+	Country     string   `json:"country"`
+	Rating      float32  `json:"rating"`
+	Tags        []string `json:"tags"`
+	Description string   `json:"description"`
 }
 
 type Places []Place
 
 type PlaceStorage interface {
-	Get(name string) (value Places, exist bool)
+	GetById(id int) (value Place, err error)
 }
 
 type PlaceUseCase interface {
-	Get(key string) (Places, bool)
+	GetById(id int) (value Place, err error)
+	GetSight(sight Place) (int, []byte)
 }

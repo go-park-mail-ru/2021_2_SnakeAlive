@@ -1,27 +1,36 @@
 package placeRepository
 
 import (
-	ent "snakealive/m/internal/entities"
+	"context"
+	"fmt"
 	"snakealive/m/pkg/domain"
-	"sync"
+
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type placeStorage struct {
-	dataHolder map[string]domain.Places
-	mu         *sync.RWMutex
+	dataHolder *pgxpool.Pool
 }
 
-func NewPlaceStorage() domain.PlaceStorage {
-	return &placeStorage{
-		dataHolder: ent.PlacesDB,
-		mu:         &sync.RWMutex{},
+func NewPlaceStorage(DB *pgxpool.Pool) domain.PlaceStorage {
+	return &placeStorage{dataHolder: DB}
+}
+
+func (u *placeStorage) GetById(id int) (value domain.Place, err error) {
+	var sight domain.Place
+
+	conn, err := u.dataHolder.Acquire(context.Background())
+	if err != nil {
+		fmt.Printf("Error while getting sight")
+		return sight, err
 	}
-}
+	defer conn.Release()
 
-func (u *placeStorage) Get(key string) (value domain.Places, exist bool) {
-	u.mu.RLock()
-	defer u.mu.RUnlock()
+	err = conn.QueryRow(context.Background(),
+		`SELECT id, name, country, rating, tags, description
+		FROM Places WHERE id = $1`,
+		id,
+	).Scan(&sight.Id, &sight.Name, &sight.Country, &sight.Rating, &sight.Tags, &sight.Description)
 
-	value, exist = u.dataHolder[key]
-	return
+	return sight, err
 }
