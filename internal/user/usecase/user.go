@@ -82,7 +82,7 @@ func (u userUseCase) Registration(user *domain.User) (int, error) {
 	}
 
 	err = u.Add(*user)
-	if err == nil {
+	if err != nil {
 		log.Printf("error while adding user")
 		return fasthttp.StatusBadRequest, err
 	}

@@ -60,7 +60,6 @@ func (s *userHandler) Login(ctx *fasthttp.RequestCtx) {
 	if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {
 		log.Printf("error while unmarshalling JSON: %s", err)
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
-		fmt.Println("!found")
 		return
 	}
 
@@ -71,11 +70,16 @@ func (s *userHandler) Login(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	code, _ := s.UserUseCase.Login(user)
+	code, err := s.UserUseCase.Login(user)
 	ctx.SetStatusCode(code)
+	if err != nil {
+		log.Printf("error while logging user in")
+		return
+	}
 
 	с := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
-	s.CookieHandler.SetCookieAndToken(ctx, с, user.Id)
+	foundUser, _ := s.UserUseCase.GetByEmail(user.Email)
+	s.CookieHandler.SetCookieAndToken(ctx, с, foundUser.Id)
 }
 
 func (s *userHandler) Registration(ctx *fasthttp.RequestCtx) {
@@ -87,8 +91,12 @@ func (s *userHandler) Registration(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	code, _ := s.UserUseCase.Registration(user)
+	code, err := s.UserUseCase.Registration(user)
 	ctx.SetStatusCode(code)
+	if err != nil {
+		log.Printf("error while registering user in")
+		return
+	}
 
 	с := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
 	newUser, _ := s.UserUseCase.GetByEmail(user.Email)
