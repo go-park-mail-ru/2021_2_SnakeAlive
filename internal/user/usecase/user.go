@@ -58,7 +58,8 @@ func (u userUseCase) Validate(user *domain.User) bool {
 func (u userUseCase) Login(user *domain.User) (int, error) {
 	foundUser, err := u.GetByEmail(user.Email)
 	if err != nil {
-		log.Printf("error while GetByEmail")
+		log.Printf("error while login-GetByEmail")
+		log.Print(err)
 		return fasthttp.StatusNotFound, err
 	}
 

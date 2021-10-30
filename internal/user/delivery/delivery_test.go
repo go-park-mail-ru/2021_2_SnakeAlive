@@ -18,12 +18,13 @@ type test struct {
 
 func SetUpDB() *pgxpool.Pool {
 	url := "postgres://tripadvisor:12345@localhost:5432/tripadvisor"
+	//url := "jdbc:postgresql://localhost:5432/postgres"
 	dbpool, err := pgxpool.Connect(context.Background(), url)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		os.Exit(1)
 	}
-	defer dbpool.Close()
+	//defer dbpool.Close()
 	return dbpool
 }
 

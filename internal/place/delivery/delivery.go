@@ -1,8 +1,6 @@
 package placeDelivery
 
 import (
-	"encoding/json"
-	"log"
 	"snakealive/m/pkg/domain"
 
 	pr "snakealive/m/internal/place/repository"
@@ -43,21 +41,7 @@ func SetUpPlaceRouter(db *pgxpool.Pool, r *router.Router) *router.Router {
 
 func (s *placeHandler) PlacesList(ctx *fasthttp.RequestCtx) {
 	param, _ := ctx.UserValue("name").(string)
-	if _, found := s.PlaceUseCase.Get(param); !found {
-		log.Printf("country not found")
-		ctx.SetStatusCode(fasthttp.StatusNotFound)
-		return
-	}
-
-	ctx.SetStatusCode(fasthttp.StatusOK)
-
-	response, _ := s.PlaceUseCase.Get(param)
-	bytes, err := json.Marshal(response)
-	if err != nil {
-		log.Printf("error while marshalling JSON: %s", err)
-		ctx.Write([]byte("{}"))
-		return
-	}
-
+	code, bytes := s.PlaceUseCase.GetPlaceListByName(param)
+	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
 }

@@ -16,4 +16,5 @@ type PlaceStorage interface {
 
 type PlaceUseCase interface {
 	Get(key string) (Places, bool)
+	GetPlaceListByName(param string) (int, []byte)
 }

@@ -73,6 +73,7 @@ func (s *userHandler) Login(ctx *fasthttp.RequestCtx) {
 
 	с := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
 	chttp.SetCookieAndToken(ctx, с, user.Id)
+
 }
 
 func (s *userHandler) Registration(ctx *fasthttp.RequestCtx) {
