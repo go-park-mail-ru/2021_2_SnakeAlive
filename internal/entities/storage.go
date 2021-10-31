@@ -66,4 +66,4 @@ var PlacesDB = map[string]domain.Places{
 	},
 }
 
-var CookieDB = map[string]int{} // string - cookie hash; int - user id
+//var CookieDB = map[string]int{} // string - cookie hash; int - user id

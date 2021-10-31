@@ -8,15 +8,15 @@ import (
 	pgxpool "github.com/jackc/pgx/v4/pgxpool"
 )
 
-type userStorage struct {
+type UserStorage struct {
 	dataHolder *pgxpool.Pool
 }
 
 func NewUserStorage(DB *pgxpool.Pool) domain.UserStorage {
-	return &userStorage{dataHolder: DB}
+	return &UserStorage{dataHolder: DB}
 }
 
-func (u *userStorage) Add(value domain.User) error {
+func (u *UserStorage) Add(value domain.User) error {
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
 		fmt.Printf("Connection error while adding user ", err)
@@ -26,6 +26,7 @@ func (u *userStorage) Add(value domain.User) error {
 
 	_, err = conn.Exec(context.Background(),
 		`INSERT INTO Users ("name", "surname", "password", "email") VALUES ($1, $2, $3, $4)`,
+
 		value.Name,
 		value.Surname,
 		value.Password,
@@ -34,10 +35,10 @@ func (u *userStorage) Add(value domain.User) error {
 	return err
 }
 
-func (u *userStorage) Delete(id int) error {
+func (u *UserStorage) Delete(id int) error {
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Connection error while adding user ", err)
+		fmt.Printf("Connection error while deleting user ", err)
 		return err
 	}
 	defer conn.Release()
@@ -49,12 +50,27 @@ func (u *userStorage) Delete(id int) error {
 	return err
 }
 
-func (u *userStorage) GetByEmail(key string) (value domain.User, err error) {
+func (u *UserStorage) DeleteByEmail(user domain.User) error {
+	conn, err := u.dataHolder.Acquire(context.Background())
+	if err != nil {
+		fmt.Printf("Connection error while deleting user ", err)
+		return err
+	}
+	defer conn.Release()
+
+	_, err = conn.Exec(context.Background(),
+		`DELETE FROM Users WHERE email = $1`,
+		user.Email,
+	)
+	return err
+}
+
+func (u *UserStorage) GetByEmail(key string) (value domain.User, err error) {
 	var user domain.User
 
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Error while adding user")
+		fmt.Printf("Error while getting user")
 		return user, err
 	}
 	defer conn.Release()
@@ -68,7 +84,7 @@ func (u *userStorage) GetByEmail(key string) (value domain.User, err error) {
 	return user, err
 }
 
-func (u *userStorage) GetById(id int) (value domain.User, err error) {
+func (u *UserStorage) GetById(id int) (value domain.User, err error) {
 	var user domain.User
 
 	conn, err := u.dataHolder.Acquire(context.Background())
@@ -87,7 +103,7 @@ func (u *userStorage) GetById(id int) (value domain.User, err error) {
 	return user, err
 }
 
-func (u *userStorage) Update(id int, value domain.User) error {
+func (u *UserStorage) Update(id int, value domain.User) error {
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
 		fmt.Printf("Connection error while adding user ", err)

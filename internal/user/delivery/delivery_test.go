@@ -2,8 +2,11 @@ package userDelivery
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"log"
 	"os"
+	"snakealive/m/pkg/domain"
 	"testing"
 
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -18,7 +21,7 @@ type test struct {
 
 func SetUpDB() *pgxpool.Pool {
 	url := "postgres://tripadvisor:12345@localhost:5432/tripadvisor"
-	//url := "jdbc:postgresql://localhost:5432/postgres"
+
 	dbpool, err := pgxpool.Connect(context.Background(), url)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
@@ -101,9 +104,7 @@ func Test_Register_Fail_HttpResponseCode(t *testing.T) {
 
 func Test_Register_Success_HttpResponseCode(t *testing.T) {
 	tests := []test{
-		{`{"name": "Name", "surname": "Surname", "email": "alex2@mail.ru", "password": "password2"}`,
-			fasthttp.StatusOK},
-		{`{"name": "Name", "surname": "Surname", "email": "alex3@mail.ru", "password": "password3"}`,
+		{`{"name": "Name", "surname": "Surname", "email": "testing1@mail.ru", "password": "password2"}`,
 			fasthttp.StatusOK},
 	}
 	ctx := &fasthttp.RequestCtx{}
@@ -112,6 +113,15 @@ func Test_Register_Success_HttpResponseCode(t *testing.T) {
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.input))
 		userHandler := CreateDelivery(SetUpDB())
+
+		user := new(domain.User)
+		if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {
+			log.Printf("error while unmarshalling JSON: %s", err)
+			ctx.SetStatusCode(fasthttp.StatusBadRequest)
+			return
+		}
+		//todo убрать deleteByEmail добавить моки
+		userHandler.DeleteProfile(ctx)
 		userHandler.Registration(ctx)
 		assert.Equal(t, tc.want, ctx.Response.Header.StatusCode())
 	}
