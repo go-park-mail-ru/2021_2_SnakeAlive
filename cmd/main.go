@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	pd "snakealive/m/internal/place/delivery"
+	td "snakealive/m/internal/trip/delivery"
 	ud "snakealive/m/internal/user/delivery"
 
 	"github.com/fasthttp/router"
@@ -18,6 +19,7 @@ func SetUpRouter(db *pgxpool.Pool) *router.Router {
 	r := router.New()
 	r = ud.SetUpUserRouter(db, r)
 	r = pd.SetUpPlaceRouter(db, r)
+	r = td.SetUpPlaceRouter(db, r)
 
 	return r
 }

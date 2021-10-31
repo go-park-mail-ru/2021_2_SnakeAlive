@@ -15,8 +15,6 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-const CookieName = "SnakeAlive"
-
 type PlaceHandler interface {
 	PlacesByCountry(ctx *fasthttp.RequestCtx)
 	Place(ctx *fasthttp.RequestCtx)
