@@ -20,7 +20,7 @@ func NewRewiewStorage(DB *pgxpool.Pool) domain.ReviewStorage {
 func (u *reviewStorage) Add(value domain.Review) error {
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Connection error while adding user ", err)
+		fmt.Print("Connection error while adding user ", err)
 		return err
 	}
 	defer conn.Release()
