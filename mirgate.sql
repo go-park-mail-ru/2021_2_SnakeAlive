@@ -35,8 +35,10 @@ CREATE TABLE Reviews (
   text TEXT,
   rating INT NOT NULL,
   user_id INT NOT NULL,
+  place_id INT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (place_id) REFERENCES places(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Places (
