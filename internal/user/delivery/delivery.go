@@ -165,6 +165,23 @@ func (s *userHandler) DeleteProfile(ctx *fasthttp.RequestCtx) {
 	s.CookieHandler.DeleteCookie(ctx, string(ctx.Request.Header.Cookie(cnst.CookieName)))
 }
 
+func (s *userHandler) DeleteProfileByEmail(ctx *fasthttp.RequestCtx) {
+	if !s.CookieHandler.CheckCookie(ctx) {
+		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
+		return
+	}
+
+	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
+	foundUser, err := s.CookieHandler.GetUser(hash)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusNotFound)
+		return
+	}
+
+	s.UserUseCase.DeleteUserByEmail(foundUser)
+	s.CookieHandler.DeleteCookie(ctx, string(ctx.Request.Header.Cookie(cnst.CookieName)))
+}
+
 func (s *userHandler) Logout(ctx *fasthttp.RequestCtx) {
 	if !s.CookieHandler.CheckCookie(ctx) {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)

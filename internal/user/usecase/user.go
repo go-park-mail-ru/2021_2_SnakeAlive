@@ -127,3 +127,8 @@ func (u userUseCase) DeleteProfile(hash string, foundUser domain.User) int {
 	u.Delete(foundUser.Id)
 	return fasthttp.StatusOK
 }
+
+func (u userUseCase) DeleteUserByEmail(user domain.User) int {
+	u.DeleteUserByEmail(user)
+	return fasthttp.StatusOK
+}

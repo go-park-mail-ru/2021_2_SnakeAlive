@@ -4,24 +4,15 @@ type Place struct {
 	Id          int      `json:"id"`
 	Name        string   `json:"name"`
 	Country     string   `json:"country"`
-	Rating      float32  `json:"rating"`
+	Rating      int      `json:"rating"`
+	Description string   `json:"sescription"`
 	Tags        []string `json:"tags"`
-	Description string   `json:"description"`
 }
 
-type TopPlace struct {
-	Id     int      `json:"id"`
-	Name   string   `json:"name"`
-	Tags   []string `json:"tags"`
-	Author string   `json:"author"`
-	Review string   `json:"review"`
-}
-
-type TopPlaces []TopPlace
+type Places []Place
 
 type PlaceStorage interface {
-	GetById(id int) (value Place, err error)
-	GetPlacesByCountry(value string) (TopPlaces, error)
+	Get(name string) (value Place, exist bool)
 }
 
 type PlaceUseCase interface {

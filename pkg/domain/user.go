@@ -14,6 +14,7 @@ type UserStorage interface {
 	GetByEmail(key string) (value User, err error)
 	Delete(id int) error
 	Update(id int, value User) error
+	DeleteByEmail(user User) error
 }
 
 type UserUseCase interface {
@@ -28,4 +29,5 @@ type UserUseCase interface {
 	GetProfile(hash string, user User) (int, []byte)
 	UpdateProfile(updatedUser *User, foundUser User, hash string) (int, []byte)
 	DeleteProfile(hash string, foundUser User) int
+	DeleteUserByEmail(user User) int
 }

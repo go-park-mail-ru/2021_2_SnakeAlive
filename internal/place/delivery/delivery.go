@@ -5,7 +5,6 @@ import (
 	"snakealive/m/pkg/domain"
 	"strconv"
 
-	"snakealive/m/internal/entities"
 	pr "snakealive/m/internal/place/repository"
 	pu "snakealive/m/internal/place/usecase"
 	cnst "snakealive/m/pkg/constants"
@@ -18,8 +17,7 @@ import (
 const CookieName = "SnakeAlive"
 
 type PlaceHandler interface {
-	PlacesByCountry(ctx *fasthttp.RequestCtx)
-	Place(ctx *fasthttp.RequestCtx)
+	PlacesList(ctx *fasthttp.RequestCtx)
 }
 
 type placeHandler struct {
@@ -33,18 +31,17 @@ func NewPlaceHandler(PlaceUseCase domain.PlaceUseCase) PlaceHandler {
 }
 
 func CreateDelivery(db *pgxpool.Pool) PlaceHandler {
-	placeLayer := NewPlaceHandler(pu.NewPlaceUseCase(pr.NewPlaceStorage(db)))
+	placeLayer := NewPlaceHandler(pu.NewPlaceUseCase(pr.NewPlaceStorage()))
 	return placeLayer
 }
 
 func SetUpPlaceRouter(db *pgxpool.Pool, r *router.Router) *router.Router {
 	placeHandler := CreateDelivery(db)
-	r.GET(cnst.CountryURL, placeHandler.PlacesByCountry)
-	r.GET(cnst.SightURL, placeHandler.Place)
+	r.GET(cnst.CountryURL, placeHandler.PlacesList)
 	return r
 }
 
-func (s *placeHandler) PlacesByCountry(ctx *fasthttp.RequestCtx) {
+func (s *placeHandler) PlacesList(ctx *fasthttp.RequestCtx) {
 	param, _ := ctx.UserValue("name").(string)
 
 	trans := entities.CountryTrans[param]
