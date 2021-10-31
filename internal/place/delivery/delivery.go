@@ -15,8 +15,7 @@ import (
 const CookieName = "SnakeAlive"
 
 type PlaceHandler interface {
-	PlacesByCountry(ctx *fasthttp.RequestCtx)
-	Place(ctx *fasthttp.RequestCtx)
+	PlacesList(ctx *fasthttp.RequestCtx)
 }
 
 type placeHandler struct {
@@ -30,18 +29,17 @@ func NewPlaceHandler(PlaceUseCase domain.PlaceUseCase) PlaceHandler {
 }
 
 func CreateDelivery(db *pgxpool.Pool) PlaceHandler {
-	placeLayer := NewPlaceHandler(pu.NewPlaceUseCase(pr.NewPlaceStorage(db)))
+	placeLayer := NewPlaceHandler(pu.NewPlaceUseCase(pr.NewPlaceStorage()))
 	return placeLayer
 }
 
 func SetUpPlaceRouter(db *pgxpool.Pool, r *router.Router) *router.Router {
 	placeHandler := CreateDelivery(db)
-	r.GET(cnst.CountryURL, placeHandler.PlacesByCountry)
-	r.GET(cnst.SightURL, placeHandler.Place)
+	r.GET(cnst.CountryURL, placeHandler.PlacesList)
 	return r
 }
 
-func (s *placeHandler) PlacesByCountry(ctx *fasthttp.RequestCtx) {
+func (s *placeHandler) PlacesList(ctx *fasthttp.RequestCtx) {
 	param, _ := ctx.UserValue("name").(string)
 	code, bytes := s.PlaceUseCase.GetPlaceListByName(param)
 	ctx.SetStatusCode(code)
