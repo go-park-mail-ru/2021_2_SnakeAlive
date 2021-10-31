@@ -10,3 +10,6 @@ const SightURL = "/sight/{id}"
 
 const ReviewAddURL = "/review"
 const ReviewURL = "/review/{id}"
+
+const TripPostURL = "/trip"
+const TripURL = "/trip/{id}"

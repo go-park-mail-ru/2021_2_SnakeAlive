@@ -117,7 +117,7 @@ func (u userUseCase) UpdateProfile(updatedUser *domain.User, foundUser domain.Us
 	bytes, err := json.Marshal(response)
 	if err != nil {
 		log.Printf("error while marshalling JSON: %s", err)
-		return fasthttp.StatusOK, []byte("{}")
+		return fasthttp.StatusBadRequest, nil
 	}
 
 	return fasthttp.StatusOK, bytes
