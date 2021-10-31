@@ -37,7 +37,7 @@ func (u *userStorage) Add(value domain.User) error {
 func (u *userStorage) Delete(id int) error {
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Connection error while adding user ", err)
+		fmt.Printf("Connection error while deleting user ", err)
 		return err
 	}
 	defer conn.Release()
@@ -54,7 +54,7 @@ func (u *userStorage) GetByEmail(key string) (value domain.User, err error) {
 
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Error while adding user")
+		fmt.Printf("Error while getting user")
 		return user, err
 	}
 	defer conn.Release()

@@ -18,6 +18,7 @@ func SetUpRouter(db *pgxpool.Pool) *router.Router {
 	r := router.New()
 	r = ud.SetUpUserRouter(db, r)
 	r = pd.SetUpPlaceRouter(db, r)
+
 	return r
 }
 

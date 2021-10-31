@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log"
 	cnst "snakealive/m/pkg/constants"
-	chttp "snakealive/m/pkg/customhttp"
 	"snakealive/m/pkg/domain"
 
+	cd "snakealive/m/internal/cookie/delivery"
 	ur "snakealive/m/internal/user/repository"
 	uu "snakealive/m/internal/user/usecase"
 
@@ -27,17 +27,20 @@ type UserHandler interface {
 }
 
 type userHandler struct {
-	UserUseCase domain.UserUseCase
+	UserUseCase   domain.UserUseCase
+	CookieHandler cd.CookieHandler
 }
 
-func NewUserHandler(UserUseCase domain.UserUseCase) UserHandler {
+func NewUserHandler(UserUseCase domain.UserUseCase, CookieHandler cd.CookieHandler) UserHandler {
 	return &userHandler{
-		UserUseCase: UserUseCase,
+		UserUseCase:   UserUseCase,
+		CookieHandler: CookieHandler,
 	}
 }
 
 func CreateDelivery(db *pgxpool.Pool) UserHandler {
-	userLayer := NewUserHandler(uu.NewUserUseCase(ur.NewUserStorage(db)))
+	cookieLayer := cd.CreateDelivery(db)
+	userLayer := NewUserHandler(uu.NewUserUseCase(ur.NewUserStorage(db)), cookieLayer)
 	return userLayer
 }
 
@@ -57,7 +60,6 @@ func (s *userHandler) Login(ctx *fasthttp.RequestCtx) {
 	if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {
 		log.Printf("error while unmarshalling JSON: %s", err)
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
-		fmt.Println("!found")
 		return
 	}
 
@@ -68,12 +70,16 @@ func (s *userHandler) Login(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	code, _ := s.UserUseCase.Login(user)
+	code, err := s.UserUseCase.Login(user)
 	ctx.SetStatusCode(code)
+	if err != nil {
+		log.Printf("error while logging user in")
+		return
+	}
 
 	с := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
-	chttp.SetCookieAndToken(ctx, с, user.Id)
-
+	foundUser, _ := s.UserUseCase.GetByEmail(user.Email)
+	s.CookieHandler.SetCookieAndToken(ctx, с, foundUser.Id)
 }
 
 func (s *userHandler) Registration(ctx *fasthttp.RequestCtx) {
@@ -85,29 +91,40 @@ func (s *userHandler) Registration(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	code, _ := s.UserUseCase.Registration(user)
+	code, err := s.UserUseCase.Registration(user)
 	ctx.SetStatusCode(code)
+	if err != nil {
+		log.Printf("error while registering user in")
+		return
+	}
 
 	с := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
 	newUser, _ := s.UserUseCase.GetByEmail(user.Email)
-	chttp.SetCookieAndToken(ctx, с, newUser.Id)
+	s.CookieHandler.SetCookieAndToken(ctx, с, newUser.Id)
 }
 
 func (s *userHandler) GetProfile(ctx *fasthttp.RequestCtx) {
-	if !chttp.CheckCookie(ctx) {
+	if !s.CookieHandler.CheckCookie(ctx) {
 		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
 		return
 	}
 
 	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
-	code, bytes := s.UserUseCase.GetProfile(hash)
+
+	foundUser, err := s.CookieHandler.GetUser(hash)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusNotFound)
+		return
+	}
+
+	code, bytes := s.UserUseCase.GetProfile(hash, foundUser)
 
 	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
 }
 
 func (s *userHandler) UpdateProfile(ctx *fasthttp.RequestCtx) {
-	if !chttp.CheckCookie(ctx) {
+	if !s.CookieHandler.CheckCookie(ctx) {
 		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
 		return
 	}
@@ -120,28 +137,40 @@ func (s *userHandler) UpdateProfile(ctx *fasthttp.RequestCtx) {
 	}
 
 	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
-	code, bytes := s.UserUseCase.UpdateProfile(updatedUser, hash)
+	foundUser, err := s.CookieHandler.GetUser(hash)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusNotFound)
+		return
+	}
+
+	code, bytes := s.UserUseCase.UpdateProfile(updatedUser, foundUser, hash)
 	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
 }
 
 func (s *userHandler) DeleteProfile(ctx *fasthttp.RequestCtx) {
-	if !chttp.CheckCookie(ctx) {
+	if !s.CookieHandler.CheckCookie(ctx) {
 		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
 		return
 	}
 
 	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
-	s.UserUseCase.DeliteProfile(hash)
-	chttp.DeleteCookie(ctx, string(ctx.Request.Header.Cookie(cnst.CookieName)))
+	foundUser, err := s.CookieHandler.GetUser(hash)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusNotFound)
+		return
+	}
+
+	s.UserUseCase.DeleteProfile(hash, foundUser)
+	s.CookieHandler.DeleteCookie(ctx, string(ctx.Request.Header.Cookie(cnst.CookieName)))
 }
 
 func (s *userHandler) Logout(ctx *fasthttp.RequestCtx) {
-	if !chttp.CheckCookie(ctx) {
+	if !s.CookieHandler.CheckCookie(ctx) {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	chttp.DeleteCookie(ctx, string(ctx.Request.Header.Cookie(cnst.CookieName)))
+	s.CookieHandler.DeleteCookie(ctx, string(ctx.Request.Header.Cookie(cnst.CookieName)))
 }
