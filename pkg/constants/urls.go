@@ -7,3 +7,6 @@ const LogoutURL = "/logout"
 
 const CountryURL = "/country/{name}"
 const SightURL = "/sight/{id}"
+
+const ReviewAddURL = "/review"
+const ReviewURL = "/review/{id}"

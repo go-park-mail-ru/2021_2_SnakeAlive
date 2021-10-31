@@ -3,7 +3,6 @@ package reviewRepository
 import (
 	"context"
 	"fmt"
-	pr "snakealive/m/internal/place/repository"
 	"snakealive/m/pkg/domain"
 
 	pgxpool "github.com/jackc/pgx/v4/pgxpool"
@@ -13,7 +12,7 @@ type reviewStorage struct {
 	dataHolder *pgxpool.Pool
 }
 
-func NewRewiewStorage(DB *pgxpool.Pool) domain.ReviewStorage {
+func NewReviewStorage(DB *pgxpool.Pool) domain.ReviewStorage {
 	return &reviewStorage{dataHolder: DB}
 }
 
@@ -26,108 +25,118 @@ func (u *reviewStorage) Add(value domain.Review) error {
 	defer conn.Release()
 
 	_, err = conn.Exec(context.Background(),
-		`INSERT INTO reviews (id, title, text, rating, user_id, created_at) VALUES ($1, $2, $3, $4)`,
+		`INSERT INTO public.reviews (title, text, rating, user_id, place_id) VALUES ($1, $2, $3, $4, $5)`,
 		value.Title,
 		value.Text,
 		value.Rating,
 		value.User_id,
+		value.Place_id,
 	)
 	return err
 }
 
-func (u *reviewStorage) Get(key string) (domain.Reviews, error) {
+func (u *reviewStorage) Test(id int) error {
+	var review domain.Review
 	var reviews domain.Reviews
-	var place domain.Place
-
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Error while getting user")
+		fmt.Print(err)
+		return err
+	}
+	defer conn.Release()
+	fmt.Println("quary ----")
+	rows, err := conn.Query(context.Background(),
+		`SELECT id, title, text, rating, user_id, place_id, created_at FROM Reviews
+		`,
+	)
+
+	for rows.Next() {
+		rows.Scan(&review.Id, &review.Title, &review.Text, &review.Rating, &review.User_id, &review.Place_id, &review.Created_at)
+		reviews = append(reviews, review)
+	}
+	fmt.Println("reviews = ", reviews)
+	//fmt.Println("rows raw = ", rows.Values())
+	// i := 0
+	// flag := true
+	// rows.Next()
+	// for flag {
+	// 	err = rows.Scan(&review.Id, &review.Title, &review.Text, &review.Rating, &review.User_id, &review.Place_id, &review.Created_at)
+
+	// 	fmt.Println("reviews[", i, "] = ", review)
+	// 	reviews = append(reviews, review)
+	// 	i += 1
+	// 	cur := rows.Next()
+	// 	fmt.Println("rows.Next() = ", cur)
+	// 	if cur == false {
+	// 		flag = false
+	// 	}
+
+	// }
+	return err
+}
+
+func (u *reviewStorage) GetListByPlace(id int) (domain.Reviews, error) {
+	reviews := make(domain.Reviews, 0)
+	conn, err := u.dataHolder.Acquire(context.Background())
+	if err != nil {
+		fmt.Print(err)
 		return reviews, err
 	}
 	defer conn.Release()
-	place, _ = pr.NewPlaceStorage().Get(key)
 
 	rows, err := conn.Query(context.Background(),
-		`SELECT id, name, surname, password, email
-		FROM Users WHERE email = $1`,
-		place.Name,
-	)
-	i := 0
+		`SELECT id, title, text, rating, user_id, place_id FROM Reviews
+		Where place_id = $1`,
+		id)
+	if err != nil {
+		fmt.Printf("Error while getting places")
+		return reviews, err
+	}
+
+	var review domain.Review
 	for rows.Next() {
-		err = rows.Scan(&reviews[i].Id, &reviews[i].Title, &reviews[i].Text, &reviews[i].Rating, &reviews[i].User_id, &reviews[i].Place_id, &reviews[i].Created_at)
-		i += 1
+		err = rows.Scan(&review.Id, &review.Title, &review.Text, &review.Rating, &review.User_id, &review.Place_id)
+		reviews = append(reviews, review)
+	}
+	if rows.Err() != nil {
+		fmt.Printf("Error while scanning places")
+		return reviews, err
 	}
 	return reviews, err
 }
 
-// func (u *reviewStorage) Delete(id int) error {
-// 	conn, err := u.dataHolder.Acquire(context.Background())
-// 	if err != nil {
-// 		fmt.Printf("Connection error while deleting user ", err)
-// 		return err
-// 	}
-// 	defer conn.Release()
+func (u *reviewStorage) Get(id int) (domain.Review, error) {
+	var review domain.Review
+	conn, err := u.dataHolder.Acquire(context.Background())
+	if err != nil {
+		fmt.Print("Error while getting user", err)
+		return review, err
+	}
+	defer conn.Release()
 
-// 	_, err = conn.Exec(context.Background(),
-// 		`DELETE FROM Users WHERE id = $1`,
-// 		id,
-// 	)
-// 	return err
-// }
+	err = conn.QueryRow(context.Background(),
+		`SELECT id, title, text, rating, user_id, place_id FROM Reviews
+		Where id = $1`,
+		id,
+	).Scan(&review.Id, &review.Title, &review.Text, &review.Rating, &review.User_id, &review.Place_id)
+	if err != nil {
+		fmt.Print("Error while scanning places", err)
+		return review, err
+	}
+	return review, err
+}
 
-// func (u *reviewStorage) GetByEmail(key string) (value domain.Review, err error) {
-// 	var user domain.User
+func (u *reviewStorage) Delete(id int) error {
+	conn, err := u.dataHolder.Acquire(context.Background())
+	if err != nil {
+		fmt.Print("Connection error while deleting user ", err)
+		return err
+	}
+	defer conn.Release()
 
-// 	conn, err := u.dataHolder.Acquire(context.Background())
-// 	if err != nil {
-// 		fmt.Printf("Error while getting user")
-// 		return user, err
-// 	}
-// 	defer conn.Release()
-
-// 	err = conn.QueryRow(context.Background(),
-// 		`SELECT id, name, surname, password, email
-// 		FROM Users WHERE email = $1`,
-// 		key,
-// 	).Scan(&user.Id, &user.Name, &user.Surname, &user.Password, &user.Email)
-
-// 	return user, err
-// }
-
-// func (u *reviewStorage) GetById(id int) (value domain.Review, err error) {
-// 	var user domain.User
-
-// 	conn, err := u.dataHolder.Acquire(context.Background())
-// 	if err != nil {
-// 		fmt.Printf("Error while adding user")
-// 		return user, err
-// 	}
-// 	defer conn.Release()
-
-// 	err = conn.QueryRow(context.Background(),
-// 		`SELECT id, name, surname, password, email
-// 		FROM Users WHERE id = $1`,
-// 		id,
-// 	).Scan(&user.Id, &user.Name, &user.Surname, &user.Password, &user.Email)
-
-// 	return user, err
-// }
-
-// func (u *reviewStorage) Update(id int, value domain.Review) error {
-// 	conn, err := u.dataHolder.Acquire(context.Background())
-// 	if err != nil {
-// 		fmt.Printf("Connection error while adding user ", err)
-// 		return err
-// 	}
-// 	defer conn.Release()
-
-// 	_, err = conn.Exec(context.Background(),
-// 		`UPDATE Users SET "name" = $1, "surname" = $2, "email" = $3, "password" = $4 WHERE id = $5`,
-// 		value.Name,
-// 		value.Surname,
-// 		value.Email,
-// 		value.Password,
-// 		id,
-// 	)
-// 	return err
-// }
+	_, err = conn.Exec(context.Background(),
+		`DELETE FROM Reviews WHERE id = $1`,
+		id,
+	)
+	return err
+}

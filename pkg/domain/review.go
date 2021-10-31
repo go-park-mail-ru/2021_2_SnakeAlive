@@ -14,27 +14,16 @@ type Review struct {
 
 type ReviewStorage interface {
 	Add(value Review) error
-	Get(key string) (Reviews, error)
-	// GetById(id int) (value User, err error)
-	// GetByEmail(key string) (value User, err error)
-	// Delete(id int) error
-	// Update(id int, value User) error
-	// DeleteByEmail(user User) error
+	Get(id int) (Review, error)
+	GetListByPlace(id int) (Reviews, error)
+	Delete(id int) error
+
+	Test(id int) error
 }
 
 type ReviewUseCase interface {
-	Add(review Review) error
-	Get(key string) error
-	GetReviewsListByName(param string) (int, []byte)
-	// GetById(id int) (value User, err error)
-	// GetByEmail(key string) (value User, err error)
-	// Delete(id int) error
-	// Update(id int, updatedUser User) error
-	// Validate(user *User) bool
-	// Login(user *User) (int, error)
-	// Registration(user *User) (int, error)
-	// GetProfile(hash string, user User) (int, []byte)
-	// UpdateProfile(updatedUser *User, foundUser User, hash string) (int, []byte)
-	// DeleteProfile(hash string, foundUser User) int
-	// DeleteUserByEmail(user User) int
+	Add(review Review) (int, error)
+	Get(id int) (Review, error)
+	Delete(id int) error
+	GetReviewsListByPlaceId(id int) (int, []byte)
 }

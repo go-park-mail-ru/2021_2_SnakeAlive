@@ -15,8 +15,6 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-const CookieName = "SnakeAlive"
-
 type PlaceHandler interface {
 	PlacesByCountry(ctx *fasthttp.RequestCtx)
 	Place(ctx *fasthttp.RequestCtx)
@@ -46,7 +44,6 @@ func SetUpPlaceRouter(db *pgxpool.Pool, r *router.Router) *router.Router {
 
 func (s *placeHandler) PlacesByCountry(ctx *fasthttp.RequestCtx) {
 	param, _ := ctx.UserValue("name").(string)
-
 	trans := entities.CountryTrans[param]
 	bytes, err := s.PlaceUseCase.GetPlacesByCountry(trans)
 	if err != nil {
