@@ -179,7 +179,7 @@ func (t *tripStorage) GetTripAuthor(id int) int {
 
 	var author int
 	err = conn.QueryRow(context.Background(),
-		`SELECT author_id
+		`SELECT user_id
 	FROM Trips WHERE id = $1`,
 		id,
 	).Scan(&author)

@@ -5,6 +5,7 @@ import (
 	"log"
 	"snakealive/m/pkg/domain"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/valyala/fasthttp"
 )
 
@@ -17,7 +18,12 @@ type tripUsecase struct {
 }
 
 func (u tripUsecase) Add(value domain.Trip, user domain.User) (int, error) {
-	//validate here
+	_, err := govalidator.ValidateStruct(value)
+	if err != nil {
+		log.Printf("error while validating trip")
+		return 0, err
+	}
+
 	return u.tripStorage.Add(value, user)
 }
 
@@ -42,6 +48,12 @@ func (u tripUsecase) GetById(id int) (int, []byte) {
 }
 
 func (u tripUsecase) Update(id int, updatedTrip domain.Trip) error {
+	_, err := govalidator.ValidateStruct(updatedTrip)
+	if err != nil {
+		log.Printf("error while validating trip")
+		return err
+	}
+
 	return u.tripStorage.Update(id, updatedTrip)
 }
 
