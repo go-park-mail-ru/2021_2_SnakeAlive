@@ -15,7 +15,7 @@ type TopPlace struct {
 	Name   string   `json:"name"`
 	Tags   []string `json:"tags"`
 	Photos []string `json:"photos"`
-	Author string   `json:"author"`
+	UserId string   `json:"user_id"`
 	Review string   `json:"review"`
 }
 

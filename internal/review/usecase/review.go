@@ -16,8 +16,8 @@ type reviewUseCase struct {
 	reviewStorage domain.ReviewStorage
 }
 
-func (u reviewUseCase) Add(review domain.Review) (int, error) {
-	err := u.reviewStorage.Add(review)
+func (u reviewUseCase) Add(review domain.Review, user domain.User) (int, error) {
+	err := u.reviewStorage.Add(review, user.Id)
 	if err != nil {
 		return fasthttp.StatusBadRequest, err
 	}
@@ -45,4 +45,9 @@ func (u reviewUseCase) GetReviewsListByPlaceId(id int) (int, []byte) {
 
 func (u reviewUseCase) Delete(id int) error {
 	return u.reviewStorage.Delete(id)
+}
+
+func (u reviewUseCase) CheckAuthor(user domain.User, id int) bool {
+	author := u.reviewStorage.GetReviewAuthor(id)
+	return author == user.Id
 }

@@ -46,11 +46,11 @@ func (u *placeStorage) GetPlacesByCountry(value string) (domain.TopPlaces, error
 	defer conn.Release()
 
 	rows, err := conn.Query(context.Background(),
-		`SELECT pl.id, pl.name, pl.tags, pl.photos, u.name, u.surname, rw.text
+		`SELECT pl.id, pl.name, pl.tags, pl.photos, rw.user_id, rw.text
 		FROM Places AS pl
 		LEFT JOIN Reviews AS rw ON pl.id = rw.place_id
-		LEFT JOIN Users AS u ON rw.user_id = u.id
-		WHERE pl.country = $1 LIMIT 10`,
+		WHERE pl.country = $1
+		LIMIT 10`,
 		value)
 	if err != nil {
 		fmt.Printf("Error while getting places")
@@ -58,10 +58,8 @@ func (u *placeStorage) GetPlacesByCountry(value string) (domain.TopPlaces, error
 	}
 
 	var sight domain.TopPlace
-	var surname string
 	for rows.Next() {
-		rows.Scan(&sight.Id, &sight.Name, &sight.Tags, &sight.Photos, &sight.Author, &surname, &sight.Review)
-		sight.Author += " " + surname
+		rows.Scan(&sight.Id, &sight.Name, &sight.Tags, &sight.Photos, &sight.UserId, &sight.Review)
 		places = append(places, sight)
 	}
 
