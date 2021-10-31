@@ -60,7 +60,7 @@ func (t *tripStorage) GetById(id int) (value domain.Trip, err error) {
 	).Scan(&trip.Id, &trip.Title, &trip.Description, &trip.Days)
 
 	rows, err := conn.Query(context.Background(),
-		`SELECT pl.id, pl.name, pl.tags, pl.description, pl.rating, pl.country, tr.day
+		`SELECT pl.id, pl.name, pl.tags, pl.description, pl.rating, pl.country, pl.photos, tr.day
 		FROM TripsPlaces AS tr
 		JOIN Places AS pl ON tr.place_id = pl.id
 		WHERE tr.trip_id = $1
@@ -76,7 +76,7 @@ func (t *tripStorage) GetById(id int) (value domain.Trip, err error) {
 	var day int
 	currentDay := 0
 	for rows.Next() {
-		rows.Scan(&place.Id, &place.Name, &place.Tags, &place.Description, &place.Rating, &place.Country, &day)
+		rows.Scan(&place.Id, &place.Name, &place.Tags, &place.Description, &place.Rating, &place.Country, &place.Photos, &day)
 		if day != currentDay && len(places) > 0 {
 			currentDay = day
 			trip.Days = append(trip.Days, places)

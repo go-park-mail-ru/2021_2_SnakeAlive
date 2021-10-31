@@ -6,6 +6,7 @@ type User struct {
 	Surname  string `json:"surname" valid:"required"`
 	Email    string `json:"email" valid:"required,email,maxstringlength(254)"`
 	Password string `json:"password" valid:"required,stringlength(8|254)"`
+	Avatar   string `json:"avatar"`
 }
 
 type UserStorage interface {

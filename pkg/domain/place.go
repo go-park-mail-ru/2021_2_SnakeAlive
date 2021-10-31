@@ -7,12 +7,14 @@ type Place struct {
 	Rating      float32  `json:"rating"`
 	Tags        []string `json:"tags"`
 	Description string   `json:"description"`
+	Photos      []string `json:"photos"`
 }
 
 type TopPlace struct {
 	Id     int      `json:"id"`
 	Name   string   `json:"name"`
 	Tags   []string `json:"tags"`
+	Photos []string `json:"photos"`
 	Author string   `json:"author"`
 	Review string   `json:"review"`
 }
