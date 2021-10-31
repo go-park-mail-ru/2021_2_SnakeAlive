@@ -3,6 +3,7 @@ package reviewRepository
 import (
 	"context"
 	"fmt"
+	pr "snakealive/m/internal/place/repository"
 	"snakealive/m/pkg/domain"
 
 	pgxpool "github.com/jackc/pgx/v4/pgxpool"
@@ -32,6 +33,31 @@ func (u *reviewStorage) Add(value domain.Review) error {
 		value.User_id,
 	)
 	return err
+}
+
+func (u *reviewStorage) Get(key string) (domain.Reviews, error) {
+	var reviews domain.Reviews
+	var place domain.Place
+
+	conn, err := u.dataHolder.Acquire(context.Background())
+	if err != nil {
+		fmt.Printf("Error while getting user")
+		return reviews, err
+	}
+	defer conn.Release()
+	place, _ = pr.NewPlaceStorage().Get(key)
+
+	rows, err := conn.Query(context.Background(),
+		`SELECT id, name, surname, password, email
+		FROM Users WHERE email = $1`,
+		place.Name,
+	)
+	i := 0
+	for rows.Next() {
+		err = rows.Scan(&reviews[i].Id, &reviews[i].Title, &reviews[i].Text, &reviews[i].Rating, &reviews[i].User_id, &reviews[i].Place_id, &reviews[i].Created_at)
+		i += 1
+	}
+	return reviews, err
 }
 
 // func (u *reviewStorage) Delete(id int) error {

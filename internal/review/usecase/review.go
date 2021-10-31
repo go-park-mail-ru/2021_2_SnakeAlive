@@ -1,7 +1,11 @@
 package reviewUseCase
 
 import (
+	"encoding/json"
+	"log"
 	"snakealive/m/pkg/domain"
+
+	"github.com/valyala/fasthttp"
 )
 
 func NewReviewUseCase(reviewStorage domain.reviewStorage) domain.ReviewUseCase {
@@ -22,6 +26,25 @@ type reviewUseCase struct {
 
 func (u reviewUseCase) Add(review domain.Review) error {
 	return u.userStorage.Add(review)
+}
+
+func (u reviewUseCase) Get(key string) error {
+	return u.userStorage.Get(key)
+}
+
+func (u reviewUseCase) GetReviewsListByName(param string) (int, []byte) {
+	if _, found := u.Get(param); !found {
+		log.Printf("country not found")
+		return fasthttp.StatusNotFound, []byte("{}")
+	}
+
+	response, _ := u.Get(param)
+	bytes, err := json.Marshal(response)
+	if err != nil {
+		log.Printf("error while marshalling JSON: %s", err)
+		return fasthttp.StatusOK, []byte("{}")
+	}
+	return fasthttp.StatusOK, bytes
 }
 
 // func (u userUseCase) Update(id int, updatedUser domain.User) error {
