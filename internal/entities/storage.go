@@ -67,3 +67,5 @@ var PlacesDB = map[string]domain.Places{
 
 var CookieDB = map[string]int{} // string - cookie hash; int - user id
 */
+
+var CountryTrans = map[string]string{"Russia": "Россия"}

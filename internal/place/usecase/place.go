@@ -28,3 +28,16 @@ func (u placeUsecase) GetSight(sight domain.Place) (int, []byte) {
 	}
 	return fasthttp.StatusOK, response
 }
+
+func (u placeUsecase) GetPlacesByCountry(value string) ([]byte, error) {
+	places, err := u.placeStorage.GetPlacesByCountry(value)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	bytes, err := json.Marshal(places)
+	if err != nil {
+		log.Printf("error while marshalling JSON: %s", err)
+	}
+	return bytes, err
+}
