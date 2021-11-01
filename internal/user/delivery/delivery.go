@@ -213,6 +213,7 @@ func (s *userHandler) UploadAvatar(ctx *fasthttp.RequestCtx) {
 
 	formFile, err := ctx.FormFile(cnst.FormFileKey)
 	if err != nil {
+		fmt.Println(err)
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}

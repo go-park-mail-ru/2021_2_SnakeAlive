@@ -2,6 +2,7 @@ package reviewRepository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"snakealive/m/pkg/domain"
 
@@ -61,6 +62,9 @@ func (u *reviewStorage) GetListByPlace(id int) (domain.Reviews, error) {
 	if rows.Err() != nil {
 		fmt.Printf("Error while scanning places")
 		return reviews, err
+	}
+	if len(reviews) == 0 {
+		return reviews, errors.New("no reviews")
 	}
 	return reviews, err
 }

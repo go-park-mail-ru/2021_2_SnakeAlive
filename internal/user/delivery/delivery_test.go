@@ -581,3 +581,101 @@ func TestHandler_DeleteProfileByEmail(t *testing.T) {
 		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
 	}
 }
+
+func TestHandler_UploadAvatar(t *testing.T) {
+	tests := []MyTest{
+		{
+			name:      "Unauthorized",
+			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
+			inputUser: domain.User{
+				Id:       1,
+				Name:     "Name",
+				Surname:  "Surname",
+				Email:    "alex@mail.ru",
+				Password: "password",
+			},
+			mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+
+			},
+			expectedStatusCode: fasthttp.StatusUnauthorized,
+		},
+	}
+	ctx := &fasthttp.RequestCtx{}
+
+	for _, tc := range tests {
+		c := gomock.NewController(t)
+		defer c.Finish()
+
+		repo := service_mocks.NewMockUserStorage(c)
+		tc.mockBehavior(repo, tc.inputUser)
+
+		ctx.Request.SetBody(nil)
+		ctx.Request.AppendBody([]byte(tc.inputBody))
+		cookieLayer := cd.CreateDelivery(SetUpDB())
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+
+		// ctx.Request.Header.SetCookie(cnst.CookieName, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))))
+		// cookieLayer.SetCookieAndToken(ctx, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))), tc.inputUser.Id)
+
+		userLayer.UploadAvatar(ctx)
+
+		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
+	}
+}
+
+func TestHandler_UploadAvatar2(t *testing.T) {
+	tests := []MyTest{
+		{
+			name:      "OK",
+			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
+			inputUser: domain.User{
+				Id:       1,
+				Name:     "Name",
+				Surname:  "Surname",
+				Email:    "alex@mail.ru",
+				Password: "password",
+				Avatar:   "1",
+			},
+			mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+
+			},
+			expectedStatusCode: fasthttp.StatusBadRequest,
+		},
+		{
+			name:      "BR",
+			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
+			inputUser: domain.User{
+				Id:       1,
+				Name:     "Name",
+				Surname:  "Surname",
+				Email:    "alex@mail.ru",
+				Password: "password",
+			},
+			mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+
+			},
+			expectedStatusCode: fasthttp.StatusBadRequest,
+		},
+	}
+	ctx := &fasthttp.RequestCtx{}
+
+	for _, tc := range tests {
+		c := gomock.NewController(t)
+		defer c.Finish()
+
+		repo := service_mocks.NewMockUserStorage(c)
+		tc.mockBehavior(repo, tc.inputUser)
+
+		ctx.Request.SetBody(nil)
+		ctx.Request.AppendBody([]byte(tc.inputBody))
+		cookieLayer := cd.CreateDelivery(SetUpDB())
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+
+		ctx.Request.Header.SetCookie(cnst.CookieName, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))))
+		cookieLayer.SetCookieAndToken(ctx, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))), tc.inputUser.Id)
+
+		userLayer.UploadAvatar(ctx)
+
+		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
+	}
+}
