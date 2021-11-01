@@ -129,6 +129,10 @@ func (u userUseCase) DeleteProfile(hash string, foundUser domain.User) int {
 }
 
 func (u userUseCase) DeleteUserByEmail(user domain.User) int {
-	u.DeleteUserByEmail(user)
+	u.userStorage.DeleteByEmail(user)
 	return fasthttp.StatusOK
+}
+
+func (u userUseCase) AddAvatar(user domain.User, avatar string) error {
+	return u.userStorage.AddAvatar(user.Id, avatar)
 }

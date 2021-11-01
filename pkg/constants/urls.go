@@ -13,3 +13,5 @@ const ReviewURL = "/review/{id}"
 
 const TripPostURL = "/trip"
 const TripURL = "/trip/{id}"
+
+const UploadURL = "/upload"

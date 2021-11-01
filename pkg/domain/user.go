@@ -16,6 +16,7 @@ type UserStorage interface {
 	Delete(id int) error
 	Update(id int, value User) error
 	DeleteByEmail(user User) error
+	AddAvatar(id int, avatar string) error
 }
 
 type UserUseCase interface {
@@ -31,4 +32,5 @@ type UserUseCase interface {
 	UpdateProfile(updatedUser *User, foundUser User, hash string) (int, []byte)
 	DeleteProfile(hash string, foundUser User) int
 	DeleteUserByEmail(user User) int
+	AddAvatar(user User, avatar string) error
 }

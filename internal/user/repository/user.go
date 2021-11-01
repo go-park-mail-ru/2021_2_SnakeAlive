@@ -123,3 +123,19 @@ func (u *UserStorage) Update(id int, value domain.User) error {
 	)
 	return err
 }
+
+func (u *UserStorage) AddAvatar(id int, avatar string) error {
+	conn, err := u.dataHolder.Acquire(context.Background())
+	if err != nil {
+		fmt.Printf("Connection error while adding AVATAR ", err)
+		return err
+	}
+	defer conn.Release()
+
+	_, err = conn.Exec(context.Background(),
+		`UPDATE Users SET "avatar" = $1 WHERE id = $2`,
+		avatar,
+		id,
+	)
+	return err
+}

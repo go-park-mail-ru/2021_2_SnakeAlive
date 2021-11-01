@@ -6,6 +6,7 @@ import (
 	"log"
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/domain"
+	"strconv"
 
 	cd "snakealive/m/internal/cookie/delivery"
 	ur "snakealive/m/internal/user/repository"
@@ -24,6 +25,7 @@ type UserHandler interface {
 	GetProfile(ctx *fasthttp.RequestCtx)
 	UpdateProfile(ctx *fasthttp.RequestCtx)
 	DeleteProfile(ctx *fasthttp.RequestCtx)
+	UploadAvatar(ctx *fasthttp.RequestCtx)
 }
 
 type userHandler struct {
@@ -52,6 +54,7 @@ func SetUpUserRouter(db *pgxpool.Pool, r *router.Router) *router.Router {
 	r.PATCH(cnst.ProfileURL, userHandler.UpdateProfile)
 	r.DELETE(cnst.ProfileURL, userHandler.DeleteProfile)
 	r.DELETE(cnst.LogoutURL, userHandler.Logout)
+	r.POST(cnst.UploadURL, userHandler.UploadAvatar)
 	return r
 }
 
@@ -190,4 +193,40 @@ func (s *userHandler) Logout(ctx *fasthttp.RequestCtx) {
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	s.CookieHandler.DeleteCookie(ctx, string(ctx.Request.Header.Cookie(cnst.CookieName)))
+}
+
+func (s *userHandler) UploadAvatar(ctx *fasthttp.RequestCtx) {
+	if !s.CookieHandler.CheckCookie(ctx) {
+		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
+		return
+	}
+
+	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
+	foundUser, err := s.CookieHandler.GetUser(hash)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
+		return
+	}
+
+	avatar := strconv.Itoa(foundUser.Id) + cnst.Format
+
+	formFile, err := ctx.FormFile(cnst.FormFileKey)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	err = fasthttp.SaveMultipartFile(formFile, cnst.StaticPath+"/"+avatar)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		fmt.Printf("%v", err)
+		return
+	}
+
+	err = s.UserUseCase.AddAvatar(foundUser, avatar)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+	ctx.SetStatusCode(fasthttp.StatusOK)
 }
