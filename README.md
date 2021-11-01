@@ -11,6 +11,11 @@ Swagger
 -------
 https://app.swaggerhub.com/apis/Snake_alive/TripAdvisor/1.0-oas3
 
+Тестирование
+-------
+```
+sh ./test.sh
+```
 Участники команды
 -------
 Волынец Александра - @TheAntiAlex
