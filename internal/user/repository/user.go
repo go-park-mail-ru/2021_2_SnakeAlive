@@ -25,12 +25,13 @@ func (u *UserStorage) Add(value domain.User) error {
 	defer conn.Release()
 
 	_, err = conn.Exec(context.Background(),
-		`INSERT INTO Users ("name", "surname", "password", "email") VALUES ($1, $2, $3, $4)`,
+		`INSERT INTO Users ("name", "surname", "password", "email", "avatar") VALUES ($1, $2, $3, $4, $5)`,
 
 		value.Name,
 		value.Surname,
 		value.Password,
 		value.Email,
+		value.Avatar,
 	)
 	return err
 }
@@ -76,10 +77,10 @@ func (u *UserStorage) GetByEmail(key string) (value domain.User, err error) {
 	defer conn.Release()
 
 	err = conn.QueryRow(context.Background(),
-		`SELECT id, name, surname, password, email
+		`SELECT id, name, surname, password, email, avatar
 		FROM Users WHERE email = $1`,
 		key,
-	).Scan(&user.Id, &user.Name, &user.Surname, &user.Password, &user.Email)
+	).Scan(&user.Id, &user.Name, &user.Surname, &user.Password, &user.Email, &user.Avatar)
 
 	return user, err
 }
@@ -95,10 +96,10 @@ func (u *UserStorage) GetById(id int) (value domain.User, err error) {
 	defer conn.Release()
 
 	err = conn.QueryRow(context.Background(),
-		`SELECT id, name, surname, password, email
+		`SELECT id, name, surname, password, email, avatar
 		FROM Users WHERE id = $1`,
 		id,
-	).Scan(&user.Id, &user.Name, &user.Surname, &user.Password, &user.Email)
+	).Scan(&user.Id, &user.Name, &user.Surname, &user.Password, &user.Email, &user.Avatar)
 
 	return user, err
 }
@@ -112,11 +113,28 @@ func (u *UserStorage) Update(id int, value domain.User) error {
 	defer conn.Release()
 
 	_, err = conn.Exec(context.Background(),
-		`UPDATE Users SET "name" = $1, "surname" = $2, "email" = $3, "password" = $4 WHERE id = $5`,
+		`UPDATE Users SET "name" = $1, "surname" = $2, "email" = $3, "password" = $4, "avatar" = $5 WHERE id = $6`,
 		value.Name,
 		value.Surname,
 		value.Email,
 		value.Password,
+		value.Avatar,
+		id,
+	)
+	return err
+}
+
+func (u *UserStorage) AddAvatar(id int, avatar string) error {
+	conn, err := u.dataHolder.Acquire(context.Background())
+	if err != nil {
+		fmt.Printf("Connection error while adding AVATAR ", err)
+		return err
+	}
+	defer conn.Release()
+
+	_, err = conn.Exec(context.Background(),
+		`UPDATE Users SET "avatar" = $1 WHERE id = $2`,
+		avatar,
 		id,
 	)
 	return err

@@ -3,6 +3,7 @@ package reviewDelivery
 import (
 	"encoding/json"
 	"log"
+	cd "snakealive/m/internal/cookie/delivery"
 	"snakealive/m/pkg/domain"
 	"strconv"
 
@@ -23,16 +24,19 @@ type ReviewHandler interface {
 
 type reviewHandler struct {
 	ReviewUseCase domain.ReviewUseCase
+	CookieHandler cd.CookieHandler
 }
 
-func NewReviewHandler(ReviewUseCase domain.ReviewUseCase) ReviewHandler {
+func NewReviewHandler(ReviewUseCase domain.ReviewUseCase, CookieHandler cd.CookieHandler) ReviewHandler {
 	return &reviewHandler{
 		ReviewUseCase: ReviewUseCase,
+		CookieHandler: CookieHandler,
 	}
 }
 
 func CreateDelivery(db *pgxpool.Pool) ReviewHandler {
-	reviewLayer := NewReviewHandler(ru.NewReviewUseCase(rr.NewReviewStorage(db)))
+	cookieLayer := cd.CreateDelivery(db)
+	reviewLayer := NewReviewHandler(ru.NewReviewUseCase(rr.NewReviewStorage(db)), cookieLayer)
 	return reviewLayer
 }
 
@@ -52,6 +56,18 @@ func (s *reviewHandler) ReviewsByPlace(ctx *fasthttp.RequestCtx) {
 }
 
 func (s *reviewHandler) AddReviewToPlace(ctx *fasthttp.RequestCtx) {
+	if !s.CookieHandler.CheckCookie(ctx) {
+		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
+		return
+	}
+	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
+
+	foundUser, err := s.CookieHandler.GetUser(hash)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
 	newReview := new(domain.Review)
 
 	if err := json.Unmarshal(ctx.PostBody(), &newReview); err != nil {
@@ -60,7 +76,7 @@ func (s *reviewHandler) AddReviewToPlace(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	code, err := s.ReviewUseCase.Add(*newReview)
+	code, err := s.ReviewUseCase.Add(*newReview, foundUser)
 	ctx.SetStatusCode(code)
 	if err != nil {
 		log.Printf("error while registering user in")
@@ -69,8 +85,20 @@ func (s *reviewHandler) AddReviewToPlace(ctx *fasthttp.RequestCtx) {
 }
 
 func (s *reviewHandler) DelReview(ctx *fasthttp.RequestCtx) {
+	if !s.CookieHandler.CheckCookie(ctx) {
+		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
+		return
+	}
 	id, _ := strconv.Atoi(ctx.UserValue("id").(string))
-	_, err := s.ReviewUseCase.Get(id)
+	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
+
+	foundUser, err := s.CookieHandler.GetUser(hash)
+	if err != nil || !s.ReviewUseCase.CheckAuthor(foundUser, id) {
+		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
+		return
+	}
+
+	_, err = s.ReviewUseCase.Get(id)
 	if err != nil {
 		log.Printf("No such review")
 		ctx.SetStatusCode(fasthttp.StatusNotFound)

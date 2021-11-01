@@ -2,6 +2,7 @@ package tripDelivery
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"snakealive/m/pkg/domain"
 	"strconv"
@@ -41,7 +42,7 @@ func CreateDelivery(db *pgxpool.Pool) TripHandler {
 	return tripLayer
 }
 
-func SetUpPlaceRouter(db *pgxpool.Pool, r *router.Router) *router.Router {
+func SetUpTripRouter(db *pgxpool.Pool, r *router.Router) *router.Router {
 	tripHandler := CreateDelivery(db)
 
 	r.GET(cnst.TripURL, tripHandler.Trip)
@@ -100,6 +101,7 @@ func (s *tripHandler) AddTrip(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
+	fmt.Printf("%v", id)
 	code, bytes := s.TripUseCase.GetById(id)
 
 	ctx.SetStatusCode(code)

@@ -10,8 +10,9 @@ CREATE TABLE Users (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
   surname TEXT NOT NULL,
-  email TEXT NOT NULL,
+  email TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL,
+  avatar TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -29,23 +30,14 @@ CREATE TABLE Cookies (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-CREATE TABLE Reviews (
-  id SERIAL NOT NULL PRIMARY KEY,
-  title TEXT,
-  text TEXT,
-  rating INT NOT NULL,
-  user_id INT NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
 CREATE TABLE Places (
   id SERIAL NOT NULL PRIMARY KEY,
   name TEXT NOT NULL,
   country TEXT NOT NULL,
   rating REAL NOT NULL,
   description TEXT,
-  tags TEXT[]
+  tags TEXT[],
+  photos TEXT[]
 );
 
 CREATE TABLE Trips (
@@ -76,3 +68,14 @@ CREATE TABLE TripsPlaces (
   CONSTRAINT fk_place FOREIGN KEY(place_id) REFERENCES places(id)
 );
 
+CREATE TABLE Reviews (
+  id SERIAL NOT NULL PRIMARY KEY,
+  title TEXT,
+  text TEXT,
+  rating INT NOT NULL,
+  user_id INT NOT NULL,
+  place_id INT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (place_id) REFERENCES places(id) ON DELETE CASCADE
+);

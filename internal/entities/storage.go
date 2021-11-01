@@ -1,13 +1,11 @@
 package entities
 
-import "snakealive/m/pkg/domain"
-
-var AuthDB = map[string]domain.User{
+/*var AuthDB = map[string]domain.User{
 	"alex@mail.ru":   {Name: "Александра", Surname: "Волынец", Email: "alex@mail.ru", Password: "password"},
 	"nikita@mail.ru": {Name: "Никита", Surname: "Черных", Email: "nikita@mail.ru", Password: "frontend123"},
 	"ksenia@mail.ru": {Name: "Ксения", Surname: "Самойлова", Email: "ksenia@mail.ru", Password: "12345678"},
 	"andrew@mail.ru": {Name: "Андрей", Surname: "Кравцов", Email: "andrew@mail.ru", Password: "000111000"},
-}
+}*/
 
 // var PlacesDB = map[string]domain.Places{
 // 	"Russia": {

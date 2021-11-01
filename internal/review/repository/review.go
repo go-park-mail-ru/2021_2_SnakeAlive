@@ -16,10 +16,10 @@ func NewReviewStorage(DB *pgxpool.Pool) domain.ReviewStorage {
 	return &reviewStorage{dataHolder: DB}
 }
 
-func (u *reviewStorage) Add(value domain.Review) error {
+func (u *reviewStorage) Add(value domain.Review, userId int) error {
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Print("Connection error while adding user ", err)
+		fmt.Print("Connection error while adding review ", err)
 		return err
 	}
 	defer conn.Release()
@@ -29,12 +29,55 @@ func (u *reviewStorage) Add(value domain.Review) error {
 		value.Title,
 		value.Text,
 		value.Rating,
-		value.User_id,
-		value.Place_id,
+		userId,
+		value.PlaceId,
 	)
 	return err
 }
 
+<<<<<<< HEAD
+=======
+func (u *reviewStorage) Test(id int) error {
+	var review domain.Review
+	var reviews domain.Reviews
+	conn, err := u.dataHolder.Acquire(context.Background())
+	if err != nil {
+		fmt.Print(err)
+		return err
+	}
+	defer conn.Release()
+	fmt.Println("quary ----")
+	rows, err := conn.Query(context.Background(),
+		`SELECT id, title, text, rating, user_id, place_id, created_at FROM Reviews
+		`,
+	)
+
+	for rows.Next() {
+		rows.Scan(&review.Id, &review.Title, &review.Text, &review.Rating, &review.UserId, &review.PlaceId, &review.CreatedAt)
+		reviews = append(reviews, review)
+	}
+	fmt.Println("reviews = ", reviews)
+	//fmt.Println("rows raw = ", rows.Values())
+	// i := 0
+	// flag := true
+	// rows.Next()
+	// for flag {
+	// 	err = rows.Scan(&review.Id, &review.Title, &review.Text, &review.Rating, &review.User_id, &review.Place_id, &review.Created_at)
+
+	// 	fmt.Println("reviews[", i, "] = ", review)
+	// 	reviews = append(reviews, review)
+	// 	i += 1
+	// 	cur := rows.Next()
+	// 	fmt.Println("rows.Next() = ", cur)
+	// 	if cur == false {
+	// 		flag = false
+	// 	}
+
+	// }
+	return err
+}
+
+>>>>>>> 1a9a135e7fdec2361deb9819e2f4e285a6fb2622
 func (u *reviewStorage) GetListByPlace(id int) (domain.Reviews, error) {
 	reviews := make(domain.Reviews, 0)
 	conn, err := u.dataHolder.Acquire(context.Background())
@@ -55,7 +98,7 @@ func (u *reviewStorage) GetListByPlace(id int) (domain.Reviews, error) {
 
 	var review domain.Review
 	for rows.Next() {
-		err = rows.Scan(&review.Id, &review.Title, &review.Text, &review.Rating, &review.User_id, &review.Place_id)
+		err = rows.Scan(&review.Id, &review.Title, &review.Text, &review.Rating, &review.UserId, &review.PlaceId)
 		reviews = append(reviews, review)
 	}
 	if rows.Err() != nil {
@@ -78,7 +121,7 @@ func (u *reviewStorage) Get(id int) (domain.Review, error) {
 		`SELECT id, title, text, rating, user_id, place_id FROM Reviews
 		Where id = $1`,
 		id,
-	).Scan(&review.Id, &review.Title, &review.Text, &review.Rating, &review.User_id, &review.Place_id)
+	).Scan(&review.Id, &review.Title, &review.Text, &review.Rating, &review.UserId, &review.PlaceId)
 	if err != nil {
 		fmt.Print("Error while scanning places", err)
 		return review, err
@@ -99,4 +142,25 @@ func (u *reviewStorage) Delete(id int) error {
 		id,
 	)
 	return err
+}
+
+func (u *reviewStorage) GetReviewAuthor(id int) int {
+	conn, err := u.dataHolder.Acquire(context.Background())
+	if err != nil {
+		fmt.Print("Connection error while deleting user ", err)
+		return 0
+	}
+	defer conn.Release()
+
+	var author int
+	err = conn.QueryRow(context.Background(),
+		`SELECT user_id
+	FROM Reviews WHERE id = $1`,
+		id,
+	).Scan(&author)
+
+	if err != nil {
+		return 0
+	}
+	return author
 }
