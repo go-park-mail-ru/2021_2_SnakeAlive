@@ -1,134 +1,8 @@
 package userDelivery
 
-// import (
-// 	"context"
-// 	"encoding/json"
-// 	"fmt"
-// 	"log"
-// 	"os"
-// 	"snakealive/m/pkg/domain"
-// 	"testing"
-
-// 	"github.com/jackc/pgx/v4/pgxpool"
-// 	"github.com/stretchr/testify/assert"
-// 	"github.com/valyala/fasthttp"
-// )
-
-// type test struct {
-// 	input string
-// 	want  int
-// }
-
-// func SetUpDB() *pgxpool.Pool {
-// 	url := "postgres://tripadvisor:12345@localhost:5432/tripadvisor"
-
-// 	dbpool, err := pgxpool.Connect(context.Background(), url)
-// 	if err != nil {
-// 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
-// 		os.Exit(1)
-// 	}
-// 	//defer dbpool.Close()
-// 	return dbpool
-// }
-
-// func Test_Login_Success_HttpResponseCode(t *testing.T) {
-// 	tests := []test{
-// 		{`{"email": "alex@mail.ru", "password": "password"}`,
-// 			fasthttp.StatusOK},
-// 		{`{"email": "nikita@mail.ru", "password": "frontend123"}`,
-// 			fasthttp.StatusOK},
-// 		{`{"email": "ksenia@mail.ru", "password": "12345678"}`,
-// 			fasthttp.StatusOK},
-// 		{`{"email": "andrew@mail.ru", "password": "000111000"}`,
-// 			fasthttp.StatusOK},
-// 	}
-// 	ctx := &fasthttp.RequestCtx{}
-
-// 	for _, tc := range tests {
-// 		ctx.Request.SetBody(nil)
-// 		ctx.Request.AppendBody([]byte(tc.input))
-// 		userHandler := CreateDelivery(SetUpDB())
-// 		userHandler.Login(ctx)
-// 		assert.Equal(t, tc.want, ctx.Response.Header.StatusCode())
-// 	}
-// }
-
-// func Test_Login_False_HttpResponseCode(t *testing.T) {
-// 	tests := []test{
-// 		{`{"email": "alex@mail.ru", "password": "123123123abcabc"}`,
-// 			fasthttp.StatusBadRequest},
-// 		{`{"email": "------@mail.ru", "password": "--123---"}`,
-// 			fasthttp.StatusNotFound},
-// 		{`{"email": "alex@mail.ru", "password": "-----"}`,
-// 			fasthttp.StatusBadRequest},
-// 		{`{"email": "------", "password": "frontend123"}`,
-// 			fasthttp.StatusBadRequest},
-// 		{`{"-----": "ksenia@mail.ru", "password": "12345678"}`,
-// 			fasthttp.StatusBadRequest},
-// 		{`{--------}`,
-// 			fasthttp.StatusBadRequest},
-// 	}
-// 	ctx := &fasthttp.RequestCtx{}
-
-// 	for _, tc := range tests {
-// 		ctx.Request.SetBody(nil)
-// 		ctx.Request.AppendBody([]byte(tc.input))
-// 		userHandler := CreateDelivery(SetUpDB())
-// 		userHandler.Login(ctx)
-// 		assert.Equal(t, tc.want, ctx.Response.Header.StatusCode())
-// 	}
-// }
-
-// func Test_Register_Fail_HttpResponseCode(t *testing.T) {
-// 	tests := []test{
-// 		{`{"name": "123", "surname": "surname", "email": "alex@mail.ru", "password": "password"}`,
-// 			fasthttp.StatusBadRequest},
-// 		{`{"name": "name", "surname": "surname", "email": "alex@mail.ru", "password": "password"}`,
-// 			fasthttp.StatusBadRequest},
-// 		{`{"name": "name2", "surname": "123", "email": "alextest@mail.ru", "password": "password"}`,
-// 			fasthttp.StatusBadRequest},
-// 		{`{"name": "name2", "surname": "surname2", "email": "ksenia@mail.ru, "password": "12345678"}`,
-// 			fasthttp.StatusBadRequest},
-// 		{`xxxxx`, fasthttp.StatusBadRequest},
-// 	}
-// 	ctx := &fasthttp.RequestCtx{}
-
-// 	for _, tc := range tests {
-// 		ctx.Request.SetBody(nil)
-// 		ctx.Request.AppendBody([]byte(tc.input))
-// 		userHandler := CreateDelivery(SetUpDB())
-// 		userHandler.Registration(ctx)
-// 		assert.Equal(t, tc.want, ctx.Response.Header.StatusCode())
-// 	}
-// }
-
-// func Test_Register_Success_HttpResponseCode(t *testing.T) {
-// 	tests := []test{
-// 		{`{"name": "Name", "surname": "Surname", "email": "testing1@mail.ru", "password": "password2"}`,
-// 			fasthttp.StatusOK},
-// 	}
-// 	ctx := &fasthttp.RequestCtx{}
-
-// 	for _, tc := range tests {
-// 		ctx.Request.SetBody(nil)
-// 		ctx.Request.AppendBody([]byte(tc.input))
-// 		userHandler := CreateDelivery(SetUpDB())
-
-// 		user := new(domain.User)
-// 		if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {
-// 			log.Printf("error while unmarshalling JSON: %s", err)
-// 			ctx.SetStatusCode(fasthttp.StatusBadRequest)
-// 			return
-// 		}
-// 		//todo убрать deleteByEmail добавить моки
-// 		userHandler.DeleteProfile(ctx)
-// 		userHandler.Registration(ctx)
-// 		assert.Equal(t, tc.want, ctx.Response.Header.StatusCode())
-// 	}
-// }
-
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	cd "snakealive/m/internal/cookie/delivery"
@@ -144,53 +18,118 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHandler_Login(t *testing.T) {
-	type mockBehavior func(r *service_mocks.MockUserStorage, user domain.User)
+type mockBehavior func(r *service_mocks.MockUserStorage, user domain.User)
 
-	tests := []struct {
-		name                 string
-		inputBody            string
-		inputUser            domain.User
-		mockBehavior         mockBehavior
-		expectedStatusCode   int
-		expectedResponseBody string
-	}{
-		// {
-		// 	name:      "OK",
-		// 	inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
-		// 	inputUser: domain.User{
-		// 		Name:     "Name",
-		// 		Surname:  "surname",
-		// 		Email:    "alex@mail.ru",
-		// 		Password: "password",
-		// 	},
-		// 	mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
-		// 		r.EXPECT().GetByEmail(user.Email).Return(user, nil)
-		// 	},
-		// 	expectedStatusCode: fasthttp.StatusOK,
-		// },
-		// {
-		// 	name:      "Wrong password",
-		// 	inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
-		// 	inputUser: domain.User{
-		// 		Name:     "Name",
-		// 		Surname:  "surname",
-		// 		Email:    "alex@mail.ru",
-		// 		Password: "12345667",
-		// 	},
-		// 	mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
-		// 		r.EXPECT().GetByEmail(user.Email).Return(user, nil).AnyTimes()
-		// 	},
-		// 	expectedStatusCode: fasthttp.StatusBadRequest,
-		// },
+type MyTest struct {
+	name                 string
+	inputBody            string
+	inputUser            domain.User
+	mockBehavior         mockBehavior
+	expectedStatusCode   int
+	expectedResponseBody string
+}
+
+func SetUpDB() *pgxpool.Pool {
+	url := "postgres://tripadvisor:12345@localhost:5432/tripadvisor"
+
+	dbpool, err := pgxpool.Connect(context.Background(), url)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		os.Exit(1)
+	}
+	return dbpool
+}
+
+func TestHandler_Login(t *testing.T) {
+	tests := []MyTest{
 		{
-			name:      "No such user",
+			name:      "OK",
 			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
-			inputUser: domain.User{},
-			mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
-				r.EXPECT().GetByEmail(user.Email).Return(domain.User{}, nil)
+			inputUser: domain.User{
+				Name:     "Name",
+				Surname:  "surname",
+				Email:    "alex@mail.ru",
+				Password: "password",
 			},
-			expectedStatusCode: fasthttp.StatusNotFound,
+			mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+				r.EXPECT().GetByEmail(user.Email).Return(user, nil)
+				r.EXPECT().GetByEmail(user.Email).Return(user, nil)
+			},
+			expectedStatusCode: fasthttp.StatusOK,
+		},
+		{
+			name:      "Wrong password",
+			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
+			inputUser: domain.User{
+				Name:     "Name",
+				Surname:  "surname",
+				Email:    "alex@mail.ru",
+				Password: "12345667",
+			},
+			mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+				r.EXPECT().GetByEmail(user.Email).Return(user, nil).AnyTimes()
+			},
+			expectedStatusCode: fasthttp.StatusBadRequest,
+		},
+		// {
+		// 	name:      "No such user",
+		// 	inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
+		// 	inputUser: domain.User{},
+		// 	mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+		// 		r.EXPECT().GetByEmail(user.Email).Return(domain.User{}, nil)
+		// 	},
+		// 	expectedStatusCode: fasthttp.StatusNotFound,
+		// },
+	}
+	ctx := &fasthttp.RequestCtx{}
+
+	for _, tc := range tests {
+		c := gomock.NewController(t)
+		defer c.Finish()
+
+		repo := service_mocks.NewMockUserStorage(c)
+		tc.mockBehavior(repo, tc.inputUser)
+
+		ctx.Request.SetBody(nil)
+		ctx.Request.AppendBody([]byte(tc.inputBody))
+		cookieLayer := cd.CreateDelivery(SetUpDB())
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+		userLayer.Login(ctx)
+
+		assert.Equal(t, ctx.Response.Header.StatusCode(), tc.expectedStatusCode)
+	}
+}
+
+func TestHandler_Register(t *testing.T) {
+	tests := []MyTest{
+		{
+			name:      "OK",
+			inputBody: `{"name": "Name", "surname": "Surname", "email": "testing@mail.ru", "password": "password"}`,
+			inputUser: domain.User{
+				Name:     "Name",
+				Surname:  "Surname",
+				Email:    "testing@mail.ru",
+				Password: "password",
+			},
+			mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+				r.EXPECT().GetByEmail(user.Email).Return(domain.User{}, errors.New("Error")).AnyTimes()
+				r.EXPECT().Add(user)
+			},
+			expectedStatusCode: fasthttp.StatusOK,
+		},
+		{
+			name:      "User registered",
+			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
+			inputUser: domain.User{
+				Name:     "Name",
+				Surname:  "Surname",
+				Email:    "alex@mail.ru",
+				Password: "password",
+			},
+			mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+				r.EXPECT().GetByEmail(user.Email).Return(domain.User{}, nil).AnyTimes()
+			},
+			expectedStatusCode: fasthttp.StatusBadRequest,
 		},
 	}
 	ctx := &fasthttp.RequestCtx{}
@@ -202,67 +141,154 @@ func TestHandler_Login(t *testing.T) {
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
 
-		//cookie_repo := service_mocks.
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
-
-		//services := &service.Service{Authorization: repo}
 		cookieLayer := cd.CreateDelivery(SetUpDB())
 		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
-		//userHandler := CreateDelivery(repo)
+		userLayer.Registration(ctx)
 
-		userLayer.Login(ctx)
-
-		assert.Equal(t, ctx.Response.Header.StatusCode(), tc.expectedStatusCode)
+		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
 	}
 }
 
-func SetUpDB() *pgxpool.Pool {
-	url := "postgres://tripadvisor:12345@localhost:5432/tripadvisor"
-
-	dbpool, err := pgxpool.Connect(context.Background(), url)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
-		os.Exit(1)
+func TestHandler_Logout(t *testing.T) {
+	tests := []MyTest{
+		{
+			name:      "OK",
+			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
+			inputUser: domain.User{
+				Name:     "Name",
+				Surname:  "Surname",
+				Email:    "alex@mail.ru",
+				Password: "password",
+			},
+			mockBehavior:       func(r *service_mocks.MockUserStorage, user domain.User) {},
+			expectedStatusCode: fasthttp.StatusBadRequest,
+		},
 	}
-	//defer dbpool.Close()
-	return dbpool
+	ctx := &fasthttp.RequestCtx{}
+
+	for _, tc := range tests {
+		c := gomock.NewController(t)
+		defer c.Finish()
+
+		repo := service_mocks.NewMockUserStorage(c)
+		tc.mockBehavior(repo, tc.inputUser)
+
+		ctx.Request.SetBody(nil)
+		ctx.Request.AppendBody([]byte(tc.inputBody))
+		cookieLayer := cd.CreateDelivery(SetUpDB())
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+		userLayer.Logout(ctx)
+
+		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
+	}
 }
 
-// for _, test := range tests {
-// 	t.Run(test.name, func(t *testing.T) {
-// 		// Init Dependencies
-// 		c := gomock.NewController(t)
-// 		defer c.Finish()
+func TestHandler_GetProfile(t *testing.T) {
+	tests := []MyTest{
+		{
+			name:      "Unauthorized",
+			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
+			inputUser: domain.User{
+				Name:     "Name",
+				Surname:  "Surname",
+				Email:    "alex@mail.ru",
+				Password: "password",
+			},
+			mockBehavior:       func(r *service_mocks.MockUserStorage, user domain.User) {},
+			expectedStatusCode: fasthttp.StatusUnauthorized,
+		},
+	}
+	ctx := &fasthttp.RequestCtx{}
 
-// 		repo := service_mocks.MockUserStorage(c)
-// 		test.mockBehavior(repo, test.inputUser)
+	for _, tc := range tests {
+		c := gomock.NewController(t)
+		defer c.Finish()
 
-// 		services := &service.Service{Authorization: repo}
-// 		handler := Handler{services}
+		repo := service_mocks.NewMockUserStorage(c)
+		tc.mockBehavior(repo, tc.inputUser)
 
-// 		// Init Endpoint
-// 		r := gin.New()
-// 		r.POST("/sign-up", handler.signUp)
+		ctx.Request.SetBody(nil)
+		ctx.Request.AppendBody([]byte(tc.inputBody))
+		cookieLayer := cd.CreateDelivery(SetUpDB())
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+		userLayer.GetProfile(ctx)
 
-// 		// Create Request
-// 		// w := httptest.NewRecorder()
-// 		// req:= httptest.NewRequest("POST", "/sign-up",
-// 		// 	bytes.NewBufferString(test.inputBody))
-// 		ctx.Request.SetBody(nil)
-// 		ctx.Request.AppendBody([]byte(test.inputBody))
-// 		// Make Request
-// 		r.ServeHTTP(w, req)
+		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
+	}
+}
 
-// 		// Assert
-// 		assert.Equal(t, w.Code, test.expectedStatusCode)
-// 		assert.Equal(t, w.Body.String(), test.expectedResponseBody)
+func TestHandler_UpdateProfile(t *testing.T) {
+	tests := []MyTest{
+		{
+			name:      "Unauthorized",
+			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
+			inputUser: domain.User{
+				Id:       1,
+				Name:     "Name",
+				Surname:  "Surname",
+				Email:    "alex@mail.ru",
+				Password: "password",
+			},
+			mockBehavior:       func(r *service_mocks.MockUserStorage, user domain.User) {},
+			expectedStatusCode: fasthttp.StatusUnauthorized,
+		},
+	}
+	ctx := &fasthttp.RequestCtx{}
 
-// 		ctx.Request.SetBody(nil)
-// 		ctx.Request.AppendBody([]byte(tc.input))
-// 		userHandler := CreateDelivery(SetUpDB())
-// 		userHandler.Login(ctx)
-// 		assert.Equal(t, tc.want, ctx.Response.Header.StatusCode())
-// 	})
-// }
-//}
+	for _, tc := range tests {
+		c := gomock.NewController(t)
+		defer c.Finish()
+
+		repo := service_mocks.NewMockUserStorage(c)
+		tc.mockBehavior(repo, tc.inputUser)
+
+		ctx.Request.SetBody(nil)
+		ctx.Request.AppendBody([]byte(tc.inputBody))
+		cookieLayer := cd.CreateDelivery(SetUpDB())
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+
+		//с := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email)))
+		//cookieLayer.SetCookieAndToken(ctx, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))), tc.inputUser.Id)
+		userLayer.UpdateProfile(ctx)
+
+		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
+	}
+}
+
+func TestHandler_DeleteProfile(t *testing.T) {
+	tests := []MyTest{
+		{
+			name:      "Unauthorized",
+			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
+			inputUser: domain.User{
+				Id:       1,
+				Name:     "Name",
+				Surname:  "Surname",
+				Email:    "alex@mail.ru",
+				Password: "password",
+			},
+			mockBehavior:       func(r *service_mocks.MockUserStorage, user domain.User) {},
+			expectedStatusCode: fasthttp.StatusUnauthorized,
+		},
+	}
+	ctx := &fasthttp.RequestCtx{}
+
+	for _, tc := range tests {
+		c := gomock.NewController(t)
+		defer c.Finish()
+
+		repo := service_mocks.NewMockUserStorage(c)
+		tc.mockBehavior(repo, tc.inputUser)
+
+		ctx.Request.SetBody(nil)
+		ctx.Request.AppendBody([]byte(tc.inputBody))
+		cookieLayer := cd.CreateDelivery(SetUpDB())
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+
+		userLayer.DeleteProfile(ctx)
+
+		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
+	}
+}

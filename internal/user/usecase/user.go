@@ -3,7 +3,6 @@ package userUseCase
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/domain"
@@ -57,7 +56,6 @@ func (u userUseCase) Validate(user *domain.User) bool {
 
 func (u userUseCase) Login(user *domain.User) (int, error) {
 	foundUser, err := u.GetByEmail(user.Email)
-	fmt.Println("foundUser = ", foundUser, "err", err, "foundUser==domain.User{}?", foundUser == domain.User{})
 	if err != nil {
 		log.Printf("error while login-GetByEmail")
 		log.Print(err)

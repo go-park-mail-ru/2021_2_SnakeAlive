@@ -1,6 +1,5 @@
 package domain
 
-//go:generate mockgen -source=review.go -destination=/mocks/mock.go
 type Reviews []Review
 
 type Review struct {

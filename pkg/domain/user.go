@@ -1,6 +1,7 @@
 package domain
 
 //go:generate mockgen -source=user.go -destination=/mocks/mock.go
+//mockgen -source=user.go -destination=mocks/mock_doer.go -package=mocks
 
 type User struct {
 	Id       int    `json:"-"`

@@ -35,49 +35,6 @@ func (u *reviewStorage) Add(value domain.Review, userId int) error {
 	return err
 }
 
-<<<<<<< HEAD
-=======
-func (u *reviewStorage) Test(id int) error {
-	var review domain.Review
-	var reviews domain.Reviews
-	conn, err := u.dataHolder.Acquire(context.Background())
-	if err != nil {
-		fmt.Print(err)
-		return err
-	}
-	defer conn.Release()
-	fmt.Println("quary ----")
-	rows, err := conn.Query(context.Background(),
-		`SELECT id, title, text, rating, user_id, place_id, created_at FROM Reviews
-		`,
-	)
-
-	for rows.Next() {
-		rows.Scan(&review.Id, &review.Title, &review.Text, &review.Rating, &review.UserId, &review.PlaceId, &review.CreatedAt)
-		reviews = append(reviews, review)
-	}
-	fmt.Println("reviews = ", reviews)
-	//fmt.Println("rows raw = ", rows.Values())
-	// i := 0
-	// flag := true
-	// rows.Next()
-	// for flag {
-	// 	err = rows.Scan(&review.Id, &review.Title, &review.Text, &review.Rating, &review.User_id, &review.Place_id, &review.Created_at)
-
-	// 	fmt.Println("reviews[", i, "] = ", review)
-	// 	reviews = append(reviews, review)
-	// 	i += 1
-	// 	cur := rows.Next()
-	// 	fmt.Println("rows.Next() = ", cur)
-	// 	if cur == false {
-	// 		flag = false
-	// 	}
-
-	// }
-	return err
-}
-
->>>>>>> 1a9a135e7fdec2361deb9819e2f4e285a6fb2622
 func (u *reviewStorage) GetListByPlace(id int) (domain.Reviews, error) {
 	reviews := make(domain.Reviews, 0)
 	conn, err := u.dataHolder.Acquire(context.Background())
