@@ -71,7 +71,7 @@ func (u *UserStorage) GetByEmail(key string) (value domain.User, err error) {
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
 		fmt.Printf("Error while getting user")
-		return user, err
+		return domain.User{}, err
 	}
 	defer conn.Release()
 

@@ -1,5 +1,7 @@
 package domain
 
+//go:generate mockgen -source=user.go -destination=/mocks/mock.go
+
 type User struct {
 	Id       int    `json:"-"`
 	Name     string `json:"name" valid:"required"`

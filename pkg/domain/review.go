@@ -1,5 +1,6 @@
 package domain
 
+//go:generate mockgen -source=review.go -destination=/mocks/mock.go
 type Reviews []Review
 
 type Review struct {
@@ -17,8 +18,6 @@ type ReviewStorage interface {
 	Get(id int) (Review, error)
 	GetListByPlace(id int) (Reviews, error)
 	Delete(id int) error
-
-	Test(id int) error
 }
 
 type ReviewUseCase interface {
