@@ -17,15 +17,15 @@ func NewPlaceStorage(DB *pgxpool.Pool) domain.PlaceStorage {
 }
 
 func (u *placeStorage) GetById(id int) (value domain.Place, err error) {
-	var sight domain.Place
 
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
 		fmt.Printf("Error while getting sight")
-		return sight, err
+		return domain.Place{}, err
 	}
 	defer conn.Release()
 
+	var sight domain.Place
 	err = conn.QueryRow(context.Background(),
 		`SELECT id, name, country, rating, tags, description, photos
 		FROM Places WHERE id = $1`,

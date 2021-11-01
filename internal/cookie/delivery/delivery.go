@@ -77,9 +77,11 @@ func (s *cookieHandler) GetUser(cookie string) (user domain.User, err error) {
 }
 
 func setToken(ctx *fasthttp.RequestCtx, hash string) {
-	t := ent.Token{Token: hash}
-	bytes, err := json.Marshal(t)
+	t := ent.Token{
+		Token: hash,
+	}
 
+	bytes, err := json.Marshal(t)
 	if err != nil {
 		log.Printf("error while marshalling JSON: %s", err)
 		ctx.Write([]byte("{}"))
