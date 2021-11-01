@@ -1,46 +1,22 @@
 package tripDelivery
 
 import (
-	"context"
 	"fmt"
-	"os"
 	cu "snakealive/m/internal/cookie/usecase"
 	tu "snakealive/m/internal/trip/usecase"
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/domain"
 	service_mocks "snakealive/m/pkg/domain/mocks"
+	"strconv"
 	"testing"
 
 	cd "snakealive/m/internal/cookie/delivery"
 
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"github.com/valyala/fasthttp"
 )
-
-//type mockBehavior func(r *service_mocks.MockTripStorage, trip domain.Trip, user domain.User)
-
-type MyTest struct {
-	name                 string
-	inputBody            string
-	inputTrip            domain.Trip
-	inputUser            domain.User
-	expectedStatusCode   int
-	expectedResponseBody string
-}
-
-func SetUpDB() *pgxpool.Pool {
-	url := "postgres://tripadvisor:12345@localhost:5432/tripadvisor"
-
-	dbpool, err := pgxpool.Connect(context.Background(), url)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
-		os.Exit(1)
-	}
-	return dbpool
-}
 
 func TestHandler_AddTrip(t *testing.T) {
 	user := domain.User{
@@ -50,69 +26,226 @@ func TestHandler_AddTrip(t *testing.T) {
 		Email:    "testtesttests@mail.ru",
 		Password: "1234567890",
 	}
-	tests := []MyTest{
-		/*{
-			name:      "Unathorised",
-			inputBody: `{"title": "Best trip ever", "description": "Wow wow", "days": [[ {"id": 1}, {"id": 2} ] ]}`,
-			inputTrip: domain.Trip{
-				Title:       "Best trip ever",
-				Description: "Wow wow",
-				Days:        [][]domain.Place{{domain.Place{Id: 1}, domain.Place{Id: 2}}},
-			},
-			inputUser:          domain.User{},
-			expectedStatusCode: fasthttp.StatusUnauthorized,
-		},*/
-		{
-			name:      "Trip added",
-			inputBody: `{"title": "Best trip ever", "description": "Wow wow", "days": [[ {"id": 1}, {"id": 2} ] ]}`,
-			inputTrip: domain.Trip{
-				Id:          0,
-				Title:       "Best trip ever",
-				Description: "Wow wow",
-				Days:        [][]domain.Place{{domain.Place{Id: 1}, domain.Place{Id: 2}}},
-			},
-			inputUser:          user,
-			expectedStatusCode: fasthttp.StatusOK,
-		},
+	inputBody := `{"title": "Best trip ever", "description": "Wow wow", "days": [[ {"id": 1}, {"id": 2} ] ]}`
+	inputTrip := domain.Trip{
+		Id:          0,
+		Title:       "Best trip ever",
+		Description: "Wow wow",
+		Days:        [][]domain.Place{{domain.Place{Id: 1}, domain.Place{Id: 2}}},
+	}
+	addedTrip := domain.Trip{
+		Id:          1,
+		Title:       "Best trip ever",
+		Description: "Wow wow",
+		Days:        [][]domain.Place{{domain.Place{Id: 1}, domain.Place{Id: 2}}},
+	}
+	expectedStatusCode := fasthttp.StatusOK
+
+	mockGetUser := func(r *service_mocks.MockCookieStorage, cookie string, user domain.User) {
+		r.EXPECT().Get(cookie).Return(user, nil).AnyTimes()
 	}
 
 	mockAdd := func(r *service_mocks.MockTripStorage, trip domain.Trip, user domain.User) {
-		r.EXPECT().Add(trip, gomock.Any()).Return(1, nil).AnyTimes()
-	}
-
-	mockGetUser := func(r *service_mocks.MockCookieStorage, cookie string) {
-		r.EXPECT().Get(gomock.Any()).Return(user, nil).AnyTimes()
+		r.EXPECT().Add(trip, user).Return(1, nil).AnyTimes()
 	}
 
 	mockGetById := func(r *service_mocks.MockTripStorage, trip domain.Trip, id int) {
-		r.EXPECT().GetById(gomock.Any()).Return(trip, nil).AnyTimes()
+		r.EXPECT().GetById(id).Return(trip, nil).AnyTimes()
 	}
 
 	ctx := &fasthttp.RequestCtx{}
 
-	for _, tc := range tests {
-		c := gomock.NewController(t)
-		defer c.Finish()
+	c := gomock.NewController(t)
+	defer c.Finish()
 
-		cookieRepo := service_mocks.NewMockCookieStorage(c)
-		cookie := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email)))
+	cookieRepo := service_mocks.NewMockCookieStorage(c)
+	cookie := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
 
-		tripRepo := service_mocks.NewMockTripStorage(c)
-		mockAdd(tripRepo, tc.inputTrip, tc.inputUser)
-		mockGetUser(cookieRepo, cookie)
-		mockGetById(tripRepo, tc.inputTrip, tc.inputTrip.Id)
+	tripRepo := service_mocks.NewMockTripStorage(c)
+	mockGetUser(cookieRepo, cookie, user)
+	mockAdd(tripRepo, inputTrip, user)
+	mockGetById(tripRepo, addedTrip, addedTrip.Id)
 
-		ctx.Request.SetBody(nil)
-		ctx.Request.AppendBody([]byte(tc.inputBody))
+	ctx.Request.SetBody(nil)
+	ctx.Request.AppendBody([]byte(inputBody))
 
-		if tc.expectedStatusCode != fasthttp.StatusUnauthorized {
-			ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
-		}
+	ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
 
-		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
-		tripLayer := NewTripHandler(tu.NewTripUseCase(tripRepo), cookieLayer)
-		tripLayer.AddTrip(ctx)
+	cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
+	tripLayer := NewTripHandler(tu.NewTripUseCase(tripRepo), cookieLayer)
+	tripLayer.AddTrip(ctx)
 
-		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
+	assert.Equal(t, expectedStatusCode, ctx.Response.Header.StatusCode())
+}
+
+func TestHandler_Trip(t *testing.T) {
+	user := domain.User{
+		Id:       1,
+		Name:     "Александра",
+		Surname:  "Волкова",
+		Email:    "testtesttests@mail.ru",
+		Password: "1234567890",
 	}
+	trip := domain.Trip{
+		Id:          1,
+		Title:       "Best trip ever",
+		Description: "Wow wow",
+		Days:        [][]domain.Place{{domain.Place{Id: 1}, domain.Place{Id: 2}}},
+	}
+	expectedStatusCode := fasthttp.StatusOK
+
+	mockGetUser := func(r *service_mocks.MockCookieStorage, cookie string, user domain.User) {
+		r.EXPECT().Get(cookie).Return(user, nil).AnyTimes()
+	}
+
+	mockGetById := func(r *service_mocks.MockTripStorage, trip domain.Trip, id int) {
+		r.EXPECT().GetById(id).Return(trip, nil).AnyTimes()
+	}
+
+	mockTripAuthor := func(r *service_mocks.MockTripStorage, trip domain.Trip, id int) {
+		r.EXPECT().GetTripAuthor(trip.Id).Return(id).AnyTimes()
+	}
+
+	ctx := &fasthttp.RequestCtx{}
+
+	c := gomock.NewController(t)
+	defer c.Finish()
+
+	cookieRepo := service_mocks.NewMockCookieStorage(c)
+	cookie := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
+
+	tripRepo := service_mocks.NewMockTripStorage(c)
+	mockGetUser(cookieRepo, cookie, user)
+	mockGetById(tripRepo, trip, trip.Id)
+	mockTripAuthor(tripRepo, trip, user.Id)
+
+	ctx.Request.SetBody(nil)
+	ctx.SetUserValue("id", strconv.Itoa(trip.Id))
+
+	ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
+
+	cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
+	tripLayer := NewTripHandler(tu.NewTripUseCase(tripRepo), cookieLayer)
+	tripLayer.Trip(ctx)
+
+	assert.Equal(t, expectedStatusCode, ctx.Response.Header.StatusCode())
+}
+
+func TestHandler_UpdateTrip(t *testing.T) {
+	user := domain.User{
+		Id:       1,
+		Name:     "Александра",
+		Surname:  "Волкова",
+		Email:    "testtesttests@mail.ru",
+		Password: "1234567890",
+	}
+	trip := domain.Trip{
+		Id:          0,
+		Title:       "Worst trip ever",
+		Description: "Wow wow",
+		Days:        [][]domain.Place{{domain.Place{Id: 1}, domain.Place{Id: 2}}},
+	}
+	updatedTrip := domain.Trip{
+		Id:          1,
+		Title:       "Worst trip ever",
+		Description: "Wow wow",
+		Days:        [][]domain.Place{{domain.Place{Id: 1}, domain.Place{Id: 2}}},
+	}
+	inputBody := `{"title": "Worst trip ever", "description": "Wow wow", "days": [[ {"id": 1}, {"id": 2} ] ]}`
+	expectedStatusCode := fasthttp.StatusOK
+
+	mockGetUser := func(r *service_mocks.MockCookieStorage, cookie string, user domain.User) {
+		r.EXPECT().Get(cookie).Return(user, nil).AnyTimes()
+	}
+
+	mockGetById := func(r *service_mocks.MockTripStorage, trip domain.Trip, id int) {
+		r.EXPECT().GetById(id).Return(trip, nil).AnyTimes()
+	}
+
+	mockTripAuthor := func(r *service_mocks.MockTripStorage, trip domain.Trip, id int) {
+		r.EXPECT().GetTripAuthor(trip.Id).Return(id).AnyTimes()
+	}
+
+	mockUpdate := func(r *service_mocks.MockTripStorage, trip domain.Trip, id int) {
+		r.EXPECT().Update(id, trip).Return(nil).AnyTimes()
+	}
+
+	ctx := &fasthttp.RequestCtx{}
+
+	c := gomock.NewController(t)
+	defer c.Finish()
+
+	cookieRepo := service_mocks.NewMockCookieStorage(c)
+	cookie := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
+
+	tripRepo := service_mocks.NewMockTripStorage(c)
+	mockGetUser(cookieRepo, cookie, user)
+	mockGetById(tripRepo, updatedTrip, updatedTrip.Id)
+	mockTripAuthor(tripRepo, updatedTrip, user.Id)
+	mockUpdate(tripRepo, trip, updatedTrip.Id)
+
+	ctx.Request.SetBody(nil)
+	ctx.SetUserValue("id", strconv.Itoa(updatedTrip.Id))
+	ctx.Request.AppendBody([]byte(inputBody))
+
+	ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
+
+	cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
+	tripLayer := NewTripHandler(tu.NewTripUseCase(tripRepo), cookieLayer)
+	tripLayer.Update(ctx)
+
+	assert.Equal(t, expectedStatusCode, ctx.Response.Header.StatusCode())
+}
+
+func TestHandler_DeleteTrip(t *testing.T) {
+	user := domain.User{
+		Id:       1,
+		Name:     "Александра",
+		Surname:  "Волкова",
+		Email:    "testtesttests@mail.ru",
+		Password: "1234567890",
+	}
+	trip := domain.Trip{
+		Id:          1,
+		Title:       "Worst trip ever",
+		Description: "Wow wow",
+		Days:        [][]domain.Place{{domain.Place{Id: 1}, domain.Place{Id: 2}}},
+	}
+	expectedStatusCode := fasthttp.StatusOK
+
+	mockGetUser := func(r *service_mocks.MockCookieStorage, cookie string, user domain.User) {
+		r.EXPECT().Get(cookie).Return(user, nil).AnyTimes()
+	}
+
+	mockTripAuthor := func(r *service_mocks.MockTripStorage, trip domain.Trip, id int) {
+		r.EXPECT().GetTripAuthor(trip.Id).Return(id).AnyTimes()
+	}
+
+	mockDelete := func(r *service_mocks.MockTripStorage, id int) {
+		r.EXPECT().Delete(id).Return(nil).AnyTimes()
+	}
+
+	ctx := &fasthttp.RequestCtx{}
+
+	c := gomock.NewController(t)
+	defer c.Finish()
+
+	cookieRepo := service_mocks.NewMockCookieStorage(c)
+	cookie := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
+
+	tripRepo := service_mocks.NewMockTripStorage(c)
+	mockGetUser(cookieRepo, cookie, user)
+	mockTripAuthor(tripRepo, trip, user.Id)
+	mockDelete(tripRepo, trip.Id)
+
+	ctx.Request.SetBody(nil)
+	ctx.SetUserValue("id", strconv.Itoa(trip.Id))
+
+	ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
+
+	cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
+	tripLayer := NewTripHandler(tu.NewTripUseCase(tripRepo), cookieLayer)
+	tripLayer.Delete(ctx)
+
+	assert.Equal(t, expectedStatusCode, ctx.Response.Header.StatusCode())
 }

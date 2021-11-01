@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	cd "snakealive/m/internal/cookie/delivery"
+	cu "snakealive/m/internal/cookie/usecase"
 	uu "snakealive/m/internal/user/usecase"
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/domain"
@@ -225,6 +226,13 @@ func TestHandler_Logout(t *testing.T) {
 }
 
 func TestHandler_Logout2(t *testing.T) {
+	user := domain.User{
+		Id:       1,
+		Name:     "Александра",
+		Surname:  "Волкова",
+		Email:    "testtesttests@mail.ru",
+		Password: "1234567890",
+	}
 	tests := []MyTest{
 		{
 			name:      "OK",
@@ -241,6 +249,12 @@ func TestHandler_Logout2(t *testing.T) {
 		},
 	}
 	ctx := &fasthttp.RequestCtx{}
+	mockGetUser := func(r *service_mocks.MockCookieStorage, cookie string, user domain.User) {
+		r.EXPECT().Get(cookie).Return(user, nil).AnyTimes()
+	}
+	mockDelete := func(r *service_mocks.MockCookieStorage, cookie string) {
+		r.EXPECT().Delete(cookie).Return(nil).AnyTimes()
+	}
 
 	for _, tc := range tests {
 		c := gomock.NewController(t)
@@ -251,11 +265,15 @@ func TestHandler_Logout2(t *testing.T) {
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
-		cookieLayer := cd.CreateDelivery(SetUpDB())
+
+		cookieRepo := service_mocks.NewMockCookieStorage(c)
+		cookie := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
+		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
 		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
 
-		ctx.Request.Header.SetCookie(cnst.CookieName, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))))
-		cookieLayer.SetCookieAndToken(ctx, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))), tc.inputUser.Id)
+		ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
+		mockGetUser(cookieRepo, cookie, user)
+		mockDelete(cookieRepo, cookie)
 
 		userLayer.Logout(ctx)
 
@@ -319,6 +337,9 @@ func TestHandler_GetProfile2(t *testing.T) {
 		},
 	}
 	ctx := &fasthttp.RequestCtx{}
+	mockGetUser := func(r *service_mocks.MockCookieStorage, cookie string, user domain.User) {
+		r.EXPECT().Get(cookie).Return(user, nil).AnyTimes()
+	}
 
 	for _, tc := range tests {
 		c := gomock.NewController(t)
@@ -326,14 +347,16 @@ func TestHandler_GetProfile2(t *testing.T) {
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
+		cookieRepo := service_mocks.NewMockCookieStorage(c)
+		cookie := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email)))
+		mockGetUser(cookieRepo, cookie, tc.inputUser)
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
-		cookieLayer := cd.CreateDelivery(SetUpDB())
-		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+		ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
 
-		ctx.Request.Header.SetCookie(cnst.CookieName, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))))
-		cookieLayer.SetCookieAndToken(ctx, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))), tc.inputUser.Id)
+		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
 
 		userLayer.GetProfile(ctx)
 
@@ -372,7 +395,6 @@ func TestHandler_UpdateProfile(t *testing.T) {
 		cookieLayer := cd.CreateDelivery(SetUpDB())
 		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
 
-		//ctx.Request.Header.SetCookie(cnst.CookieName, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))))
 		userLayer.UpdateProfile(ctx)
 
 		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
@@ -380,6 +402,13 @@ func TestHandler_UpdateProfile(t *testing.T) {
 }
 
 func TestHandler_UpdateProfile2(t *testing.T) {
+	user := domain.User{
+		Id:       1,
+		Name:     "Name",
+		Surname:  "Surname",
+		Email:    "alex@mail.ru",
+		Password: "password",
+	}
 	tests := []MyTest{
 		{
 			name:      "OK",
@@ -399,6 +428,9 @@ func TestHandler_UpdateProfile2(t *testing.T) {
 		},
 	}
 	ctx := &fasthttp.RequestCtx{}
+	mockGetUser := func(r *service_mocks.MockCookieStorage, cookie string, user domain.User) {
+		r.EXPECT().Get(cookie).Return(user, nil).AnyTimes()
+	}
 
 	for _, tc := range tests {
 		c := gomock.NewController(t)
@@ -409,11 +441,14 @@ func TestHandler_UpdateProfile2(t *testing.T) {
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
-		cookieLayer := cd.CreateDelivery(SetUpDB())
-		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
 
-		ctx.Request.Header.SetCookie(cnst.CookieName, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))))
-		cookieLayer.SetCookieAndToken(ctx, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))), tc.inputUser.Id)
+		cookieRepo := service_mocks.NewMockCookieStorage(c)
+		cookie := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email)))
+		mockGetUser(cookieRepo, cookie, user)
+		ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
+
+		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
 
 		userLayer.UpdateProfile(ctx)
 
@@ -478,6 +513,12 @@ func TestHandler_DeleteProfile2(t *testing.T) {
 		},
 	}
 	ctx := &fasthttp.RequestCtx{}
+	mockGetUser := func(r *service_mocks.MockCookieStorage, cookie string, user domain.User) {
+		r.EXPECT().Get(cookie).Return(user, nil).AnyTimes()
+	}
+	mockDelete := func(r *service_mocks.MockCookieStorage, cookie string) {
+		r.EXPECT().Delete(cookie).Return(nil).AnyTimes()
+	}
 
 	for _, tc := range tests {
 		c := gomock.NewController(t)
@@ -485,14 +526,17 @@ func TestHandler_DeleteProfile2(t *testing.T) {
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
+		cookieRepo := service_mocks.NewMockCookieStorage(c)
+		cookie := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email)))
+		mockGetUser(cookieRepo, cookie, tc.inputUser)
+		mockDelete(cookieRepo, cookie)
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
-		cookieLayer := cd.CreateDelivery(SetUpDB())
-		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+		ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
 
-		ctx.Request.Header.SetCookie(cnst.CookieName, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))))
-		cookieLayer.SetCookieAndToken(ctx, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))), tc.inputUser.Id)
+		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
 
 		userLayer.DeleteProfile(ctx)
 
@@ -519,6 +563,12 @@ func TestHandler_DeleteProfileByEmail2(t *testing.T) {
 		},
 	}
 	ctx := &fasthttp.RequestCtx{}
+	mockGetUser := func(r *service_mocks.MockCookieStorage, cookie string, user domain.User) {
+		r.EXPECT().Get(cookie).Return(user, nil).AnyTimes()
+	}
+	mockDelete := func(r *service_mocks.MockCookieStorage, cookie string) {
+		r.EXPECT().Delete(cookie).Return(nil).AnyTimes()
+	}
 
 	for _, tc := range tests {
 		c := gomock.NewController(t)
@@ -529,11 +579,15 @@ func TestHandler_DeleteProfileByEmail2(t *testing.T) {
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
-		cookieLayer := cd.CreateDelivery(SetUpDB())
-		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+		cookieRepo := service_mocks.NewMockCookieStorage(c)
+		cookie := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email)))
+		mockGetUser(cookieRepo, cookie, tc.inputUser)
+		mockDelete(cookieRepo, cookie)
 
-		ctx.Request.Header.SetCookie(cnst.CookieName, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))))
-		cookieLayer.SetCookieAndToken(ctx, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))), tc.inputUser.Id)
+		ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
+
+		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
 
 		userLayer.DeleteProfileByEmail(ctx)
 
@@ -572,10 +626,6 @@ func TestHandler_DeleteProfileByEmail(t *testing.T) {
 		ctx.Request.AppendBody([]byte(tc.inputBody))
 		cookieLayer := cd.CreateDelivery(SetUpDB())
 		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
-
-		// ctx.Request.Header.SetCookie(cnst.CookieName, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))))
-		// cookieLayer.SetCookieAndToken(ctx, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))), tc.inputUser.Id)
-
 		userLayer.DeleteProfileByEmail(ctx)
 
 		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
@@ -613,10 +663,6 @@ func TestHandler_UploadAvatar(t *testing.T) {
 		ctx.Request.AppendBody([]byte(tc.inputBody))
 		cookieLayer := cd.CreateDelivery(SetUpDB())
 		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
-
-		// ctx.Request.Header.SetCookie(cnst.CookieName, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))))
-		// cookieLayer.SetCookieAndToken(ctx, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))), tc.inputUser.Id)
-
 		userLayer.UploadAvatar(ctx)
 
 		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
@@ -658,6 +704,9 @@ func TestHandler_UploadAvatar2(t *testing.T) {
 		},
 	}
 	ctx := &fasthttp.RequestCtx{}
+	mockGetUser := func(r *service_mocks.MockCookieStorage, cookie string, user domain.User) {
+		r.EXPECT().Get(cookie).Return(user, nil).AnyTimes()
+	}
 
 	for _, tc := range tests {
 		c := gomock.NewController(t)
@@ -665,14 +714,16 @@ func TestHandler_UploadAvatar2(t *testing.T) {
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
+		cookieRepo := service_mocks.NewMockCookieStorage(c)
+		cookie := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email)))
+		mockGetUser(cookieRepo, cookie, tc.inputUser)
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
-		cookieLayer := cd.CreateDelivery(SetUpDB())
-		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+		ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
 
-		ctx.Request.Header.SetCookie(cnst.CookieName, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))))
-		cookieLayer.SetCookieAndToken(ctx, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))), tc.inputUser.Id)
+		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
 
 		userLayer.UploadAvatar(ctx)
 
