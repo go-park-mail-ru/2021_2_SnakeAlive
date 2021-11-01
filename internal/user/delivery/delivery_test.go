@@ -60,9 +60,18 @@ func TestHandler_Login(t *testing.T) {
 			expectedStatusCode: fasthttp.StatusOK,
 		},
 		{
+			name:      "Validate error",
+			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "123"}`,
+			inputUser: domain.User{},
+			mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+			},
+			expectedStatusCode: fasthttp.StatusBadRequest,
+		},
+		{
 			name:      "Wrong password",
 			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
 			inputUser: domain.User{
+				Id:       0,
 				Name:     "Name",
 				Surname:  "surname",
 				Email:    "alex@mail.ru",
@@ -73,15 +82,22 @@ func TestHandler_Login(t *testing.T) {
 			},
 			expectedStatusCode: fasthttp.StatusBadRequest,
 		},
-		// {
-		// 	name:      "No such user",
-		// 	inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
-		// 	inputUser: domain.User{},
-		// 	mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
-		// 		r.EXPECT().GetByEmail(user.Email).Return(domain.User{}, nil)
-		// 	},
-		// 	expectedStatusCode: fasthttp.StatusNotFound,
-		// },
+		{
+			name:      "No such user",
+			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex123231@mail.ru", "password": "password"}`,
+			inputUser: domain.User{},
+			mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+				r.EXPECT().GetByEmail("alex123231@mail.ru").Return(user, errors.New("Error")).AnyTimes()
+			},
+			expectedStatusCode: fasthttp.StatusNotFound,
+		},
+		{
+			name:               "Json unmarshalling error",
+			inputBody:          `---`,
+			inputUser:          domain.User{},
+			mockBehavior:       func(r *service_mocks.MockUserStorage, user domain.User) {},
+			expectedStatusCode: fasthttp.StatusBadRequest,
+		},
 	}
 	ctx := &fasthttp.RequestCtx{}
 
@@ -120,6 +136,20 @@ func TestHandler_Register(t *testing.T) {
 			expectedStatusCode: fasthttp.StatusOK,
 		},
 		{
+			name:               "Json unmarshal error",
+			inputBody:          `---`,
+			inputUser:          domain.User{},
+			mockBehavior:       func(r *service_mocks.MockUserStorage, user domain.User) {},
+			expectedStatusCode: fasthttp.StatusBadRequest,
+		},
+		{
+			name:               "Validate error",
+			inputBody:          `{"----": "Name", "surname": "Surname", "email": "testing@mail.ru", "password": "password"}`,
+			inputUser:          domain.User{},
+			mockBehavior:       func(r *service_mocks.MockUserStorage, user domain.User) {},
+			expectedStatusCode: fasthttp.StatusBadRequest,
+		},
+		{
 			name:      "User registered",
 			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
 			inputUser: domain.User{
@@ -131,6 +161,13 @@ func TestHandler_Register(t *testing.T) {
 			mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
 				r.EXPECT().GetByEmail(user.Email).Return(domain.User{}, nil).AnyTimes()
 			},
+			expectedStatusCode: fasthttp.StatusBadRequest,
+		},
+		{
+			name:               "Json unmarshalling error",
+			inputBody:          `---`,
+			inputUser:          domain.User{},
+			mockBehavior:       func(r *service_mocks.MockUserStorage, user domain.User) {},
 			expectedStatusCode: fasthttp.StatusBadRequest,
 		},
 	}
@@ -187,6 +224,44 @@ func TestHandler_Logout(t *testing.T) {
 	}
 }
 
+func TestHandler_Logout2(t *testing.T) {
+	tests := []MyTest{
+		{
+			name:      "OK",
+			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
+			inputUser: domain.User{
+				Id:       1,
+				Name:     "Name",
+				Surname:  "Surname",
+				Email:    "alex@mail.ru",
+				Password: "password",
+			},
+			mockBehavior:       func(r *service_mocks.MockUserStorage, user domain.User) {},
+			expectedStatusCode: fasthttp.StatusOK,
+		},
+	}
+	ctx := &fasthttp.RequestCtx{}
+
+	for _, tc := range tests {
+		c := gomock.NewController(t)
+		defer c.Finish()
+
+		repo := service_mocks.NewMockUserStorage(c)
+		tc.mockBehavior(repo, tc.inputUser)
+
+		ctx.Request.SetBody(nil)
+		ctx.Request.AppendBody([]byte(tc.inputBody))
+		cookieLayer := cd.CreateDelivery(SetUpDB())
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+
+		ctx.Request.Header.SetCookie(cnst.CookieName, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))))
+		cookieLayer.SetCookieAndToken(ctx, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))), tc.inputUser.Id)
+
+		userLayer.Logout(ctx)
+
+		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
+	}
+}
 func TestHandler_GetProfile(t *testing.T) {
 	tests := []MyTest{
 		{
@@ -218,8 +293,6 @@ func TestHandler_GetProfile(t *testing.T) {
 		cookieLayer := cd.CreateDelivery(SetUpDB())
 		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
 
-		cookieLayer.SetCookieAndToken(ctx, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))), tc.inputUser.Id)
-
 		userLayer.GetProfile(ctx)
 
 		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
@@ -230,9 +303,10 @@ func TestHandler_GetProfile(t *testing.T) {
 func TestHandler_GetProfile2(t *testing.T) {
 	tests := []MyTest{
 		{
-			name:      "Unauthorized",
+			name:      "OK",
 			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
 			inputUser: domain.User{
+				Id:       1,
 				Name:     "Name",
 				Surname:  "Surname",
 				Email:    "alex@mail.ru",
@@ -259,6 +333,8 @@ func TestHandler_GetProfile2(t *testing.T) {
 		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
 
 		ctx.Request.Header.SetCookie(cnst.CookieName, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))))
+		cookieLayer.SetCookieAndToken(ctx, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))), tc.inputUser.Id)
+
 		userLayer.GetProfile(ctx)
 
 		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
@@ -309,6 +385,7 @@ func TestHandler_UpdateProfile2(t *testing.T) {
 			name:      "OK",
 			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
 			inputUser: domain.User{
+				Id:       0,
 				Name:     "Name",
 				Surname:  "Surname",
 				Email:    "alex@mail.ru",
@@ -356,7 +433,9 @@ func TestHandler_DeleteProfile(t *testing.T) {
 				Email:    "alex@mail.ru",
 				Password: "password",
 			},
-			mockBehavior:       func(r *service_mocks.MockUserStorage, user domain.User) {},
+			mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+				r.EXPECT().Delete(user.Id).AnyTimes()
+			},
 			expectedStatusCode: fasthttp.StatusUnauthorized,
 		},
 	}
@@ -373,6 +452,47 @@ func TestHandler_DeleteProfile(t *testing.T) {
 		ctx.Request.AppendBody([]byte(tc.inputBody))
 		cookieLayer := cd.CreateDelivery(SetUpDB())
 		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+
+		userLayer.DeleteProfile(ctx)
+
+		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
+	}
+}
+
+func TestHandler_DeleteProfile2(t *testing.T) {
+	tests := []MyTest{
+		{
+			name:      "OK",
+			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
+			inputUser: domain.User{
+				Id:       1,
+				Name:     "Name",
+				Surname:  "Surname",
+				Email:    "alex@mail.ru",
+				Password: "password",
+			},
+			mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+				r.EXPECT().Delete(user.Id).AnyTimes()
+			},
+			expectedStatusCode: fasthttp.StatusOK,
+		},
+	}
+	ctx := &fasthttp.RequestCtx{}
+
+	for _, tc := range tests {
+		c := gomock.NewController(t)
+		defer c.Finish()
+
+		repo := service_mocks.NewMockUserStorage(c)
+		tc.mockBehavior(repo, tc.inputUser)
+
+		ctx.Request.SetBody(nil)
+		ctx.Request.AppendBody([]byte(tc.inputBody))
+		cookieLayer := cd.CreateDelivery(SetUpDB())
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+
+		ctx.Request.Header.SetCookie(cnst.CookieName, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))))
+		cookieLayer.SetCookieAndToken(ctx, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))), tc.inputUser.Id)
 
 		userLayer.DeleteProfile(ctx)
 
