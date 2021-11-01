@@ -2,7 +2,7 @@ package cookieRepository
 
 import (
 	"context"
-	"fmt"
+	logs "snakealive/m/internal/logger"
 	"snakealive/m/pkg/domain"
 
 	pgxpool "github.com/jackc/pgx/v4/pgxpool"
@@ -17,9 +17,11 @@ func NewCookieStorage(DB *pgxpool.Pool) domain.CookieStorage {
 }
 
 func (c *cookieStorage) Add(key string, userId int) error {
+	logger := logs.GetLogger()
+
 	conn, err := c.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Connection error while adding cookie ", err)
+		logger.Error("error while aquiring connection")
 		return err
 	}
 	defer conn.Release()
@@ -33,9 +35,11 @@ func (c *cookieStorage) Add(key string, userId int) error {
 }
 
 func (c *cookieStorage) Get(value string) (user domain.User, err error) {
+	logger := logs.GetLogger()
+
 	conn, err := c.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Error while getting cookie")
+		logger.Error("error while aquiring connection")
 		return user, err
 	}
 	defer conn.Release()
@@ -52,9 +56,11 @@ func (c *cookieStorage) Get(value string) (user domain.User, err error) {
 
 }
 func (c *cookieStorage) Delete(value string) error {
+	logger := logs.GetLogger()
+
 	conn, err := c.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Connection error while deleting cookie", err)
+		logger.Error("error while aquiring connection")
 		return err
 	}
 	defer conn.Release()

@@ -2,10 +2,11 @@ package reviewUseCase
 
 import (
 	"encoding/json"
-	"log"
+	logs "snakealive/m/internal/logger"
 	"snakealive/m/pkg/domain"
 
 	"github.com/valyala/fasthttp"
+	"go.uber.org/zap"
 )
 
 func NewReviewUseCase(reviewStorage domain.ReviewStorage) domain.ReviewUseCase {
@@ -29,15 +30,17 @@ func (u reviewUseCase) Get(id int) (domain.Review, error) {
 }
 
 func (u reviewUseCase) GetReviewsListByPlaceId(id int) (int, []byte) {
+	logger := logs.GetLogger()
+
 	response, err := u.reviewStorage.GetListByPlace(id)
 	if err != nil {
-		log.Print("reviews not found", err)
+		logger.Error("reviews not found: ", zap.Error(err))
 		return fasthttp.StatusNotFound, []byte("{}")
 	}
 
 	bytes, err := json.Marshal(response)
 	if err != nil {
-		log.Printf("error while marshalling JSON: %s", err)
+		logger.Error("error while marshalling JSON: ", zap.Error(err))
 		return fasthttp.StatusOK, []byte("{}")
 	}
 	return fasthttp.StatusOK, bytes

@@ -2,7 +2,7 @@ package userRepository
 
 import (
 	"context"
-	"fmt"
+	logs "snakealive/m/internal/logger"
 	"snakealive/m/pkg/domain"
 
 	pgxpool "github.com/jackc/pgx/v4/pgxpool"
@@ -17,9 +17,10 @@ func NewUserStorage(DB *pgxpool.Pool) domain.UserStorage {
 }
 
 func (u *UserStorage) Add(value domain.User) error {
+	logger := logs.GetLogger()
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Connection error while adding user ", err)
+		logger.Error("error while aquiring connection")
 		return err
 	}
 	defer conn.Release()
@@ -37,9 +38,11 @@ func (u *UserStorage) Add(value domain.User) error {
 }
 
 func (u *UserStorage) Delete(id int) error {
+	logger := logs.GetLogger()
+
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Connection error while deleting user ", err)
+		logger.Error("error while aquiring connection")
 		return err
 	}
 	defer conn.Release()
@@ -52,9 +55,11 @@ func (u *UserStorage) Delete(id int) error {
 }
 
 func (u *UserStorage) DeleteByEmail(user domain.User) error {
+	logger := logs.GetLogger()
+
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Connection error while deleting user ", err)
+		logger.Error("error while aquiring connection")
 		return err
 	}
 	defer conn.Release()
@@ -67,11 +72,12 @@ func (u *UserStorage) DeleteByEmail(user domain.User) error {
 }
 
 func (u *UserStorage) GetByEmail(key string) (value domain.User, err error) {
+	logger := logs.GetLogger()
 	var user domain.User
 
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Error while getting user")
+		logger.Error("error while aquiring connection")
 		return domain.User{}, err
 	}
 	defer conn.Release()
@@ -86,11 +92,12 @@ func (u *UserStorage) GetByEmail(key string) (value domain.User, err error) {
 }
 
 func (u *UserStorage) GetById(id int) (value domain.User, err error) {
+	logger := logs.GetLogger()
 	var user domain.User
 
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Error while adding user")
+		logger.Error("error while aquiring connection")
 		return user, err
 	}
 	defer conn.Release()
@@ -105,9 +112,11 @@ func (u *UserStorage) GetById(id int) (value domain.User, err error) {
 }
 
 func (u *UserStorage) Update(id int, value domain.User) error {
+	logger := logs.GetLogger()
+
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Connection error while adding user ", err)
+		logger.Error("error while aquiring connection")
 		return err
 	}
 	defer conn.Release()
@@ -125,9 +134,11 @@ func (u *UserStorage) Update(id int, value domain.User) error {
 }
 
 func (u *UserStorage) AddAvatar(id int, avatar string) error {
+	logger := logs.GetLogger()
+
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Connection error while adding AVATAR ", err)
+		logger.Error("error while aquiring connection")
 		return err
 	}
 	defer conn.Release()

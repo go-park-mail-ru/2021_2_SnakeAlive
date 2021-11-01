@@ -1,19 +1,22 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
+	logs "snakealive/m/internal/logger"
 	cnst "snakealive/m/pkg/constants"
 )
 
 func main() {
+	logs.BuildLogger()
+	logger := logs.GetLogger()
+
 	fs := http.FileServer(http.Dir(cnst.StaticPath))
 	http.Handle("/", fs)
 
-	fmt.Println("starting file server at :3000")
+	logger.Info("starting server at :3000")
 	err := http.ListenAndServe(":3000", nil)
 	if err != nil {
-		fmt.Println("failed to start file server:", err)
+		logger.Fatal("failed to start file server")
 		return
 	}
 }

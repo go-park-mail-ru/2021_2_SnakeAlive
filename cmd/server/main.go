@@ -3,14 +3,14 @@ package main
 import (
 	"bytes"
 	"context"
-	"fmt"
-	"os"
+	logs "snakealive/m/internal/logger"
 	pd "snakealive/m/internal/place/delivery"
 	rd "snakealive/m/internal/review/delivery"
 	td "snakealive/m/internal/trip/delivery"
 	ud "snakealive/m/internal/user/delivery"
 
 	"github.com/fasthttp/router"
+	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap"
 	pgxpool "github.com/jackc/pgx/v4/pgxpool"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/valyala/fasthttp"
@@ -46,19 +46,25 @@ func corsMiddleware(handler func(ctx *fasthttp.RequestCtx)) func(ctx *fasthttp.R
 }
 
 func main() {
-	fmt.Println("starting server at :8080")
+	logs.BuildLogger()
+	logger := logs.GetLogger()
+
+	ctx := ctxzap.ToContext(context.Background(), logger)
+
+	logger.Info("starting server at :8080")
+
 	url := "postgres://tripadvisor:12345@localhost:5432/tripadvisor"
-	dbpool, err := pgxpool.Connect(context.Background(), url)
+	dbpool, err := pgxpool.Connect(ctx, url)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
-		os.Exit(1)
+		logger.Fatal("unable to connect to database")
+		return
 	}
 	defer dbpool.Close()
 
 	r := SetUpRouter(dbpool)
 
 	if err := fasthttp.ListenAndServe(":8080", corsMiddleware(r.Handler)); err != nil {
-		fmt.Println("failed to start server:", err)
+		logger.Fatal("failed to start server")
 		return
 	}
 }

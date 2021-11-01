@@ -3,12 +3,13 @@ package userUseCase
 import (
 	"encoding/json"
 	"errors"
-	"log"
+	logs "snakealive/m/internal/logger"
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/domain"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/valyala/fasthttp"
+	"go.uber.org/zap"
 )
 
 func NewUserUseCase(userStorage domain.UserStorage) domain.UserUseCase {
@@ -32,10 +33,12 @@ func (u userUseCase) Add(user domain.User) error {
 }
 
 func (u userUseCase) Update(id int, updatedUser domain.User) error {
+	logger := logs.GetLogger()
 
 	user, err := u.GetByEmail(updatedUser.Email)
 	if err != nil && user.Id != id {
-		return errors.New("fail to get user") // change later
+		logger.Error("user not found")
+		return errors.New("failed to get user")
 	}
 
 	return u.userStorage.Update(id, updatedUser)
@@ -46,23 +49,28 @@ func (u userUseCase) Delete(id int) error {
 }
 
 func (u userUseCase) Validate(user *domain.User) bool {
+	logger := logs.GetLogger()
+
 	if !govalidator.IsEmail(user.Email) ||
 		!govalidator.StringLength(user.Password, cnst.MinPasswordLength, cnst.MaxPasswordLength) ||
 		!govalidator.MaxStringLength(user.Email, cnst.MaxEmailLength) {
+		logger.Error("error while validating user")
 		return false
 	}
 	return true
 }
 
 func (u userUseCase) Login(user *domain.User) (int, error) {
+	logger := logs.GetLogger()
+
 	foundUser, err := u.GetByEmail(user.Email)
 	if err != nil {
-		log.Printf("error while login-GetByEmail")
-		log.Print(err)
+		logger.Error("unable to find user")
 		return fasthttp.StatusNotFound, err
 	}
 
 	if foundUser.Password != user.Password {
+		logger.Error("wrong password")
 		return fasthttp.StatusBadRequest, err
 	}
 
@@ -70,21 +78,23 @@ func (u userUseCase) Login(user *domain.User) (int, error) {
 }
 
 func (u userUseCase) Registration(user *domain.User) (int, error) {
+	logger := logs.GetLogger()
+
 	_, err := govalidator.ValidateStruct(user)
 	if err != nil {
-		log.Printf("error while validating user")
+		logger.Error("error while validating user")
 		return fasthttp.StatusBadRequest, err
 	}
 
 	_, err = u.GetByEmail(user.Email)
 	if err == nil {
-		log.Printf("user with this email already exists")
+		logger.Error("user with this email already exists")
 		return fasthttp.StatusBadRequest, err
 	}
 
 	err = u.Add(*user)
 	if err != nil {
-		log.Printf("error while adding user")
+		logger.Error("error while adding user")
 		return fasthttp.StatusBadRequest, err
 	}
 
@@ -92,31 +102,35 @@ func (u userUseCase) Registration(user *domain.User) (int, error) {
 }
 
 func (u userUseCase) GetProfile(hash string, foundUser domain.User) (int, []byte) {
+	logger := logs.GetLogger()
+
 	response := map[string]string{"name": foundUser.Name, "surname": foundUser.Surname}
 	bytes, err := json.Marshal(response)
 	if err != nil {
-		log.Printf("error while marshalling JSON: %s", err)
+		logger.Error("error while marshalling JSON: %s", zap.Error(err))
 		return fasthttp.StatusOK, []byte("{}")
 	}
 	return fasthttp.StatusOK, bytes
 }
 
 func (u userUseCase) UpdateProfile(updatedUser *domain.User, foundUser domain.User, hash string) (int, []byte) {
+	logger := logs.GetLogger()
+
 	_, err := govalidator.ValidateStruct(updatedUser)
 	if err != nil {
-		log.Printf("error while validating user")
+		logger.Error("error while validating user")
 		return fasthttp.StatusBadRequest, nil
 	}
 
 	if err = u.Update(foundUser.Id, *updatedUser); err != nil {
-		log.Printf("user with this email already exists")
+		logger.Error("user with this email already exists")
 		return fasthttp.StatusBadRequest, nil
 	}
 
 	response := map[string]string{"name": updatedUser.Name, "surname": updatedUser.Surname, "email": updatedUser.Email}
 	bytes, err := json.Marshal(response)
 	if err != nil {
-		log.Printf("error while marshalling JSON: %s", err)
+		logger.Error("error while marshalling JSON: ", zap.Error(err))
 		return fasthttp.StatusBadRequest, nil
 	}
 

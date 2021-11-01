@@ -2,16 +2,17 @@ package cookieDelivery
 
 import (
 	"encoding/json"
-	"log"
 	cr "snakealive/m/internal/cookie/repository"
 	cu "snakealive/m/internal/cookie/usecase"
 	ent "snakealive/m/internal/entities"
+	logs "snakealive/m/internal/logger"
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/domain"
 	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/valyala/fasthttp"
+	"go.uber.org/zap"
 )
 
 type CookieHandler interface {
@@ -77,13 +78,15 @@ func (s *cookieHandler) GetUser(cookie string) (user domain.User, err error) {
 }
 
 func setToken(ctx *fasthttp.RequestCtx, hash string) {
+	logger := logs.GetLogger()
+
 	t := ent.Token{
 		Token: hash,
 	}
 
 	bytes, err := json.Marshal(t)
 	if err != nil {
-		log.Printf("error while marshalling JSON: %s", err)
+		logger.Error("error while marshalling JSON: ", zap.Error(err))
 		ctx.Write([]byte("{}"))
 		return
 	}

@@ -2,11 +2,12 @@ package TripUseCase
 
 import (
 	"encoding/json"
-	"log"
+	logs "snakealive/m/internal/logger"
 	"snakealive/m/pkg/domain"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/valyala/fasthttp"
+	"go.uber.org/zap"
 )
 
 func NewTripUseCase(tripStorage domain.TripStorage) domain.TripUseCase {
@@ -18,9 +19,11 @@ type tripUsecase struct {
 }
 
 func (u tripUsecase) Add(value domain.Trip, user domain.User) (int, error) {
+	logger := logs.GetLogger()
+
 	_, err := govalidator.ValidateStruct(value)
 	if err != nil {
-		log.Printf("error while validating trip")
+		logger.Error("error while validating trip struct")
 		return 0, err
 	}
 
@@ -28,19 +31,22 @@ func (u tripUsecase) Add(value domain.Trip, user domain.User) (int, error) {
 }
 
 func (u tripUsecase) GetById(id int) (int, []byte) {
+	logger := logs.GetLogger()
+
 	value, err := u.tripStorage.GetById(id)
 	if err != nil {
-		log.Printf("error while getting trip: %s", err)
+		logger.Error("error while getting trip: ", zap.Error(err))
 		return fasthttp.StatusBadRequest, nil
 	}
 
 	if value.Id == 0 {
+		logger.Error("trip not found")
 		return fasthttp.StatusNotFound, nil
 	}
 
 	bytes, err := json.Marshal(value)
 	if err != nil {
-		log.Printf("error while marshalling JSON: %s", err)
+		logger.Error("error while marshalling JSON: ", zap.Error(err))
 		return fasthttp.StatusBadRequest, nil
 	}
 
@@ -48,9 +54,11 @@ func (u tripUsecase) GetById(id int) (int, []byte) {
 }
 
 func (u tripUsecase) Update(id int, updatedTrip domain.Trip) error {
+	logger := logs.GetLogger()
+
 	_, err := govalidator.ValidateStruct(updatedTrip)
 	if err != nil {
-		log.Printf("error while validating trip")
+		logger.Error("error while validating trip struct")
 		return err
 	}
 

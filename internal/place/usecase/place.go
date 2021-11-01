@@ -2,10 +2,11 @@ package placeUseCase
 
 import (
 	"encoding/json"
-	"log"
+	logs "snakealive/m/internal/logger"
 	"snakealive/m/pkg/domain"
 
 	"github.com/valyala/fasthttp"
+	"go.uber.org/zap"
 )
 
 func NewPlaceUseCase(placeStorage domain.PlaceStorage) domain.PlaceUseCase {
@@ -21,15 +22,19 @@ func (u placeUsecase) GetById(id int) (value domain.Place, err error) {
 }
 
 func (u placeUsecase) GetSight(sight domain.Place) (int, []byte) {
+	logger := logs.GetLogger()
+
 	response, err := json.Marshal(sight)
 	if err != nil {
-		log.Printf("error while marshalling JSON: %s", err)
+		logger.Error("error while marshalling JSON: ", zap.Error(err))
 		return fasthttp.StatusBadRequest, []byte("{}")
 	}
 	return fasthttp.StatusOK, response
 }
 
 func (u placeUsecase) GetPlacesByCountry(value string) ([]byte, error) {
+	logger := logs.GetLogger()
+
 	places, err := u.placeStorage.GetPlacesByCountry(value)
 	if err != nil {
 		return []byte{}, err
@@ -37,7 +42,7 @@ func (u placeUsecase) GetPlacesByCountry(value string) ([]byte, error) {
 
 	bytes, err := json.Marshal(places)
 	if err != nil {
-		log.Printf("error while marshalling JSON: %s", err)
+		logger.Error("error while marshalling JSON: ", zap.Error(err))
 	}
 	return bytes, err
 }

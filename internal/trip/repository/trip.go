@@ -2,7 +2,7 @@ package tripRepository
 
 import (
 	"context"
-	"fmt"
+	logs "snakealive/m/internal/logger"
 	"snakealive/m/pkg/domain"
 
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -17,11 +17,12 @@ func NewTripStorage(DB *pgxpool.Pool) domain.TripStorage {
 }
 
 func (t *tripStorage) Add(value domain.Trip, user domain.User) (int, error) {
+	logger := logs.GetLogger()
 	var tripId int
 
 	conn, err := t.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Connection error while adding trip ", err)
+		logger.Error("error while aquiring connection")
 		return tripId, err
 	}
 	defer conn.Release()
@@ -35,7 +36,7 @@ func (t *tripStorage) Add(value domain.Trip, user domain.User) (int, error) {
 		value.Days[0][0].Id,
 	).Scan(&tripId)
 	if err != nil {
-		fmt.Printf("Connection error while adding trip ", err)
+		logger.Error("error while scanning trip info")
 		return tripId, err
 	}
 
@@ -44,11 +45,12 @@ func (t *tripStorage) Add(value domain.Trip, user domain.User) (int, error) {
 }
 
 func (t *tripStorage) GetById(id int) (value domain.Trip, err error) {
+	logger := logs.GetLogger()
 	var trip domain.Trip
 
 	conn, err := t.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Connection error while adding trip ", err)
+		logger.Error("error while aquiring connection")
 		return trip, err
 	}
 	defer conn.Release()
@@ -58,6 +60,10 @@ func (t *tripStorage) GetById(id int) (value domain.Trip, err error) {
 		FROM Trips WHERE id = $1`,
 		id,
 	).Scan(&trip.Id, &trip.Title, &trip.Description, &trip.Days)
+	if err != nil {
+		logger.Error("error while scanning trip info")
+		return trip, err
+	}
 
 	rows, err := conn.Query(context.Background(),
 		`SELECT pl.id, pl.name, pl.tags, pl.description, pl.rating, pl.country, pl.photos, tr.day
@@ -67,7 +73,7 @@ func (t *tripStorage) GetById(id int) (value domain.Trip, err error) {
 		ORDER BY tr.day, tr.order`,
 		id)
 	if err != nil {
-		fmt.Printf("Error while getting places")
+		logger.Error("error while getting trip places")
 		return trip, err
 	}
 
@@ -90,9 +96,11 @@ func (t *tripStorage) GetById(id int) (value domain.Trip, err error) {
 }
 
 func (t *tripStorage) Update(id int, value domain.Trip) error {
+	logger := logs.GetLogger()
+
 	conn, err := t.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Connection error while adding trip ", err)
+		logger.Error("error while aquiring connection")
 		return err
 	}
 	defer conn.Release()
@@ -106,7 +114,7 @@ func (t *tripStorage) Update(id int, value domain.Trip) error {
 		id,
 	)
 	if err != nil || t.deletePlaces(id) != nil {
-		fmt.Printf("Connection error while adding trip ", err)
+		logger.Error("error while removing previous places")
 		return err
 	}
 
@@ -115,14 +123,17 @@ func (t *tripStorage) Update(id int, value domain.Trip) error {
 }
 
 func (t *tripStorage) Delete(id int) error {
+	logger := logs.GetLogger()
+
 	conn, err := t.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Connection error while deleting places ", err)
+		logger.Error("error while aquiring connection")
 		return err
 	}
 	defer conn.Release()
 
 	if err = t.deletePlaces(id); err != nil {
+		logger.Error("error while deleting places")
 		return err
 	}
 	_, err = conn.Exec(context.Background(),
@@ -133,9 +144,11 @@ func (t *tripStorage) Delete(id int) error {
 }
 
 func (t *tripStorage) deletePlaces(tripId int) error {
+	logger := logs.GetLogger()
+
 	conn, err := t.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Connection error while deleting places ", err)
+		logger.Error("error while aquiring connection")
 		return err
 	}
 	defer conn.Release()
@@ -148,9 +161,11 @@ func (t *tripStorage) deletePlaces(tripId int) error {
 }
 
 func (t *tripStorage) addPlaces(value [][]domain.Place, tripId int) error {
+	logger := logs.GetLogger()
+
 	conn, err := t.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Connection error while adding places ", err)
+		logger.Error("error while aquiring connection")
 		return err
 	}
 	defer conn.Release()
@@ -170,9 +185,11 @@ func (t *tripStorage) addPlaces(value [][]domain.Place, tripId int) error {
 }
 
 func (t *tripStorage) GetTripAuthor(id int) int {
+	logger := logs.GetLogger()
+
 	conn, err := t.dataHolder.Acquire(context.Background())
 	if err != nil {
-		fmt.Printf("Connection error while adding places ", err)
+		logger.Error("error while aquiring connection")
 		return 0
 	}
 	defer conn.Release()
@@ -185,6 +202,7 @@ func (t *tripStorage) GetTripAuthor(id int) int {
 	).Scan(&author)
 
 	if err != nil {
+		logger.Error("error while getting trip author from database")
 		return 0
 	}
 	return author
