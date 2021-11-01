@@ -25,6 +25,7 @@ type UserHandler interface {
 	GetProfile(ctx *fasthttp.RequestCtx)
 	UpdateProfile(ctx *fasthttp.RequestCtx)
 	DeleteProfile(ctx *fasthttp.RequestCtx)
+	DeleteProfileByEmail(ctx *fasthttp.RequestCtx)
 	UploadAvatar(ctx *fasthttp.RequestCtx)
 }
 

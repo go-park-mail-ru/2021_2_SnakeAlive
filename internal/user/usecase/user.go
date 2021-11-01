@@ -34,8 +34,8 @@ func (u userUseCase) Add(user domain.User) error {
 func (u userUseCase) Update(id int, updatedUser domain.User) error {
 
 	user, err := u.GetByEmail(updatedUser.Email)
-	if err == nil && user.Id != id {
-		return errors.New("user with this email already exists") // change later
+	if err != nil && user.Id != id {
+		return errors.New("fail to get user") // change later
 	}
 
 	return u.userStorage.Update(id, updatedUser)

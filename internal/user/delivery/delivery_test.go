@@ -7,10 +7,12 @@ import (
 	"os"
 	cd "snakealive/m/internal/cookie/delivery"
 	uu "snakealive/m/internal/user/usecase"
+	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/domain"
 	service_mocks "snakealive/m/pkg/domain/mocks"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/valyala/fasthttp"
 
@@ -196,7 +198,9 @@ func TestHandler_GetProfile(t *testing.T) {
 				Email:    "alex@mail.ru",
 				Password: "password",
 			},
-			mockBehavior:       func(r *service_mocks.MockUserStorage, user domain.User) {},
+			mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+				r.EXPECT().GetByEmail(user.Email).Return(domain.User{}, nil).AnyTimes()
+			},
 			expectedStatusCode: fasthttp.StatusUnauthorized,
 		},
 	}
@@ -213,10 +217,53 @@ func TestHandler_GetProfile(t *testing.T) {
 		ctx.Request.AppendBody([]byte(tc.inputBody))
 		cookieLayer := cd.CreateDelivery(SetUpDB())
 		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+
+		cookieLayer.SetCookieAndToken(ctx, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))), tc.inputUser.Id)
+
 		userLayer.GetProfile(ctx)
 
 		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
 	}
+
+}
+
+func TestHandler_GetProfile2(t *testing.T) {
+	tests := []MyTest{
+		{
+			name:      "Unauthorized",
+			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
+			inputUser: domain.User{
+				Name:     "Name",
+				Surname:  "Surname",
+				Email:    "alex@mail.ru",
+				Password: "password",
+			},
+			mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+				r.EXPECT().GetByEmail(user.Email).Return(domain.User{}, nil).AnyTimes()
+			},
+			expectedStatusCode: fasthttp.StatusOK,
+		},
+	}
+	ctx := &fasthttp.RequestCtx{}
+
+	for _, tc := range tests {
+		c := gomock.NewController(t)
+		defer c.Finish()
+
+		repo := service_mocks.NewMockUserStorage(c)
+		tc.mockBehavior(repo, tc.inputUser)
+
+		ctx.Request.SetBody(nil)
+		ctx.Request.AppendBody([]byte(tc.inputBody))
+		cookieLayer := cd.CreateDelivery(SetUpDB())
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+
+		ctx.Request.Header.SetCookie(cnst.CookieName, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))))
+		userLayer.GetProfile(ctx)
+
+		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
+	}
+
 }
 
 func TestHandler_UpdateProfile(t *testing.T) {
@@ -249,8 +296,48 @@ func TestHandler_UpdateProfile(t *testing.T) {
 		cookieLayer := cd.CreateDelivery(SetUpDB())
 		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
 
-		//с := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email)))
-		//cookieLayer.SetCookieAndToken(ctx, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))), tc.inputUser.Id)
+		//ctx.Request.Header.SetCookie(cnst.CookieName, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))))
+		userLayer.UpdateProfile(ctx)
+
+		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
+	}
+}
+
+func TestHandler_UpdateProfile2(t *testing.T) {
+	tests := []MyTest{
+		{
+			name:      "OK",
+			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
+			inputUser: domain.User{
+				Name:     "Name",
+				Surname:  "Surname",
+				Email:    "alex@mail.ru",
+				Password: "password",
+			},
+			mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+				r.EXPECT().Update(1, user).AnyTimes()
+				r.EXPECT().GetByEmail(user.Email).AnyTimes()
+			},
+			expectedStatusCode: fasthttp.StatusOK,
+		},
+	}
+	ctx := &fasthttp.RequestCtx{}
+
+	for _, tc := range tests {
+		c := gomock.NewController(t)
+		defer c.Finish()
+
+		repo := service_mocks.NewMockUserStorage(c)
+		tc.mockBehavior(repo, tc.inputUser)
+
+		ctx.Request.SetBody(nil)
+		ctx.Request.AppendBody([]byte(tc.inputBody))
+		cookieLayer := cd.CreateDelivery(SetUpDB())
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+
+		ctx.Request.Header.SetCookie(cnst.CookieName, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))))
+		cookieLayer.SetCookieAndToken(ctx, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))), tc.inputUser.Id)
+
 		userLayer.UpdateProfile(ctx)
 
 		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
@@ -288,6 +375,88 @@ func TestHandler_DeleteProfile(t *testing.T) {
 		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
 
 		userLayer.DeleteProfile(ctx)
+
+		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
+	}
+}
+
+func TestHandler_DeleteProfileByEmail2(t *testing.T) {
+	tests := []MyTest{
+		{
+			name:      "Unauthorized",
+			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
+			inputUser: domain.User{
+				Id:       1,
+				Name:     "name",
+				Surname:  "surname",
+				Email:    "alex@mail.ru",
+				Password: "password",
+			},
+			mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+				r.EXPECT().DeleteByEmail(user)
+			},
+			expectedStatusCode: fasthttp.StatusOK,
+		},
+	}
+	ctx := &fasthttp.RequestCtx{}
+
+	for _, tc := range tests {
+		c := gomock.NewController(t)
+		defer c.Finish()
+
+		repo := service_mocks.NewMockUserStorage(c)
+		tc.mockBehavior(repo, tc.inputUser)
+
+		ctx.Request.SetBody(nil)
+		ctx.Request.AppendBody([]byte(tc.inputBody))
+		cookieLayer := cd.CreateDelivery(SetUpDB())
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+
+		ctx.Request.Header.SetCookie(cnst.CookieName, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))))
+		cookieLayer.SetCookieAndToken(ctx, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))), tc.inputUser.Id)
+
+		userLayer.DeleteProfileByEmail(ctx)
+
+		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
+	}
+}
+
+func TestHandler_DeleteProfileByEmail(t *testing.T) {
+	tests := []MyTest{
+		{
+			name:      "Unauthorized",
+			inputBody: `{"name": "Name", "surname": "Surname", "email": "alex@mail.ru", "password": "password"}`,
+			inputUser: domain.User{
+				Id:       1,
+				Name:     "Name",
+				Surname:  "Surname",
+				Email:    "alex@mail.ru",
+				Password: "password",
+			},
+			mockBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+
+			},
+			expectedStatusCode: fasthttp.StatusUnauthorized,
+		},
+	}
+	ctx := &fasthttp.RequestCtx{}
+
+	for _, tc := range tests {
+		c := gomock.NewController(t)
+		defer c.Finish()
+
+		repo := service_mocks.NewMockUserStorage(c)
+		tc.mockBehavior(repo, tc.inputUser)
+
+		ctx.Request.SetBody(nil)
+		ctx.Request.AppendBody([]byte(tc.inputBody))
+		cookieLayer := cd.CreateDelivery(SetUpDB())
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+
+		// ctx.Request.Header.SetCookie(cnst.CookieName, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))))
+		// cookieLayer.SetCookieAndToken(ctx, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(tc.inputUser.Email))), tc.inputUser.Id)
+
+		userLayer.DeleteProfileByEmail(ctx)
 
 		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
 	}
