@@ -91,7 +91,8 @@ func (s *userHandler) Login(ctx *fasthttp.RequestCtx) {
 
 	с := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
 	foundUser, _ := s.UserUseCase.GetByEmail(user.Email)
-	s.CookieHandler.SetCookieAndToken(ctx, с, foundUser.Id)
+
+	s.CookieHandler.SetCookieAndToken(ctx, с, foundUser)
 	logger.Info(string(ctx.Path()),
 		zap.Int("status", ctx.Response.StatusCode()),
 	)
@@ -122,7 +123,7 @@ func (s *userHandler) Registration(ctx *fasthttp.RequestCtx) {
 
 	с := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
 	newUser, _ := s.UserUseCase.GetByEmail(user.Email)
-	s.CookieHandler.SetCookieAndToken(ctx, с, newUser.Id)
+	s.CookieHandler.SetCookieAndToken(ctx, с, newUser)
 	logger.Info(string(ctx.Path()),
 		zap.Int("status", ctx.Response.StatusCode()),
 	)
@@ -136,18 +137,24 @@ func (s *userHandler) GetProfile(ctx *fasthttp.RequestCtx) {
 		zap.String("url", string(ctx.Path())),
 	)
 
-	if !s.CookieHandler.CheckCookie(ctx) {
-		logger.Error("user is unauthorized")
-		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
-		return
-	}
-
 	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
-
 	foundUser, err := s.CookieHandler.GetUser(hash)
 	if err != nil {
 		logger.Error("unable to determine user")
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
+		return
+	}
+
+	CSRFToken := ""
+	if err := json.Unmarshal(ctx.PostBody(), &CSRFToken); err != nil {
+		logger.Error("error while unmarshalling JSON: ", zap.Error(err))
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	if !s.CookieHandler.CheckCookieAndToken(ctx, CSRFToken, foundUser) {
+		logger.Error("user is unauthorized")
+		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
 		return
 	}
 
@@ -168,7 +175,22 @@ func (s *userHandler) UpdateProfile(ctx *fasthttp.RequestCtx) {
 		zap.String("url", string(ctx.Path())),
 	)
 
-	if !s.CookieHandler.CheckCookie(ctx) {
+	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
+	foundUser, err := s.CookieHandler.GetUser(hash)
+	if err != nil {
+		logger.Error("unable to determine user")
+		ctx.SetStatusCode(fasthttp.StatusNotFound)
+		return
+	}
+
+	CSRFToken := ""
+	if err := json.Unmarshal(ctx.PostBody(), &CSRFToken); err != nil {
+		logger.Error("error while unmarshalling JSON: ", zap.Error(err))
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	if !s.CookieHandler.CheckCookieAndToken(ctx, CSRFToken, foundUser) {
 		logger.Error("user is unauthorized")
 		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
 		return
@@ -178,14 +200,6 @@ func (s *userHandler) UpdateProfile(ctx *fasthttp.RequestCtx) {
 	if err := json.Unmarshal(ctx.PostBody(), &updatedUser); err != nil {
 		logger.Error("error while unmarshalling JSON: ", zap.Error(err))
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
-		return
-	}
-
-	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
-	foundUser, err := s.CookieHandler.GetUser(hash)
-	if err != nil {
-		logger.Error("uunable to determine user")
-		ctx.SetStatusCode(fasthttp.StatusNotFound)
 		return
 	}
 
@@ -234,17 +248,24 @@ func (s *userHandler) DeleteProfileByEmail(ctx *fasthttp.RequestCtx) {
 		zap.String("url", string(ctx.Path())),
 	)
 
-	if !s.CookieHandler.CheckCookie(ctx) {
-		logger.Error("user is unauthorized")
-		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
-		return
-	}
-
 	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
 	foundUser, err := s.CookieHandler.GetUser(hash)
 	if err != nil {
-		logger.Error("uable to determine user")
+		logger.Error("unable to determine user")
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
+		return
+	}
+
+	CSRFToken := ""
+	if err := json.Unmarshal(ctx.PostBody(), &CSRFToken); err != nil {
+		logger.Error("error while unmarshalling JSON: ", zap.Error(err))
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	if !s.CookieHandler.CheckCookieAndToken(ctx, CSRFToken, foundUser) {
+		logger.Error("user is unauthorized")
+		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
 		return
 	}
 
@@ -263,9 +284,24 @@ func (s *userHandler) Logout(ctx *fasthttp.RequestCtx) {
 		zap.String("url", string(ctx.Path())),
 	)
 
-	if !s.CookieHandler.CheckCookie(ctx) {
-		logger.Error("user is unauthorized")
+	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
+	foundUser, err := s.CookieHandler.GetUser(hash)
+	if err != nil {
+		logger.Error("unable to determine user")
+		ctx.SetStatusCode(fasthttp.StatusNotFound)
+		return
+	}
+
+	CSRFToken := ""
+	if err := json.Unmarshal(ctx.PostBody(), &CSRFToken); err != nil {
+		logger.Error("error while unmarshalling JSON: ", zap.Error(err))
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	if !s.CookieHandler.CheckCookieAndToken(ctx, CSRFToken, foundUser) {
+		logger.Error("user is unauthorized")
+		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
 		return
 	}
 
@@ -284,15 +320,22 @@ func (s *userHandler) UploadAvatar(ctx *fasthttp.RequestCtx) {
 		zap.String("url", string(ctx.Path())),
 	)
 
-	if !s.CookieHandler.CheckCookie(ctx) {
-		logger.Error("user is unauthorized")
-		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
-		return
-	}
-
 	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
 	foundUser, err := s.CookieHandler.GetUser(hash)
 	if err != nil {
+		logger.Error("unable to determine user")
+		ctx.SetStatusCode(fasthttp.StatusNotFound)
+		return
+	}
+
+	CSRFToken := ""
+	if err := json.Unmarshal(ctx.PostBody(), &CSRFToken); err != nil {
+		logger.Error("error while unmarshalling JSON: ", zap.Error(err))
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	if !s.CookieHandler.CheckCookieAndToken(ctx, CSRFToken, foundUser) {
 		logger.Error("user is unauthorized")
 		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
 		return
