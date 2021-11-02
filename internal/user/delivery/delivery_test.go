@@ -7,6 +7,7 @@ import (
 	"os"
 	cd "snakealive/m/internal/cookie/delivery"
 	cu "snakealive/m/internal/cookie/usecase"
+	logs "snakealive/m/internal/logger"
 	uu "snakealive/m/internal/user/usecase"
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/domain"
@@ -105,6 +106,7 @@ func TestHandler_Login(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
+		logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
@@ -177,6 +179,7 @@ func TestHandler_Register(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
+		logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
@@ -211,6 +214,7 @@ func TestHandler_Logout(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
+		logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
@@ -259,6 +263,7 @@ func TestHandler_Logout2(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
+		logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
@@ -302,6 +307,7 @@ func TestHandler_GetProfile(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
+		logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
@@ -344,6 +350,7 @@ func TestHandler_GetProfile2(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
+		logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
@@ -386,6 +393,7 @@ func TestHandler_UpdateProfile(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
+		logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
@@ -435,6 +443,7 @@ func TestHandler_UpdateProfile2(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
+		logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
@@ -479,6 +488,7 @@ func TestHandler_DeleteProfile(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
+		logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
@@ -523,6 +533,7 @@ func TestHandler_DeleteProfile2(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
+		logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
@@ -573,6 +584,7 @@ func TestHandler_DeleteProfileByEmail2(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
+		logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
@@ -618,6 +630,7 @@ func TestHandler_DeleteProfileByEmail(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
+		logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
@@ -655,6 +668,7 @@ func TestHandler_UploadAvatar(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
+		logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
@@ -711,6 +725,7 @@ func TestHandler_UploadAvatar2(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
+		logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)

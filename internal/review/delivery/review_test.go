@@ -7,6 +7,7 @@ import (
 	"os"
 	cd "snakealive/m/internal/cookie/delivery"
 	cu "snakealive/m/internal/cookie/usecase"
+	logs "snakealive/m/internal/logger"
 	ru "snakealive/m/internal/review/usecase"
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/domain"
@@ -86,6 +87,8 @@ func TestHandler_ReviewsByPlace(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
+		logs.BuildLogger()
+
 		repo := service_mocks.NewMockReviewStorage(c)
 		tc.mockBehavior(repo, tc.inputReview)
 
@@ -134,6 +137,7 @@ func TestHandler_AddReviewToPlace(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
+		logs.BuildLogger()
 
 		cookieRepo := service_mocks.NewMockCookieStorage(c)
 		cookie := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
@@ -178,6 +182,8 @@ func TestHandler_AddReviewToPlace2(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
+		logs.BuildLogger()
+
 		repo := service_mocks.NewMockReviewStorage(c)
 		tc.mockBehavior(repo, tc.inputReview)
 
@@ -216,6 +222,8 @@ func TestHandler_DelReview(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
+		logs.BuildLogger()
+
 		repo := service_mocks.NewMockReviewStorage(c)
 		tc.mockBehavior(repo, tc.inputReview)
 
@@ -285,6 +293,8 @@ func TestHandler_DelReview2(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
+		logs.BuildLogger()
+
 		repo := service_mocks.NewMockReviewStorage(c)
 		tc.mockBehavior(repo, tc.inputReview)
 
