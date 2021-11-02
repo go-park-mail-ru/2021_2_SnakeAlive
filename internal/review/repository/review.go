@@ -52,7 +52,7 @@ func (u *reviewStorage) GetListByPlace(id int) (domain.Reviews, error) {
 
 	rows, err := conn.Query(context.Background(),
 		`SELECT id, title, text, rating, user_id, place_id FROM Reviews
-		Where place_id = $1`,
+		Where place_id = $1 LIMIT 10`,
 		id)
 	if err != nil {
 		logger.Error("error while getting places from database")
