@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	logs "snakealive/m/internal/logger"
+	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/domain"
 
 	pgxpool "github.com/jackc/pgx/v4/pgxpool"
@@ -29,7 +30,7 @@ func (u *reviewStorage) Add(value domain.Review, userId int) error {
 	defer conn.Release()
 
 	_, err = conn.Exec(context.Background(),
-		`INSERT INTO public.reviews (title, text, rating, user_id, place_id) VALUES ($1, $2, $3, $4, $5)`,
+		cnst.AddReviewQuery,
 		value.Title,
 		value.Text,
 		value.Rating,
@@ -51,8 +52,7 @@ func (u *reviewStorage) GetListByPlace(id int) (domain.Reviews, error) {
 	defer conn.Release()
 
 	rows, err := conn.Query(context.Background(),
-		`SELECT id, title, text, rating, user_id, place_id FROM Reviews
-		Where place_id = $1 LIMIT 10`,
+		cnst.GetReviewsByPlaceQuery,
 		id)
 	if err != nil {
 		logger.Error("error while getting places from database")
@@ -87,8 +87,7 @@ func (u *reviewStorage) Get(id int) (domain.Review, error) {
 	defer conn.Release()
 
 	err = conn.QueryRow(context.Background(),
-		`SELECT id, title, text, rating, user_id, place_id FROM Reviews
-		Where id = $1`,
+		cnst.GetReviewByIdQuery,
 		id,
 	).Scan(&review.Id, &review.Title, &review.Text, &review.Rating, &review.UserId, &review.PlaceId)
 	if err != nil {
@@ -109,7 +108,7 @@ func (u *reviewStorage) Delete(id int) error {
 	defer conn.Release()
 
 	_, err = conn.Exec(context.Background(),
-		`DELETE FROM Reviews WHERE id = $1`,
+		cnst.DeleteReviewQuery,
 		id,
 	)
 	return err
@@ -127,8 +126,7 @@ func (u *reviewStorage) GetReviewAuthor(id int) int {
 
 	var author int
 	err = conn.QueryRow(context.Background(),
-		`SELECT user_id
-	FROM Reviews WHERE id = $1`,
+		cnst.GetReviewAuthorQuery,
 		id,
 	).Scan(&author)
 

@@ -37,6 +37,7 @@ func (u placeUsecase) GetPlacesByCountry(value string) ([]byte, error) {
 
 	places, err := u.placeStorage.GetPlacesByCountry(value)
 	if err != nil {
+		logger.Error("error while getting places by country")
 		return []byte{}, err
 	}
 

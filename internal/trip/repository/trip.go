@@ -3,6 +3,7 @@ package tripRepository
 import (
 	"context"
 	logs "snakealive/m/internal/logger"
+	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/domain"
 
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -28,7 +29,7 @@ func (t *tripStorage) Add(value domain.Trip, user domain.User) (int, error) {
 	defer conn.Release()
 
 	err = conn.QueryRow(context.Background(),
-		`INSERT INTO Trips ("title", "description", "days", "user_id", "origin") VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+		cnst.AddTripQuery,
 		value.Title,
 		value.Description,
 		len(value.Days),
@@ -56,8 +57,7 @@ func (t *tripStorage) GetById(id int) (value domain.Trip, err error) {
 	defer conn.Release()
 
 	err = conn.QueryRow(context.Background(),
-		`SELECT id, title, description, days
-		FROM Trips WHERE id = $1`,
+		cnst.GetTripQuery,
 		id,
 	).Scan(&trip.Id, &trip.Title, &trip.Description, &trip.Days)
 	if err != nil {
@@ -66,11 +66,7 @@ func (t *tripStorage) GetById(id int) (value domain.Trip, err error) {
 	}
 
 	rows, err := conn.Query(context.Background(),
-		`SELECT pl.id, pl.name, pl.tags, pl.description, pl.rating, pl.country, pl.photos, tr.day
-		FROM TripsPlaces AS tr
-		JOIN Places AS pl ON tr.place_id = pl.id
-		WHERE tr.trip_id = $1
-		ORDER BY tr.day, tr.order`,
+		cnst.GetPlaceForTripQuery,
 		id)
 	if err != nil {
 		logger.Error("error while getting trip places")
@@ -106,7 +102,7 @@ func (t *tripStorage) Update(id int, value domain.Trip) error {
 	defer conn.Release()
 
 	_, err = conn.Exec(context.Background(),
-		`UPDATE Trips SET "title" = $1, "description" = $2, "days" = $3, "origin" = $4 WHERE id = $5`,
+		cnst.UpdateTripQuery,
 		value.Title,
 		value.Description,
 		len(value.Days),
@@ -137,7 +133,7 @@ func (t *tripStorage) Delete(id int) error {
 		return err
 	}
 	_, err = conn.Exec(context.Background(),
-		`DELETE FROM Trips WHERE id = $1`,
+		cnst.DeleteTripQuery,
 		id,
 	)
 	return err
@@ -154,7 +150,7 @@ func (t *tripStorage) deletePlaces(tripId int) error {
 	defer conn.Release()
 
 	_, err = conn.Exec(context.Background(),
-		`DELETE FROM TripsPlaces WHERE trip_id = $1`,
+		cnst.DeletePlacesForTripQuery,
 		tripId,
 	)
 	return err
@@ -173,7 +169,7 @@ func (t *tripStorage) addPlaces(value [][]domain.Place, tripId int) error {
 	for day, places := range value {
 		for ind, place := range places {
 			_, err = conn.Exec(context.Background(),
-				`INSERT INTO TripsPlaces ("trip_id", "place_id", "day", "order") VALUES ($1, $2, $3, $4)`,
+				cnst.AddPlacesForTripQuery,
 				tripId,
 				place.Id,
 				day,
@@ -196,8 +192,7 @@ func (t *tripStorage) GetTripAuthor(id int) int {
 
 	var author int
 	err = conn.QueryRow(context.Background(),
-		`SELECT user_id
-	FROM Trips WHERE id = $1`,
+		cnst.GetTripAuthorQuery,
 		id,
 	).Scan(&author)
 

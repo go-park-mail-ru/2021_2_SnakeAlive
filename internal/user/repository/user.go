@@ -3,6 +3,7 @@ package userRepository
 import (
 	"context"
 	logs "snakealive/m/internal/logger"
+	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/domain"
 
 	pgxpool "github.com/jackc/pgx/v4/pgxpool"
@@ -26,8 +27,7 @@ func (u *UserStorage) Add(value domain.User) error {
 	defer conn.Release()
 
 	_, err = conn.Exec(context.Background(),
-		`INSERT INTO Users ("name", "surname", "password", "email", "avatar") VALUES ($1, $2, $3, $4, $5)`,
-
+		cnst.AddUserQuery,
 		value.Name,
 		value.Surname,
 		value.Password,
@@ -48,7 +48,7 @@ func (u *UserStorage) Delete(id int) error {
 	defer conn.Release()
 
 	_, err = conn.Exec(context.Background(),
-		`DELETE FROM Users WHERE id = $1`,
+		cnst.DeleteUserByIdQuery,
 		id,
 	)
 	return err
@@ -65,7 +65,7 @@ func (u *UserStorage) DeleteByEmail(user domain.User) error {
 	defer conn.Release()
 
 	_, err = conn.Exec(context.Background(),
-		`DELETE FROM Users WHERE email = $1`,
+		cnst.DeleteUserByEmailQuery,
 		user.Email,
 	)
 	return err
@@ -83,8 +83,7 @@ func (u *UserStorage) GetByEmail(key string) (value domain.User, err error) {
 	defer conn.Release()
 
 	err = conn.QueryRow(context.Background(),
-		`SELECT id, name, surname, password, email, avatar
-		FROM Users WHERE email = $1`,
+		cnst.GetUserByEmailQuery,
 		key,
 	).Scan(&user.Id, &user.Name, &user.Surname, &user.Password, &user.Email, &user.Avatar)
 
@@ -103,8 +102,7 @@ func (u *UserStorage) GetById(id int) (value domain.User, err error) {
 	defer conn.Release()
 
 	err = conn.QueryRow(context.Background(),
-		`SELECT id, name, surname, password, email, avatar
-		FROM Users WHERE id = $1`,
+		cnst.GetUserByIdQuery,
 		id,
 	).Scan(&user.Id, &user.Name, &user.Surname, &user.Password, &user.Email, &user.Avatar)
 
@@ -122,7 +120,7 @@ func (u *UserStorage) Update(id int, value domain.User) error {
 	defer conn.Release()
 
 	_, err = conn.Exec(context.Background(),
-		`UPDATE Users SET "name" = $1, "surname" = $2, "email" = $3, "password" = $4, "avatar" = $5 WHERE id = $6`,
+		cnst.UpdateUserQuery,
 		value.Name,
 		value.Surname,
 		value.Email,
@@ -144,7 +142,7 @@ func (u *UserStorage) AddAvatar(id int, avatar string) error {
 	defer conn.Release()
 
 	_, err = conn.Exec(context.Background(),
-		`UPDATE Users SET "avatar" = $1 WHERE id = $2`,
+		cnst.AddAvatarQuery,
 		avatar,
 		id,
 	)

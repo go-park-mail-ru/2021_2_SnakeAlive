@@ -3,6 +3,7 @@ package placeRepository
 import (
 	"context"
 	logs "snakealive/m/internal/logger"
+	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/domain"
 
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -28,8 +29,7 @@ func (u *placeStorage) GetById(id int) (value domain.Place, err error) {
 
 	var sight domain.Place
 	err = conn.QueryRow(context.Background(),
-		`SELECT id, name, country, rating, tags, description, photos
-		FROM Places WHERE id = $1`,
+		cnst.GetPlaceByIdQuery,
 		id,
 	).Scan(&sight.Id, &sight.Name, &sight.Country, &sight.Rating, &sight.Tags, &sight.Description, &sight.Photos)
 
@@ -48,11 +48,7 @@ func (u *placeStorage) GetPlacesByCountry(value string) (domain.TopPlaces, error
 	defer conn.Release()
 
 	rows, err := conn.Query(context.Background(),
-		`SELECT pl.id, pl.name, pl.tags, pl.photos, rw.user_id, rw.text
-		FROM Places AS pl
-		LEFT JOIN Reviews AS rw ON pl.id = rw.place_id
-		WHERE pl.country = $1
-		LIMIT 10`,
+		cnst.GetPlacesByCountryQuery,
 		value)
 	if err != nil {
 		logger.Error("error while getting list of places from database")

@@ -68,8 +68,12 @@ func (s *cookieHandler) DeleteCookie(ctx *fasthttp.RequestCtx, cookie string) {
 }
 
 func (s *cookieHandler) CheckCookie(ctx *fasthttp.RequestCtx) bool {
+	logger := logs.GetLogger()
 	cookieHash := string(ctx.Request.Header.Cookie(cnst.CookieName))
 	_, err := s.CookieUseCase.Get(cookieHash)
+	if err != nil {
+		logger.Error("unable to find cookie")
+	}
 	return err == nil
 }
 

@@ -76,7 +76,12 @@ func (s *placeHandler) Place(ctx *fasthttp.RequestCtx) {
 		zap.String("url", string(ctx.Path())),
 	)
 
-	param, _ := strconv.Atoi(ctx.UserValue("id").(string))
+	param, err := strconv.Atoi(ctx.UserValue("id").(string))
+	if err != nil {
+		logger.Error("error while getting sid param: ", zap.Error(err))
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
 
 	sight, err := s.PlaceUseCase.GetById(param)
 	if err != nil {
