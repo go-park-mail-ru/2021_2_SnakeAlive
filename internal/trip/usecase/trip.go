@@ -6,6 +6,7 @@ import (
 	"snakealive/m/pkg/domain"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/microcosm-cc/bluemonday"
 	"github.com/valyala/fasthttp"
 	"go.uber.org/zap"
 )
@@ -26,8 +27,9 @@ func (u tripUsecase) Add(value domain.Trip, user domain.User) (int, error) {
 		logger.Error("error while validating trip struct")
 		return 0, err
 	}
+	cleanTrip := u.SanitizeTrip(value)
 
-	return u.tripStorage.Add(value, user)
+	return u.tripStorage.Add(cleanTrip, user)
 }
 
 func (u tripUsecase) GetById(id int) (int, []byte) {
@@ -61,8 +63,9 @@ func (u tripUsecase) Update(id int, updatedTrip domain.Trip) error {
 		logger.Error("error while validating trip struct")
 		return err
 	}
+	cleanTrip := u.SanitizeTrip(updatedTrip)
 
-	return u.tripStorage.Update(id, updatedTrip)
+	return u.tripStorage.Update(id, cleanTrip)
 }
 
 func (u tripUsecase) Delete(id int) error {
@@ -72,4 +75,12 @@ func (u tripUsecase) Delete(id int) error {
 func (u tripUsecase) CheckAuthor(user domain.User, id int) bool {
 	author := u.tripStorage.GetTripAuthor(id)
 	return author == user.Id
+}
+
+func (u tripUsecase) SanitizeTrip(trip domain.Trip) domain.Trip {
+	sanitizer := bluemonday.UGCPolicy()
+
+	trip.Title = sanitizer.Sanitize(trip.Title)
+	trip.Description = sanitizer.Sanitize(trip.Description)
+	return trip
 }

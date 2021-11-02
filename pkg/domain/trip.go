@@ -21,4 +21,5 @@ type TripUseCase interface {
 	Delete(id int) error
 	Update(id int, updatedTrip Trip) error
 	CheckAuthor(user User, id int) bool
+	SanitizeTrip(trip Trip) Trip
 }

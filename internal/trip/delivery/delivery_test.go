@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	cd "snakealive/m/internal/cookie/delivery"
+	logs "snakealive/m/internal/logger"
 
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
@@ -19,6 +20,8 @@ import (
 )
 
 func TestHandler_AddTrip(t *testing.T) {
+	logs.BuildLogger()
+
 	user := domain.User{
 		Id:       1,
 		Name:     "Александра",
@@ -79,6 +82,8 @@ func TestHandler_AddTrip(t *testing.T) {
 }
 
 func TestHandler_Trip(t *testing.T) {
+	logs.BuildLogger()
+
 	user := domain.User{
 		Id:       1,
 		Name:     "Александра",
@@ -132,6 +137,8 @@ func TestHandler_Trip(t *testing.T) {
 }
 
 func TestHandler_UpdateTrip(t *testing.T) {
+	logs.BuildLogger()
+
 	user := domain.User{
 		Id:       1,
 		Name:     "Александра",
@@ -198,6 +205,8 @@ func TestHandler_UpdateTrip(t *testing.T) {
 }
 
 func TestHandler_DeleteTrip(t *testing.T) {
+	logs.BuildLogger()
+
 	user := domain.User{
 		Id:       1,
 		Name:     "Александра",

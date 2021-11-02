@@ -5,6 +5,7 @@ import (
 	logs "snakealive/m/internal/logger"
 	"snakealive/m/pkg/domain"
 
+	"github.com/microcosm-cc/bluemonday"
 	"github.com/valyala/fasthttp"
 	"go.uber.org/zap"
 )
@@ -18,7 +19,8 @@ type reviewUseCase struct {
 }
 
 func (u reviewUseCase) Add(review domain.Review, user domain.User) (int, error) {
-	err := u.reviewStorage.Add(review, user.Id)
+	cleanReview := u.SanitizeReview(review)
+	err := u.reviewStorage.Add(cleanReview, user.Id)
 	if err != nil {
 		return fasthttp.StatusBadRequest, err
 	}
@@ -53,4 +55,12 @@ func (u reviewUseCase) Delete(id int) error {
 func (u reviewUseCase) CheckAuthor(user domain.User, id int) bool {
 	author := u.reviewStorage.GetReviewAuthor(id)
 	return author == user.Id
+}
+
+func (u reviewUseCase) SanitizeReview(review domain.Review) domain.Review {
+	sanitizer := bluemonday.UGCPolicy()
+
+	review.Title = sanitizer.Sanitize(review.Title)
+	review.Text = sanitizer.Sanitize(review.Text)
+	return review
 }
