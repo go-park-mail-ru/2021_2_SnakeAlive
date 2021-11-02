@@ -26,4 +26,5 @@ type ReviewUseCase interface {
 	Delete(id int) error
 	GetReviewsListByPlaceId(id int) (int, []byte)
 	CheckAuthor(user User, id int) bool
+	SanitizeReview(review Review) Review
 }

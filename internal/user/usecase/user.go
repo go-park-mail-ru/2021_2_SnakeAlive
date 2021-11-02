@@ -8,6 +8,7 @@ import (
 	"snakealive/m/pkg/domain"
 
 	"github.com/asaskevich/govalidator"
+	"github.com/microcosm-cc/bluemonday"
 	"github.com/valyala/fasthttp"
 	"go.uber.org/zap"
 )
@@ -91,8 +92,9 @@ func (u userUseCase) Registration(user *domain.User) (int, error) {
 		logger.Error("user with this email already exists")
 		return fasthttp.StatusBadRequest, err
 	}
+	cleanUser := u.SanitizeUser(*user)
 
-	err = u.Add(*user)
+	err = u.Add(cleanUser)
 	if err != nil {
 		logger.Error("error while adding user")
 		return fasthttp.StatusBadRequest, err
@@ -121,13 +123,14 @@ func (u userUseCase) UpdateProfile(updatedUser *domain.User, foundUser domain.Us
 		logger.Error("error while validating user")
 		return fasthttp.StatusBadRequest, nil
 	}
+	cleanUser := u.SanitizeUser(*updatedUser)
 
-	if err = u.Update(foundUser.Id, *updatedUser); err != nil {
+	if err = u.Update(foundUser.Id, cleanUser); err != nil {
 		logger.Error("user with this email already exists")
 		return fasthttp.StatusBadRequest, nil
 	}
 
-	response := map[string]string{"name": updatedUser.Name, "surname": updatedUser.Surname, "email": updatedUser.Email}
+	response := map[string]string{"name": cleanUser.Name, "surname": cleanUser.Surname, "email": cleanUser.Email}
 	bytes, err := json.Marshal(response)
 	if err != nil {
 		logger.Error("error while marshalling JSON: ", zap.Error(err))
@@ -149,4 +152,14 @@ func (u userUseCase) DeleteUserByEmail(user domain.User) int {
 
 func (u userUseCase) AddAvatar(user domain.User, avatar string) error {
 	return u.userStorage.AddAvatar(user.Id, avatar)
+}
+
+func (u userUseCase) SanitizeUser(user domain.User) domain.User {
+	sanitizer := bluemonday.UGCPolicy()
+
+	user.Name = sanitizer.Sanitize(user.Name)
+	user.Surname = sanitizer.Sanitize(user.Surname)
+	user.Email = sanitizer.Sanitize(user.Email)
+	user.Password = sanitizer.Sanitize(user.Password)
+	return user
 }

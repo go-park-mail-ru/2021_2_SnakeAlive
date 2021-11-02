@@ -36,4 +36,5 @@ type UserUseCase interface {
 	DeleteProfile(hash string, foundUser User) int
 	DeleteUserByEmail(user User) int
 	AddAvatar(user User, avatar string) error
+	SanitizeUser(user User) User
 }
