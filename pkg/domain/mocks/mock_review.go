@@ -35,11 +35,12 @@ func (m *MockReviewStorage) EXPECT() *MockReviewStorageMockRecorder {
 }
 
 // Add mocks base method.
-func (m *MockReviewStorage) Add(value domain.Review, userId int) error {
+func (m *MockReviewStorage) Add(value domain.Review, userId int) (int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Add", value, userId)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Add indicates an expected call of Add.
@@ -78,18 +79,18 @@ func (mr *MockReviewStorageMockRecorder) Get(id interface{}) *gomock.Call {
 }
 
 // GetListByPlace mocks base method.
-func (m *MockReviewStorage) GetListByPlace(id int) (domain.Reviews, error) {
+func (m *MockReviewStorage) GetListByPlace(id, limit, skip int) (domain.ReviewsNoPlace, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetListByPlace", id)
-	ret0, _ := ret[0].(domain.Reviews)
+	ret := m.ctrl.Call(m, "GetListByPlace", id, limit, skip)
+	ret0, _ := ret[0].(domain.ReviewsNoPlace)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetListByPlace indicates an expected call of GetListByPlace.
-func (mr *MockReviewStorageMockRecorder) GetListByPlace(id interface{}) *gomock.Call {
+func (mr *MockReviewStorageMockRecorder) GetListByPlace(id, limit, skip interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetListByPlace", reflect.TypeOf((*MockReviewStorage)(nil).GetListByPlace), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetListByPlace", reflect.TypeOf((*MockReviewStorage)(nil).GetListByPlace), id, limit, skip)
 }
 
 // GetReviewAuthor mocks base method.
@@ -130,12 +131,13 @@ func (m *MockReviewUseCase) EXPECT() *MockReviewUseCaseMockRecorder {
 }
 
 // Add mocks base method.
-func (m *MockReviewUseCase) Add(review domain.Review, user domain.User) (int, error) {
+func (m *MockReviewUseCase) Add(review domain.Review, user domain.User) (int, []byte, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Add", review, user)
 	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret1, _ := ret[1].([]byte)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // Add indicates an expected call of Add.
@@ -188,16 +190,30 @@ func (mr *MockReviewUseCaseMockRecorder) Get(id interface{}) *gomock.Call {
 }
 
 // GetReviewsListByPlaceId mocks base method.
-func (m *MockReviewUseCase) GetReviewsListByPlaceId(id int) (int, []byte) {
+func (m *MockReviewUseCase) GetReviewsListByPlaceId(id int, user domain.User, limit, skip int) (int, []byte) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetReviewsListByPlaceId", id)
+	ret := m.ctrl.Call(m, "GetReviewsListByPlaceId", id, user, limit, skip)
 	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].([]byte)
 	return ret0, ret1
 }
 
 // GetReviewsListByPlaceId indicates an expected call of GetReviewsListByPlaceId.
-func (mr *MockReviewUseCaseMockRecorder) GetReviewsListByPlaceId(id interface{}) *gomock.Call {
+func (mr *MockReviewUseCaseMockRecorder) GetReviewsListByPlaceId(id, user, limit, skip interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetReviewsListByPlaceId", reflect.TypeOf((*MockReviewUseCase)(nil).GetReviewsListByPlaceId), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetReviewsListByPlaceId", reflect.TypeOf((*MockReviewUseCase)(nil).GetReviewsListByPlaceId), id, user, limit, skip)
+}
+
+// SanitizeReview mocks base method.
+func (m *MockReviewUseCase) SanitizeReview(review domain.Review) domain.Review {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SanitizeReview", review)
+	ret0, _ := ret[0].(domain.Review)
+	return ret0
+}
+
+// SanitizeReview indicates an expected call of SanitizeReview.
+func (mr *MockReviewUseCaseMockRecorder) SanitizeReview(review interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SanitizeReview", reflect.TypeOf((*MockReviewUseCase)(nil).SanitizeReview), review)
 }

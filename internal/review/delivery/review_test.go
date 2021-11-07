@@ -9,6 +9,7 @@ import (
 	cu "snakealive/m/internal/cookie/usecase"
 	logs "snakealive/m/internal/logger"
 	ru "snakealive/m/internal/review/usecase"
+	ud "snakealive/m/internal/user/delivery"
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/domain"
 	service_mocks "snakealive/m/pkg/domain/mocks"
@@ -22,14 +23,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type mockBehavior func(r *service_mocks.MockReviewStorage, user domain.Review)
+type mockReviewBehavior func(r *service_mocks.MockReviewStorage, review domain.Review)
+type mockUserBehavior func(r *service_mocks.MockUserStorage, user domain.User)
 
 type MyTest struct {
 	name                 string
 	urlArg               int
 	inputBody            string
 	inputReview          domain.Review
-	mockBehavior         mockBehavior
+	outputUser           domain.User
+	mockReviewBehavior   mockReviewBehavior
+	mockUserBehavior     mockUserBehavior
 	expectedStatusCode   int
 	expectedResponseBody string
 }
@@ -59,8 +63,11 @@ func TestHandler_ReviewsByPlace(t *testing.T) {
 				UserId:  1,
 				PlaceId: 1,
 			},
-			mockBehavior: func(r *service_mocks.MockReviewStorage, review domain.Review) {
-				r.EXPECT().GetListByPlace(review.PlaceId)
+			mockReviewBehavior: func(r *service_mocks.MockReviewStorage, review domain.Review) {
+				r.EXPECT().GetListByPlace(review.PlaceId, 0, 10)
+			},
+			mockUserBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+				r.EXPECT().GetById(gomock.Any()).Return(user, nil).AnyTimes()
 			},
 			expectedStatusCode: fasthttp.StatusOK,
 		},
@@ -76,8 +83,18 @@ func TestHandler_ReviewsByPlace(t *testing.T) {
 				UserId:  1,
 				PlaceId: 1000,
 			},
-			mockBehavior: func(r *service_mocks.MockReviewStorage, review domain.Review) {
-				r.EXPECT().GetListByPlace(review.PlaceId).Return(domain.Reviews{}, errors.New("err"))
+			outputUser: domain.User{
+				Id:       1,
+				Name:     "Александра",
+				Surname:  "Волкова",
+				Email:    "testtesttests@mail.ru",
+				Password: "1234567890",
+			},
+			mockReviewBehavior: func(r *service_mocks.MockReviewStorage, review domain.Review) {
+				r.EXPECT().GetListByPlace(review.PlaceId, 0, 10).Return(domain.ReviewsNoPlace{}, errors.New("err"))
+			},
+			mockUserBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+				r.EXPECT().GetById(gomock.Any()).Return(user, nil).AnyTimes()
 			},
 			expectedStatusCode: fasthttp.StatusNotFound,
 		},
@@ -90,15 +107,19 @@ func TestHandler_ReviewsByPlace(t *testing.T) {
 		logs.BuildLogger()
 
 		repo := service_mocks.NewMockReviewStorage(c)
-		tc.mockBehavior(repo, tc.inputReview)
+		tc.mockReviewBehavior(repo, tc.inputReview)
+
+		userRepo := service_mocks.NewMockUserStorage(c)
+		tc.mockUserBehavior(userRepo, tc.outputUser)
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
 		cookieLayer := cd.CreateDelivery(SetUpDB())
-		userLayer := NewReviewHandler(ru.NewReviewUseCase(repo), cookieLayer)
+		userLayer := ud.CreateDelivery(SetUpDB())
+		reviewLayer := NewReviewHandler(ru.NewReviewUseCase(repo, userRepo), cookieLayer, userLayer)
 
 		ctx.SetUserValue("id", fmt.Sprint(tc.urlArg))
-		userLayer.ReviewsByPlace(ctx)
+		reviewLayer.ReviewsByPlace(ctx)
 
 		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
 	}
@@ -123,8 +144,11 @@ func TestHandler_AddReviewToPlace(t *testing.T) {
 				Rating:  10,
 				PlaceId: 1,
 			},
-			mockBehavior: func(r *service_mocks.MockReviewStorage, review domain.Review) {
+			mockReviewBehavior: func(r *service_mocks.MockReviewStorage, review domain.Review) {
 				r.EXPECT().Add(review, review.PlaceId)
+			},
+			mockUserBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+				r.EXPECT().GetById(gomock.Any()).Return(user, nil).AnyTimes()
 			},
 			expectedStatusCode: fasthttp.StatusOK,
 		},
@@ -144,17 +168,21 @@ func TestHandler_AddReviewToPlace(t *testing.T) {
 		mockGetUser(cookieRepo, cookie, user)
 
 		repo := service_mocks.NewMockReviewStorage(c)
-		tc.mockBehavior(repo, tc.inputReview)
+		tc.mockReviewBehavior(repo, tc.inputReview)
+
+		userRepo := service_mocks.NewMockUserStorage(c)
+		tc.mockUserBehavior(userRepo, tc.outputUser)
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
-		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
-		userLayer := NewReviewHandler(ru.NewReviewUseCase(repo), cookieLayer)
+		cookieLayer := cd.CreateDelivery(SetUpDB())
+		userLayer := ud.CreateDelivery(SetUpDB())
+		reviewLayer := NewReviewHandler(ru.NewReviewUseCase(repo, userRepo), cookieLayer, userLayer)
 
 		ctx.SetUserValue("id", fmt.Sprint(tc.urlArg))
 
 		ctx.Request.Header.SetCookie(cnst.CookieName, fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte("alex@mail.ru"))))
-		userLayer.AddReviewToPlace(ctx)
+		reviewLayer.AddReviewToPlace(ctx)
 
 		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
 	}
@@ -173,7 +201,10 @@ func TestHandler_AddReviewToPlace2(t *testing.T) {
 				UserId:  1,
 				PlaceId: 1,
 			},
-			mockBehavior:       func(r *service_mocks.MockReviewStorage, review domain.Review) {},
+			mockReviewBehavior: func(r *service_mocks.MockReviewStorage, review domain.Review) {},
+			mockUserBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+				r.EXPECT().GetById(gomock.Any()).Return(user, nil).AnyTimes()
+			},
 			expectedStatusCode: fasthttp.StatusUnauthorized,
 		},
 	}
@@ -185,16 +216,20 @@ func TestHandler_AddReviewToPlace2(t *testing.T) {
 		logs.BuildLogger()
 
 		repo := service_mocks.NewMockReviewStorage(c)
-		tc.mockBehavior(repo, tc.inputReview)
+		tc.mockReviewBehavior(repo, tc.inputReview)
+
+		userRepo := service_mocks.NewMockUserStorage(c)
+		tc.mockUserBehavior(userRepo, tc.outputUser)
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
 		cookieLayer := cd.CreateDelivery(SetUpDB())
-		userLayer := NewReviewHandler(ru.NewReviewUseCase(repo), cookieLayer)
+		userLayer := ud.CreateDelivery(SetUpDB())
+		reviewLayer := NewReviewHandler(ru.NewReviewUseCase(repo, userRepo), cookieLayer, userLayer)
 
 		ctx.SetUserValue("id", fmt.Sprint(tc.urlArg))
 
-		userLayer.AddReviewToPlace(ctx)
+		reviewLayer.AddReviewToPlace(ctx)
 
 		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
 	}
@@ -213,7 +248,10 @@ func TestHandler_DelReview(t *testing.T) {
 				UserId:  1,
 				PlaceId: 1,
 			},
-			mockBehavior:       func(r *service_mocks.MockReviewStorage, review domain.Review) {},
+			mockReviewBehavior: func(r *service_mocks.MockReviewStorage, review domain.Review) {},
+			mockUserBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+				r.EXPECT().GetById(gomock.Any()).Return(user, nil).AnyTimes()
+			},
 			expectedStatusCode: fasthttp.StatusUnauthorized,
 		},
 	}
@@ -225,16 +263,20 @@ func TestHandler_DelReview(t *testing.T) {
 		logs.BuildLogger()
 
 		repo := service_mocks.NewMockReviewStorage(c)
-		tc.mockBehavior(repo, tc.inputReview)
+		tc.mockReviewBehavior(repo, tc.inputReview)
+
+		userRepo := service_mocks.NewMockUserStorage(c)
+		tc.mockUserBehavior(userRepo, tc.outputUser)
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
 		cookieLayer := cd.CreateDelivery(SetUpDB())
-		userLayer := NewReviewHandler(ru.NewReviewUseCase(repo), cookieLayer)
+		userLayer := ud.CreateDelivery(SetUpDB())
+		reviewLayer := NewReviewHandler(ru.NewReviewUseCase(repo, userRepo), cookieLayer, userLayer)
 
 		ctx.SetUserValue("id", fmt.Sprint(tc.urlArg))
 
-		userLayer.DelReview(ctx)
+		reviewLayer.DelReview(ctx)
 
 		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
 	}
@@ -259,11 +301,14 @@ func TestHandler_DelReview2(t *testing.T) {
 				Rating:  10,
 				PlaceId: 1,
 			},
-			mockBehavior: func(r *service_mocks.MockReviewStorage, review domain.Review) {
+			mockReviewBehavior: func(r *service_mocks.MockReviewStorage, review domain.Review) {
 
 				r.EXPECT().GetReviewAuthor(1).Return(1)
 				r.EXPECT().Get(1)
 				r.EXPECT().Delete(1)
+			},
+			mockUserBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+				r.EXPECT().GetById(gomock.Any()).Return(user, nil).AnyTimes()
 			},
 			expectedStatusCode: fasthttp.StatusOK,
 		},
@@ -277,9 +322,12 @@ func TestHandler_DelReview2(t *testing.T) {
 				Rating:  10,
 				PlaceId: 1,
 			},
-			mockBehavior: func(r *service_mocks.MockReviewStorage, review domain.Review) {
+			mockReviewBehavior: func(r *service_mocks.MockReviewStorage, review domain.Review) {
 
 				r.EXPECT().GetReviewAuthor(1).Return(0)
+			},
+			mockUserBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
+				r.EXPECT().GetById(gomock.Any()).Return(user, nil).AnyTimes()
 			},
 			expectedStatusCode: fasthttp.StatusUnauthorized,
 		},
@@ -296,7 +344,10 @@ func TestHandler_DelReview2(t *testing.T) {
 		logs.BuildLogger()
 
 		repo := service_mocks.NewMockReviewStorage(c)
-		tc.mockBehavior(repo, tc.inputReview)
+		tc.mockReviewBehavior(repo, tc.inputReview)
+
+		userRepo := service_mocks.NewMockUserStorage(c)
+		tc.mockUserBehavior(userRepo, tc.outputUser)
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
@@ -308,10 +359,11 @@ func TestHandler_DelReview2(t *testing.T) {
 		mockGetUser(cookieRepo, cookie, user)
 
 		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
-		userLayer := NewReviewHandler(ru.NewReviewUseCase(repo), cookieLayer)
+		userLayer := ud.CreateDelivery(SetUpDB())
+		reviewLayer := NewReviewHandler(ru.NewReviewUseCase(repo, userRepo), cookieLayer, userLayer)
 
 		ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
-		userLayer.DelReview(ctx)
+		reviewLayer.DelReview(ctx)
 
 		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
 	}

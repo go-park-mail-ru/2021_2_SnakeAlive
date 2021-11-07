@@ -302,6 +302,20 @@ func (mr *MockUserUseCaseMockRecorder) Registration(user interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Registration", reflect.TypeOf((*MockUserUseCase)(nil).Registration), user)
 }
 
+// SanitizeUser mocks base method.
+func (m *MockUserUseCase) SanitizeUser(user domain.User) domain.User {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SanitizeUser", user)
+	ret0, _ := ret[0].(domain.User)
+	return ret0
+}
+
+// SanitizeUser indicates an expected call of SanitizeUser.
+func (mr *MockUserUseCaseMockRecorder) SanitizeUser(user interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SanitizeUser", reflect.TypeOf((*MockUserUseCase)(nil).SanitizeUser), user)
+}
+
 // Update mocks base method.
 func (m *MockUserUseCase) Update(id int, updatedUser domain.User) error {
 	m.ctrl.T.Helper()

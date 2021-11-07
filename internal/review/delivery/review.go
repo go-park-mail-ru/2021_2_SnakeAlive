@@ -2,8 +2,11 @@ package reviewDelivery
 
 import (
 	"encoding/json"
+	"fmt"
 	cd "snakealive/m/internal/cookie/delivery"
 	logs "snakealive/m/internal/logger"
+	ud "snakealive/m/internal/user/delivery"
+	ur "snakealive/m/internal/user/repository"
 	"snakealive/m/pkg/domain"
 	"strconv"
 
@@ -26,18 +29,21 @@ type ReviewHandler interface {
 type reviewHandler struct {
 	ReviewUseCase domain.ReviewUseCase
 	CookieHandler cd.CookieHandler
+	UserHandler   ud.UserHandler
 }
 
-func NewReviewHandler(ReviewUseCase domain.ReviewUseCase, CookieHandler cd.CookieHandler) ReviewHandler {
+func NewReviewHandler(ReviewUseCase domain.ReviewUseCase, CookieHandler cd.CookieHandler, UserHandler ud.UserHandler) ReviewHandler {
 	return &reviewHandler{
 		ReviewUseCase: ReviewUseCase,
 		CookieHandler: CookieHandler,
+		UserHandler:   UserHandler,
 	}
 }
 
 func CreateDelivery(db *pgxpool.Pool) ReviewHandler {
 	cookieLayer := cd.CreateDelivery(db)
-	reviewLayer := NewReviewHandler(ru.NewReviewUseCase(rr.NewReviewStorage(db)), cookieLayer)
+	userLayer := ud.CreateDelivery(db)
+	reviewLayer := NewReviewHandler(ru.NewReviewUseCase(rr.NewReviewStorage(db), ur.NewUserStorage(db)), cookieLayer, userLayer)
 	return reviewLayer
 }
 
@@ -58,7 +64,25 @@ func (s *reviewHandler) ReviewsByPlace(ctx *fasthttp.RequestCtx) {
 	)
 
 	id, _ := strconv.Atoi(ctx.UserValue("id").(string))
-	code, bytes := s.ReviewUseCase.GetReviewsListByPlaceId(id)
+	cookieHash := string(ctx.Request.Header.Cookie(cnst.CookieName))
+	var user domain.User
+	user, err := s.CookieHandler.GetUser(cookieHash)
+	if err != nil {
+		logger.Error("unable to determine user")
+		user = domain.User{}
+	}
+	skip, err := strconv.Atoi(string(ctx.QueryArgs().Peek("skip")))
+	if err != nil {
+		logger.Error("unable to get query arg skip")
+		skip = cnst.DefaultSkip
+	}
+	limit, err := strconv.Atoi(string(ctx.QueryArgs().Peek("limit")))
+	if err != nil {
+		logger.Error("unable to get query arg limit")
+		limit = 0
+	}
+	fmt.Println("limit skip = ", limit, skip)
+	code, bytes := s.ReviewUseCase.GetReviewsListByPlaceId(id, user, limit, skip)
 	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
 	logger.Info(string(ctx.Path()),
@@ -96,8 +120,9 @@ func (s *reviewHandler) AddReviewToPlace(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	code, err := s.ReviewUseCase.Add(*newReview, foundUser)
+	code, bytes, err := s.ReviewUseCase.Add(*newReview, foundUser)
 	ctx.SetStatusCode(code)
+	ctx.Write(bytes)
 	if err != nil {
 		logger.Error("error while registering user in")
 		return

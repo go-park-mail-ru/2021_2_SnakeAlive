@@ -19,49 +19,53 @@ func NewReviewStorage(DB *pgxpool.Pool) domain.ReviewStorage {
 	return &reviewStorage{dataHolder: DB}
 }
 
-func (u *reviewStorage) Add(value domain.Review, userId int) error {
+func (u *reviewStorage) Add(value domain.Review, userId int) (int, error) {
 	logger := logs.GetLogger()
-
+	insertedId := 0
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
 		logger.Error("error while aquiring connection")
-		return err
+		return insertedId, err
 	}
 	defer conn.Release()
 
-	_, err = conn.Exec(context.Background(),
+	err = conn.QueryRow(context.Background(),
 		cnst.AddReviewQuery,
 		value.Title,
 		value.Text,
 		value.Rating,
 		userId,
 		value.PlaceId,
-	)
-	return err
+	).Scan(&insertedId)
+	if err != nil {
+		logger.Error("error while adding review: ", zap.Error(err))
+		return insertedId, err
+	}
+	return insertedId, err
 }
 
-func (u *reviewStorage) GetListByPlace(id int) (domain.Reviews, error) {
+func (u *reviewStorage) GetListByPlace(id int, limit int, skip int) (domain.ReviewsNoPlace, error) {
 	logger := logs.GetLogger()
 
-	reviews := make(domain.Reviews, 0)
+	reviews := make(domain.ReviewsNoPlace, 0)
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
 		logger.Error("error while aquiring connection")
 		return reviews, err
 	}
 	defer conn.Release()
-
+	const GetReviewsByPlaceQuery = `SELECT id, title, text, rating, user_id FROM Reviews WHERE place_id = $1 LIMIT $2 OFFSET $3`
 	rows, err := conn.Query(context.Background(),
-		cnst.GetReviewsByPlaceQuery,
-		id)
+		GetReviewsByPlaceQuery,
+		id, limit, skip)
 	if err != nil {
 		logger.Error("error while getting places from database")
 		return reviews, err
 	}
 
-	var review domain.Review
+	var review domain.ReviewNoPlace
 	for rows.Next() {
-		err = rows.Scan(&review.Id, &review.Title, &review.Text, &review.Rating, &review.UserId, &review.PlaceId)
+		err = rows.Scan(&review.Id, &review.Title, &review.Text, &review.Rating, &review.UserId)
 		reviews = append(reviews, review)
 	}
 	if rows.Err() != nil {

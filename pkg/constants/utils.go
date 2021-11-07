@@ -2,6 +2,8 @@ package constants
 
 const CookieName = "SnakeAlive"
 
+const DefaultSkip = 10
+
 const FormFileKey = "avatar"
 
 const StaticPath = "./static"
