@@ -44,10 +44,10 @@ func (u *reviewStorage) Add(value domain.Review, userId int) (int, error) {
 	return insertedId, err
 }
 
-func (u *reviewStorage) GetListByPlace(id int) (domain.Reviews, error) {
+func (u *reviewStorage) GetListByPlace(id int) (domain.ReviewsNoPlace, error) {
 	logger := logs.GetLogger()
 
-	reviews := make(domain.Reviews, 0)
+	reviews := make(domain.ReviewsNoPlace, 0)
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
 		logger.Error("error while aquiring connection")
@@ -63,9 +63,9 @@ func (u *reviewStorage) GetListByPlace(id int) (domain.Reviews, error) {
 		return reviews, err
 	}
 
-	var review domain.Review
+	var review domain.ReviewNoPlace
 	for rows.Next() {
-		err = rows.Scan(&review.Id, &review.Title, &review.Text, &review.Rating, &review.UserId, &review.PlaceId)
+		err = rows.Scan(&review.Id, &review.Title, &review.Text, &review.Rating, &review.UserId)
 		reviews = append(reviews, review)
 	}
 	if rows.Err() != nil {

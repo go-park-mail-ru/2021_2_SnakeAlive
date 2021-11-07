@@ -79,10 +79,10 @@ func (mr *MockReviewStorageMockRecorder) Get(id interface{}) *gomock.Call {
 }
 
 // GetListByPlace mocks base method.
-func (m *MockReviewStorage) GetListByPlace(id int) (domain.Reviews, error) {
+func (m *MockReviewStorage) GetListByPlace(id int) (domain.ReviewsNoPlace, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetListByPlace", id)
-	ret0, _ := ret[0].(domain.Reviews)
+	ret0, _ := ret[0].(domain.ReviewsNoPlace)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

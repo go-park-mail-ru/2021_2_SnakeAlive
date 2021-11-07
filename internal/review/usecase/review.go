@@ -2,6 +2,7 @@ package reviewUseCase
 
 import (
 	"encoding/json"
+	"fmt"
 	logs "snakealive/m/internal/logger"
 	"snakealive/m/pkg/domain"
 
@@ -10,12 +11,19 @@ import (
 	"go.uber.org/zap"
 )
 
-func NewReviewUseCase(reviewStorage domain.ReviewStorage) domain.ReviewUseCase {
-	return reviewUseCase{reviewStorage: reviewStorage}
+func NewReviewUseCase(reviewStorage domain.ReviewStorage, userStorage domain.UserStorage) domain.ReviewUseCase {
+	return reviewUseCase{reviewStorage: reviewStorage, userStorage: userStorage}
 }
 
 type reviewUseCase struct {
 	reviewStorage domain.ReviewStorage
+	userStorage   domain.UserStorage
+}
+
+type ReviewUser struct {
+	Review domain.ReviewNoPlace `json:"review"`
+	User   domain.User          `json:"user"`
+	Owner  bool                 `json:"owner"`
 }
 
 func (u reviewUseCase) Add(review domain.Review, user domain.User) (int, []byte, error) {
@@ -38,20 +46,35 @@ func (u reviewUseCase) Get(id int) (domain.Review, error) {
 	return u.reviewStorage.Get(id)
 }
 
-func (u reviewUseCase) GetReviewsListByPlaceId(id int) (int, []byte) {
+func (u reviewUseCase) GetReviewsListByPlaceId(id int, user domain.User) (int, []byte) {
 	logger := logs.GetLogger()
 
-	response, err := u.reviewStorage.GetListByPlace(id)
+	reviews, err := u.reviewStorage.GetListByPlace(id)
 	if err != nil {
 		logger.Error("reviews not found: ", zap.Error(err))
 		return fasthttp.StatusNotFound, []byte("{}")
 	}
 
-	bytes, err := json.Marshal(response)
+	reviewData := make([]ReviewUser, 0)
+	var ru ReviewUser
+
+	for i := 0; i < len(reviews); i++ {
+		ru.Review = reviews[i]
+		ru.User, err = u.userStorage.GetById(reviews[i].UserId)
+		if err != nil {
+			logger.Error("error while get user in reviews list: ", zap.Error(err))
+			return fasthttp.StatusOK, []byte("{}")
+		}
+		ru.Owner = u.CheckAuthor(user, reviews[i].Id)
+		reviewData = append(reviewData, ru)
+	}
+
+	bytes, err := json.Marshal(reviewData)
 	if err != nil {
 		logger.Error("error while marshalling JSON: ", zap.Error(err))
 		return fasthttp.StatusOK, []byte("{}")
 	}
+	fmt.Println("bytes= ", bytes)
 	return fasthttp.StatusOK, bytes
 }
 

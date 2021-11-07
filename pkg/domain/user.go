@@ -4,7 +4,7 @@ package domain
 //mockgen -source=user.go -destination=mocks/mock_doer.go -package=mocks
 
 type User struct {
-	Id       int    `json:"-"`
+	Id       int    `json:"id"`
 	Name     string `json:"name" valid:"required"`
 	Surname  string `json:"surname" valid:"required"`
 	Email    string `json:"email" valid:"required,email,maxstringlength(254)"`
