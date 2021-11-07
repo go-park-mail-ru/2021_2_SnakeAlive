@@ -38,7 +38,7 @@ func CreateDelivery(db *pgxpool.Pool) PlaceHandler {
 
 func SetUpPlaceRouter(db *pgxpool.Pool, r *router.Router) *router.Router {
 	placeHandler := CreateDelivery(db)
-	r.GET(cnst.CountryURL, placeHandler.PlacesByCountry)
+	r.GET(cnst.SightsByCountruURL, placeHandler.PlacesByCountry)
 	r.GET(cnst.SightURL, placeHandler.Place)
 	return r
 }

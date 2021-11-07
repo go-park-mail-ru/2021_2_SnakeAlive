@@ -5,8 +5,12 @@ const RegisterURL = "/register"
 const ProfileURL = "/profile"
 const LogoutURL = "/logout"
 
-const CountryURL = "/country/{name}"
+const CountryNameURL = "/country/{name}"
+const CountryIdURL = "/country/id/{id}"
+const CountryListURL = "/country/list"
+
 const SightURL = "/sight/{id}"
+const SightsByCountruURL = "/sights/{name}"
 
 const ReviewAddURL = "/review"
 const ReviewURL = "/review/{id}"

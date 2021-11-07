@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	cd "snakealive/m/internal/country/delivery"
 	logs "snakealive/m/internal/logger"
 	pd "snakealive/m/internal/place/delivery"
 	rd "snakealive/m/internal/review/delivery"
@@ -22,6 +23,7 @@ func SetUpRouter(db *pgxpool.Pool) *router.Router {
 	r = pd.SetUpPlaceRouter(db, r)
 	r = td.SetUpTripRouter(db, r)
 	r = rd.SetUpReviewRouter(db, r)
+	r = cd.SetUpCountryRouter(db, r)
 
 	return r
 }
