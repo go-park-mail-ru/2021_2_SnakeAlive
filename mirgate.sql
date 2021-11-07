@@ -79,3 +79,46 @@ CREATE TABLE Reviews (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (place_id) REFERENCES places(id) ON DELETE CASCADE
 );
+
+CREATE TABLE Countries (
+  id SERIAL NOT NULL PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL,
+  photo TEXT
+);
+
+INSERT INTO Countries ("name", "description", "photo")
+VALUES ('Россия', 'Россия – крупнейшая страна мира, расположенная в Восточной Европе и Северной Азии и омываемая водами Тихого и Северного Ледовитого океанов.', 'russia.jpeg');
+INSERT INTO Countries ("name", "description", "photo")
+VALUES ('Германия', 'Германия – государство в Западной Европе с лесами, реками, горными хребтами и пляжными курортами Северного моря.', 'germany.jpeg');
+INSERT INTO Countries ("name", "description", "photo")
+VALUES ('США', ' Соединенные Штаты Америки – государство, состоящее из 50 штатов, занимает значительную часть Северной Америки. ', 'usa.jpeg');
+INSERT INTO Countries ("name", "description", "photo")
+VALUES ('Великобритания', 'Великобритания (официальное название – Соединенное Королевство Великобритании и Северной Ирландии) – островное государство на северо-западе Европы, состоящее из Англии, Шотландии, Уэльса и Северной Ирландии. ', 'uk.jpeg');
+
+INSERT INTO Users ("name", "surname", "password", "email", "avatar")
+VALUES ('Алексадра', 'Волынец', 'password', 'alex@mail.ru', 'test.jpeg');
+INSERT INTO Users ("name", "surname", "password", "email", "avatar")
+VALUES ('Никита', 'Черных', 'frontend123', 'nikita@mail.ru', 'test.jpeg');
+INSERT INTO Users ("name", "surname", "password", "email", "avatar")
+VALUES ('Ксения', 'Самойлова', '12345678', 'ksenia@mail.ru', 'test.jpeg');
+INSERT INTO Users ("name", "surname", "password", "email", "avatar")
+VALUES ('Андрей', 'Кравцов', '000111000', 'andrew@mail.ru', 'test.jpeg');
+
+INSERT INTO Places ("name", "country", "rating", "description", "tags", "photos")
+VALUES ('Цирк', 'Россия', 5, 'Коровы крутые очень! Огонь!',
+ARRAY['Опасно', 'Есть парковка'], ARRAY['test.jpeg', 'test.jpeg']);
+INSERT INTO Places ("name", "country", "rating", "description", "tags", "photos")
+VALUES ('Кафе', 'Россия', 2.3, 'Обслуживание на 2-',
+ARRAY['Еда', 'Есть парковка'], ARRAY['test.jpeg', 'test.jpeg']);
+INSERT INTO Places ("name", "country", "rating", "description", "tags", "photos")
+VALUES ('Церковь', 'Россия', 4.5, 'Самое святое место после Иерусалима',
+ARRAY['Святые места'], ARRAY['test.jpeg']);
+INSERT INTO Places ("name", "country", "rating", "description", "tags", "photos")
+VALUES ('Музей', 'Россия', 3.5, 'Огонь!',
+ARRAY['Исскуство', '18+'], ARRAY['test.jpeg', 'test.jpeg']);
+
+INSERT INTO public.reviews (id, title, text, rating, user_id, place_id, created_at) VALUES (DEFAULT, 'title', 'text', 10, 1, 1, DEFAULT);
+INSERT INTO public.reviews (id, title, text, rating, user_id, place_id, created_at) VALUES (DEFAULT, 'title2', 'text2', 11, 1, 1, DEFAULT);
+INSERT INTO public.reviews (id, title, text, rating, user_id, place_id, created_at) VALUES (DEFAULT, 'title3', 'text3', 12, 1, 2, DEFAULT);
+
