@@ -14,7 +14,7 @@ type Review struct {
 }
 
 type ReviewNoPlace struct {
-	Id        int    `json:"-"`
+	Id        int    `json:"id"`
 	Title     string `json:"title"`
 	Text      string `json:"text"`
 	Rating    int    `json:"rating"`
