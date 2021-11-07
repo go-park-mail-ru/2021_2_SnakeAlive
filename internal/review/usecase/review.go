@@ -22,7 +22,7 @@ type reviewUseCase struct {
 
 type ReviewUser struct {
 	Review domain.ReviewNoPlace `json:"review"`
-	User   domain.User          `json:"user"`
+	User   domain.PublicUser    `json:"user"`
 	Owner  bool                 `json:"owner"`
 }
 
@@ -60,12 +60,13 @@ func (u reviewUseCase) GetReviewsListByPlaceId(id int, user domain.User, limit i
 
 	for i := 0; i < len(reviews); i++ {
 		ru.Review = reviews[i]
-		ru.User, err = u.userStorage.GetById(reviews[i].UserId)
+		ru.User, err = u.userStorage.GetPublicById(reviews[i].UserId)
 		if err != nil {
 			logger.Error("error while get user in reviews list: ", zap.Error(err))
 			return fasthttp.StatusOK, []byte("{}")
 		}
 		ru.Owner = u.CheckAuthor(user, reviews[i].Id)
+
 		reviewData = append(reviewData, ru)
 	}
 

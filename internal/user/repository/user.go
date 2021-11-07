@@ -109,6 +109,25 @@ func (u *UserStorage) GetById(id int) (value domain.User, err error) {
 	return user, err
 }
 
+func (u *UserStorage) GetPublicById(id int) (value domain.PublicUser, err error) {
+	logger := logs.GetLogger()
+	var user domain.PublicUser
+
+	conn, err := u.dataHolder.Acquire(context.Background())
+	if err != nil {
+		logger.Error("error while aquiring connection")
+		return user, err
+	}
+	defer conn.Release()
+	const GetPublicUserByIdQuery = `SELECT id, name, surname, avatar FROM Users WHERE id = $1`
+	err = conn.QueryRow(context.Background(),
+		GetPublicUserByIdQuery,
+		id,
+	).Scan(&user.Id, &user.Name, &user.Surname, &user.Avatar)
+
+	return user, err
+}
+
 func (u *UserStorage) Update(id int, value domain.User) error {
 	logger := logs.GetLogger()
 

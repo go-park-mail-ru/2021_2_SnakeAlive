@@ -29,6 +29,10 @@ func (u userUseCase) GetById(id int) (value domain.User, err error) {
 	return u.userStorage.GetById(id)
 }
 
+func (u userUseCase) GetPublicById(id int) (value domain.PublicUser, err error) {
+	return u.userStorage.GetPublicById(id)
+}
+
 func (u userUseCase) Add(user domain.User) error {
 	return u.userStorage.Add(user)
 }

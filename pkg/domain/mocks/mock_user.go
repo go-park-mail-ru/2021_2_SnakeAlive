@@ -120,6 +120,21 @@ func (mr *MockUserStorageMockRecorder) GetById(id interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetById", reflect.TypeOf((*MockUserStorage)(nil).GetById), id)
 }
 
+// GetPublicById mocks base method.
+func (m *MockUserStorage) GetPublicById(id int) (domain.PublicUser, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPublicById", id)
+	ret0, _ := ret[0].(domain.PublicUser)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPublicById indicates an expected call of GetPublicById.
+func (mr *MockUserStorageMockRecorder) GetPublicById(id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPublicById", reflect.TypeOf((*MockUserStorage)(nil).GetPublicById), id)
+}
+
 // Update mocks base method.
 func (m *MockUserStorage) Update(id int, value domain.User) error {
 	m.ctrl.T.Helper()
@@ -270,6 +285,21 @@ func (m *MockUserUseCase) GetProfile(hash string, user domain.User) (int, []byte
 func (mr *MockUserUseCaseMockRecorder) GetProfile(hash, user interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProfile", reflect.TypeOf((*MockUserUseCase)(nil).GetProfile), hash, user)
+}
+
+// GetPublicById mocks base method.
+func (m *MockUserUseCase) GetPublicById(id int) (domain.PublicUser, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetPublicById", id)
+	ret0, _ := ret[0].(domain.PublicUser)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetPublicById indicates an expected call of GetPublicById.
+func (mr *MockUserUseCaseMockRecorder) GetPublicById(id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPublicById", reflect.TypeOf((*MockUserUseCase)(nil).GetPublicById), id)
 }
 
 // Login mocks base method.

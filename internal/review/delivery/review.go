@@ -2,7 +2,6 @@ package reviewDelivery
 
 import (
 	"encoding/json"
-	"fmt"
 	cd "snakealive/m/internal/cookie/delivery"
 	logs "snakealive/m/internal/logger"
 	ud "snakealive/m/internal/user/delivery"
@@ -81,7 +80,6 @@ func (s *reviewHandler) ReviewsByPlace(ctx *fasthttp.RequestCtx) {
 		logger.Error("unable to get query arg limit")
 		limit = 0
 	}
-	fmt.Println("limit skip = ", limit, skip)
 	code, bytes := s.ReviewUseCase.GetReviewsListByPlaceId(id, user, limit, skip)
 	ctx.SetStatusCode(code)
 	ctx.Write(bytes)

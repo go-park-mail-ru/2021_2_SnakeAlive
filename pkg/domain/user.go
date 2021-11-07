@@ -12,9 +12,17 @@ type User struct {
 	Avatar   string `json:"avatar"`
 }
 
+type PublicUser struct {
+	Id      int    `json:"id"`
+	Name    string `json:"name" valid:"required"`
+	Surname string `json:"surname" valid:"required"`
+	Avatar  string `json:"avatar"`
+}
+
 type UserStorage interface {
 	Add(value User) error
 	GetById(id int) (value User, err error)
+	GetPublicById(id int) (value PublicUser, err error)
 	GetByEmail(key string) (value User, err error)
 	Delete(id int) error
 	Update(id int, value User) error
@@ -25,6 +33,7 @@ type UserStorage interface {
 type UserUseCase interface {
 	Add(user User) error
 	GetById(id int) (value User, err error)
+	GetPublicById(id int) (value PublicUser, err error)
 	GetByEmail(key string) (value User, err error)
 	Delete(id int) error
 	Update(id int, updatedUser User) error
