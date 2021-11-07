@@ -19,25 +19,29 @@ func NewReviewStorage(DB *pgxpool.Pool) domain.ReviewStorage {
 	return &reviewStorage{dataHolder: DB}
 }
 
-func (u *reviewStorage) Add(value domain.Review, userId int) error {
+func (u *reviewStorage) Add(value domain.Review, userId int) (int, error) {
 	logger := logs.GetLogger()
-
+	insertedId := 0
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
 		logger.Error("error while aquiring connection")
-		return err
+		return insertedId, err
 	}
 	defer conn.Release()
 
-	_, err = conn.Exec(context.Background(),
+	err = conn.QueryRow(context.Background(),
 		cnst.AddReviewQuery,
 		value.Title,
 		value.Text,
 		value.Rating,
 		userId,
 		value.PlaceId,
-	)
-	return err
+	).Scan(&insertedId)
+	if err != nil {
+		logger.Error("error while adding review: ", zap.Error(err))
+		return insertedId, err
+	}
+	return insertedId, err
 }
 
 func (u *reviewStorage) GetListByPlace(id int) (domain.Reviews, error) {

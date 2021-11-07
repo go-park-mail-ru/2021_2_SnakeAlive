@@ -13,7 +13,7 @@ type Review struct {
 }
 
 type ReviewStorage interface {
-	Add(value Review, userId int) error
+	Add(value Review, userId int) (int, error)
 	Get(id int) (Review, error)
 	GetListByPlace(id int) (Reviews, error)
 	Delete(id int) error
@@ -21,7 +21,7 @@ type ReviewStorage interface {
 }
 
 type ReviewUseCase interface {
-	Add(review Review, user User) (int, error)
+	Add(review Review, user User) (int, []byte, error)
 	Get(id int) (Review, error)
 	Delete(id int) error
 	GetReviewsListByPlaceId(id int) (int, []byte)

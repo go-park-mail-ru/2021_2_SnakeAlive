@@ -18,13 +18,20 @@ type reviewUseCase struct {
 	reviewStorage domain.ReviewStorage
 }
 
-func (u reviewUseCase) Add(review domain.Review, user domain.User) (int, error) {
+func (u reviewUseCase) Add(review domain.Review, user domain.User) (int, []byte, error) {
+	logger := logs.GetLogger()
 	cleanReview := u.SanitizeReview(review)
-	err := u.reviewStorage.Add(cleanReview, user.Id)
+	insertedId, err := u.reviewStorage.Add(cleanReview, user.Id)
 	if err != nil {
-		return fasthttp.StatusBadRequest, err
+		return fasthttp.StatusBadRequest, []byte("{}"), err
 	}
-	return fasthttp.StatusOK, err
+
+	bytes, err := json.Marshal(insertedId)
+	if err != nil {
+		logger.Error("error while marshalling JSON: ", zap.Error(err))
+		return fasthttp.StatusOK, []byte("{}"), err
+	}
+	return fasthttp.StatusOK, bytes, err
 }
 
 func (u reviewUseCase) Get(id int) (domain.Review, error) {

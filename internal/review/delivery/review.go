@@ -96,8 +96,9 @@ func (s *reviewHandler) AddReviewToPlace(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	code, err := s.ReviewUseCase.Add(*newReview, foundUser)
+	code, bytes, err := s.ReviewUseCase.Add(*newReview, foundUser)
 	ctx.SetStatusCode(code)
+	ctx.Write(bytes)
 	if err != nil {
 		logger.Error("error while registering user in")
 		return
