@@ -2,6 +2,7 @@ package reviewDelivery
 
 import (
 	"encoding/json"
+	"fmt"
 	cd "snakealive/m/internal/cookie/delivery"
 	logs "snakealive/m/internal/logger"
 	ud "snakealive/m/internal/user/delivery"
@@ -70,7 +71,18 @@ func (s *reviewHandler) ReviewsByPlace(ctx *fasthttp.RequestCtx) {
 		logger.Error("unable to determine user")
 		user = domain.User{}
 	}
-	code, bytes := s.ReviewUseCase.GetReviewsListByPlaceId(id, user)
+	skip, err := strconv.Atoi(string(ctx.QueryArgs().Peek("skip")))
+	if err != nil {
+		logger.Error("unable to get query arg skip")
+		skip = cnst.DefaultSkip
+	}
+	limit, err := strconv.Atoi(string(ctx.QueryArgs().Peek("limit")))
+	if err != nil {
+		logger.Error("unable to get query arg limit")
+		limit = 0
+	}
+	fmt.Println("limit skip = ", limit, skip)
+	code, bytes := s.ReviewUseCase.GetReviewsListByPlaceId(id, user, limit, skip)
 	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
 	logger.Info(string(ctx.Path()),

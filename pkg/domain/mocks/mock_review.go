@@ -79,18 +79,18 @@ func (mr *MockReviewStorageMockRecorder) Get(id interface{}) *gomock.Call {
 }
 
 // GetListByPlace mocks base method.
-func (m *MockReviewStorage) GetListByPlace(id int) (domain.ReviewsNoPlace, error) {
+func (m *MockReviewStorage) GetListByPlace(id, limit, skip int) (domain.ReviewsNoPlace, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetListByPlace", id)
+	ret := m.ctrl.Call(m, "GetListByPlace", id, limit, skip)
 	ret0, _ := ret[0].(domain.ReviewsNoPlace)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetListByPlace indicates an expected call of GetListByPlace.
-func (mr *MockReviewStorageMockRecorder) GetListByPlace(id interface{}) *gomock.Call {
+func (mr *MockReviewStorageMockRecorder) GetListByPlace(id, limit, skip interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetListByPlace", reflect.TypeOf((*MockReviewStorage)(nil).GetListByPlace), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetListByPlace", reflect.TypeOf((*MockReviewStorage)(nil).GetListByPlace), id, limit, skip)
 }
 
 // GetReviewAuthor mocks base method.
@@ -190,18 +190,18 @@ func (mr *MockReviewUseCaseMockRecorder) Get(id interface{}) *gomock.Call {
 }
 
 // GetReviewsListByPlaceId mocks base method.
-func (m *MockReviewUseCase) GetReviewsListByPlaceId(id int) (int, []byte) {
+func (m *MockReviewUseCase) GetReviewsListByPlaceId(id int, user domain.User, limit, skip int) (int, []byte) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetReviewsListByPlaceId", id)
+	ret := m.ctrl.Call(m, "GetReviewsListByPlaceId", id, user, limit, skip)
 	ret0, _ := ret[0].(int)
 	ret1, _ := ret[1].([]byte)
 	return ret0, ret1
 }
 
 // GetReviewsListByPlaceId indicates an expected call of GetReviewsListByPlaceId.
-func (mr *MockReviewUseCaseMockRecorder) GetReviewsListByPlaceId(id interface{}) *gomock.Call {
+func (mr *MockReviewUseCaseMockRecorder) GetReviewsListByPlaceId(id, user, limit, skip interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetReviewsListByPlaceId", reflect.TypeOf((*MockReviewUseCase)(nil).GetReviewsListByPlaceId), id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetReviewsListByPlaceId", reflect.TypeOf((*MockReviewUseCase)(nil).GetReviewsListByPlaceId), id, user, limit, skip)
 }
 
 // SanitizeReview mocks base method.

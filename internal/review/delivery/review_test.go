@@ -64,7 +64,7 @@ func TestHandler_ReviewsByPlace(t *testing.T) {
 				PlaceId: 1,
 			},
 			mockReviewBehavior: func(r *service_mocks.MockReviewStorage, review domain.Review) {
-				r.EXPECT().GetListByPlace(review.PlaceId)
+				r.EXPECT().GetListByPlace(review.PlaceId, 0, 10)
 			},
 			mockUserBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
 				r.EXPECT().GetById(gomock.Any()).Return(user, nil).AnyTimes()
@@ -91,7 +91,7 @@ func TestHandler_ReviewsByPlace(t *testing.T) {
 				Password: "1234567890",
 			},
 			mockReviewBehavior: func(r *service_mocks.MockReviewStorage, review domain.Review) {
-				r.EXPECT().GetListByPlace(review.PlaceId).Return(domain.ReviewsNoPlace{}, errors.New("err"))
+				r.EXPECT().GetListByPlace(review.PlaceId, 0, 10).Return(domain.ReviewsNoPlace{}, errors.New("err"))
 			},
 			mockUserBehavior: func(r *service_mocks.MockUserStorage, user domain.User) {
 				r.EXPECT().GetById(gomock.Any()).Return(user, nil).AnyTimes()

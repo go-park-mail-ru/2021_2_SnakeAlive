@@ -25,7 +25,7 @@ type ReviewNoPlace struct {
 type ReviewStorage interface {
 	Add(value Review, userId int) (int, error)
 	Get(id int) (Review, error)
-	GetListByPlace(id int) (ReviewsNoPlace, error)
+	GetListByPlace(id int, limit int, skip int) (ReviewsNoPlace, error)
 	Delete(id int) error
 	GetReviewAuthor(id int) int
 }
@@ -34,7 +34,7 @@ type ReviewUseCase interface {
 	Add(review Review, user User) (int, []byte, error)
 	Get(id int) (Review, error)
 	Delete(id int) error
-	GetReviewsListByPlaceId(id int, user User) (int, []byte)
+	GetReviewsListByPlaceId(id int, user User, limit int, skip int) (int, []byte)
 	CheckAuthor(user User, id int) bool
 	SanitizeReview(review Review) Review
 }

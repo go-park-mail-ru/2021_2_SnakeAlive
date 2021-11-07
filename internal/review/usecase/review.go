@@ -46,10 +46,10 @@ func (u reviewUseCase) Get(id int) (domain.Review, error) {
 	return u.reviewStorage.Get(id)
 }
 
-func (u reviewUseCase) GetReviewsListByPlaceId(id int, user domain.User) (int, []byte) {
+func (u reviewUseCase) GetReviewsListByPlaceId(id int, user domain.User, limit int, skip int) (int, []byte) {
 	logger := logs.GetLogger()
-
-	reviews, err := u.reviewStorage.GetListByPlace(id)
+	user = u.SanitizeUser(user)
+	reviews, err := u.reviewStorage.GetListByPlace(id, limit, skip)
 	if err != nil {
 		logger.Error("reviews not found: ", zap.Error(err))
 		return fasthttp.StatusNotFound, []byte("{}")
@@ -93,4 +93,14 @@ func (u reviewUseCase) SanitizeReview(review domain.Review) domain.Review {
 	review.Title = sanitizer.Sanitize(review.Title)
 	review.Text = sanitizer.Sanitize(review.Text)
 	return review
+}
+
+func (u reviewUseCase) SanitizeUser(user domain.User) domain.User {
+	sanitizer := bluemonday.UGCPolicy()
+
+	user.Name = sanitizer.Sanitize(user.Name)
+	user.Surname = sanitizer.Sanitize(user.Surname)
+	user.Email = sanitizer.Sanitize(user.Email)
+	user.Password = sanitizer.Sanitize(user.Password)
+	return user
 }

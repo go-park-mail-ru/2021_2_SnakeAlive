@@ -44,7 +44,7 @@ func (u *reviewStorage) Add(value domain.Review, userId int) (int, error) {
 	return insertedId, err
 }
 
-func (u *reviewStorage) GetListByPlace(id int) (domain.ReviewsNoPlace, error) {
+func (u *reviewStorage) GetListByPlace(id int, limit int, skip int) (domain.ReviewsNoPlace, error) {
 	logger := logs.GetLogger()
 
 	reviews := make(domain.ReviewsNoPlace, 0)
@@ -54,10 +54,10 @@ func (u *reviewStorage) GetListByPlace(id int) (domain.ReviewsNoPlace, error) {
 		return reviews, err
 	}
 	defer conn.Release()
-
+	const GetReviewsByPlaceQuery = `SELECT id, title, text, rating, user_id FROM Reviews WHERE place_id = $1 LIMIT $2 OFFSET $3`
 	rows, err := conn.Query(context.Background(),
-		cnst.GetReviewsByPlaceQuery,
-		id)
+		GetReviewsByPlaceQuery,
+		id, limit, skip)
 	if err != nil {
 		logger.Error("error while getting places from database")
 		return reviews, err
