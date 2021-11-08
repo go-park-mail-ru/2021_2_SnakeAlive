@@ -110,7 +110,7 @@ func (u userUseCase) Registration(user *domain.User) (int, error) {
 func (u userUseCase) GetProfile(hash string, foundUser domain.User) (int, []byte) {
 	logger := logs.GetLogger()
 
-	response := map[string]string{"name": foundUser.Name, "surname": foundUser.Surname,
+	response := map[string]string{"name": foundUser.Name, "surname": foundUser.Surname, "email": foundUser.Email,
 		"avatar": foundUser.Avatar, "description": foundUser.Description}
 	bytes, err := json.Marshal(response)
 	if err != nil {
