@@ -2,8 +2,8 @@ package placeUseCase
 
 import (
 	"encoding/json"
-	logs "snakealive/m/internal/logger"
-	"snakealive/m/pkg/domain"
+	"snakealive/m/internal/domain"
+	logs "snakealive/m/pkg/logger"
 
 	"github.com/valyala/fasthttp"
 	"go.uber.org/zap"

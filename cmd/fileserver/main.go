@@ -2,8 +2,8 @@ package main
 
 import (
 	"net/http"
-	logs "snakealive/m/internal/logger"
 	cnst "snakealive/m/pkg/constants"
+	logs "snakealive/m/pkg/logger"
 )
 
 func main() {

@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	cr "snakealive/m/internal/cookie/repository"
 	cu "snakealive/m/internal/cookie/usecase"
+	"snakealive/m/internal/domain"
 	ent "snakealive/m/internal/entities"
-	logs "snakealive/m/internal/logger"
 	cnst "snakealive/m/pkg/constants"
-	"snakealive/m/pkg/domain"
+	logs "snakealive/m/pkg/logger"
 	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -15,35 +15,27 @@ import (
 	"go.uber.org/zap"
 )
 
-type CookieHandler interface {
-	SetCookieAndToken(ctx *fasthttp.RequestCtx, cookie string, id int)
-	setCookie(ctx *fasthttp.RequestCtx, cookie string, id int)
-	DeleteCookie(ctx *fasthttp.RequestCtx, cookie string)
-	CheckCookie(ctx *fasthttp.RequestCtx) bool
-	GetUser(cookie string) (user domain.User, err error)
-}
-
 type cookieHandler struct {
 	CookieUseCase domain.CookieUseCase
 }
 
-func NewCookieHandler(CookieUseCase domain.CookieUseCase) CookieHandler {
+func NewCookieHandler(CookieUseCase domain.CookieUseCase) domain.CookieHandler {
 	return &cookieHandler{
 		CookieUseCase: CookieUseCase,
 	}
 }
 
-func CreateDelivery(db *pgxpool.Pool) CookieHandler {
+func CreateDelivery(db *pgxpool.Pool) domain.CookieHandler {
 	cookieLayer := NewCookieHandler(cu.NewCookieUseCase(cr.NewCookieStorage(db)))
 	return cookieLayer
 }
 
 func (s *cookieHandler) SetCookieAndToken(ctx *fasthttp.RequestCtx, cookie string, id int) {
-	s.setCookie(ctx, cookie, id)
+	s.SetCookie(ctx, cookie, id)
 	setToken(ctx, cookie)
 }
 
-func (s *cookieHandler) setCookie(ctx *fasthttp.RequestCtx, cookie string, id int) {
+func (s *cookieHandler) SetCookie(ctx *fasthttp.RequestCtx, cookie string, id int) {
 	var c fasthttp.Cookie
 	c.SetKey(cnst.CookieName)
 	c.SetValue(cookie)

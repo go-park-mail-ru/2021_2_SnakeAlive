@@ -1,5 +1,7 @@
 package domain
 
+import "github.com/valyala/fasthttp"
+
 type Reviews []Review
 type ReviewsNoPlace []ReviewNoPlace
 
@@ -20,6 +22,12 @@ type ReviewNoPlace struct {
 	Rating    int    `json:"rating"`
 	UserId    int    `json:"user_id"`
 	CreatedAt string `json:"created_at"`
+}
+
+type ReviewHandler interface {
+	ReviewsByPlace(ctx *fasthttp.RequestCtx)
+	AddReviewToPlace(ctx *fasthttp.RequestCtx)
+	DelReview(ctx *fasthttp.RequestCtx)
 }
 
 type ReviewStorage interface {

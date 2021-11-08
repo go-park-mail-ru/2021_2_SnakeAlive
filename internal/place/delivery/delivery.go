@@ -1,14 +1,14 @@
 package placeDelivery
 
 import (
-	"snakealive/m/pkg/domain"
+	"snakealive/m/internal/domain"
 	"strconv"
 
 	"snakealive/m/internal/entities"
-	logs "snakealive/m/internal/logger"
 	pr "snakealive/m/internal/place/repository"
 	pu "snakealive/m/internal/place/usecase"
 	cnst "snakealive/m/pkg/constants"
+	logs "snakealive/m/pkg/logger"
 
 	"github.com/fasthttp/router"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -16,22 +16,17 @@ import (
 	"go.uber.org/zap"
 )
 
-type PlaceHandler interface {
-	PlacesByCountry(ctx *fasthttp.RequestCtx)
-	Place(ctx *fasthttp.RequestCtx)
-}
-
 type placeHandler struct {
 	PlaceUseCase domain.PlaceUseCase
 }
 
-func NewPlaceHandler(PlaceUseCase domain.PlaceUseCase) PlaceHandler {
+func NewPlaceHandler(PlaceUseCase domain.PlaceUseCase) domain.PlaceHandler {
 	return &placeHandler{
 		PlaceUseCase: PlaceUseCase,
 	}
 }
 
-func CreateDelivery(db *pgxpool.Pool) PlaceHandler {
+func CreateDelivery(db *pgxpool.Pool) domain.PlaceHandler {
 	placeLayer := NewPlaceHandler(pu.NewPlaceUseCase(pr.NewPlaceStorage(db)))
 	return placeLayer
 }

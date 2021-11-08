@@ -1,14 +1,14 @@
 package countryDelivery
 
 import (
-	"snakealive/m/pkg/domain"
+	"snakealive/m/internal/domain"
 	"strconv"
 
 	cr "snakealive/m/internal/country/repository"
 	cu "snakealive/m/internal/country/usecase"
 	"snakealive/m/internal/entities"
-	logs "snakealive/m/internal/logger"
 	cnst "snakealive/m/pkg/constants"
+	logs "snakealive/m/pkg/logger"
 
 	"github.com/fasthttp/router"
 	"github.com/jackc/pgx/v4/pgxpool"

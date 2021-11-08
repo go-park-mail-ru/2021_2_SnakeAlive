@@ -3,10 +3,10 @@ package reviewDelivery
 import (
 	"encoding/json"
 	cd "snakealive/m/internal/cookie/delivery"
-	logs "snakealive/m/internal/logger"
+	"snakealive/m/internal/domain"
 	ud "snakealive/m/internal/user/delivery"
 	ur "snakealive/m/internal/user/repository"
-	"snakealive/m/pkg/domain"
+	logs "snakealive/m/pkg/logger"
 	"strconv"
 
 	rr "snakealive/m/internal/review/repository"
@@ -19,19 +19,13 @@ import (
 	"go.uber.org/zap"
 )
 
-type ReviewHandler interface {
-	ReviewsByPlace(ctx *fasthttp.RequestCtx)
-	AddReviewToPlace(ctx *fasthttp.RequestCtx)
-	DelReview(ctx *fasthttp.RequestCtx)
-}
-
 type reviewHandler struct {
 	ReviewUseCase domain.ReviewUseCase
-	CookieHandler cd.CookieHandler
-	UserHandler   ud.UserHandler
+	CookieHandler domain.CookieHandler
+	UserHandler   domain.UserHandler
 }
 
-func NewReviewHandler(ReviewUseCase domain.ReviewUseCase, CookieHandler cd.CookieHandler, UserHandler ud.UserHandler) ReviewHandler {
+func NewReviewHandler(ReviewUseCase domain.ReviewUseCase, CookieHandler domain.CookieHandler, UserHandler domain.UserHandler) domain.ReviewHandler {
 	return &reviewHandler{
 		ReviewUseCase: ReviewUseCase,
 		CookieHandler: CookieHandler,
@@ -39,7 +33,7 @@ func NewReviewHandler(ReviewUseCase domain.ReviewUseCase, CookieHandler cd.Cooki
 	}
 }
 
-func CreateDelivery(db *pgxpool.Pool) ReviewHandler {
+func CreateDelivery(db *pgxpool.Pool) domain.ReviewHandler {
 	cookieLayer := cd.CreateDelivery(db)
 	userLayer := ud.CreateDelivery(db)
 	reviewLayer := NewReviewHandler(ru.NewReviewUseCase(rr.NewReviewStorage(db), ur.NewUserStorage(db)), cookieLayer, userLayer)

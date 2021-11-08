@@ -3,9 +3,9 @@ package reviewRepository
 import (
 	"context"
 	"errors"
-	logs "snakealive/m/internal/logger"
+	"snakealive/m/internal/domain"
 	cnst "snakealive/m/pkg/constants"
-	"snakealive/m/pkg/domain"
+	logs "snakealive/m/pkg/logger"
 
 	pgxpool "github.com/jackc/pgx/v4/pgxpool"
 	"go.uber.org/zap"

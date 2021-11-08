@@ -2,8 +2,8 @@ package countryRepository
 
 import (
 	"context"
-	logs "snakealive/m/internal/logger"
-	"snakealive/m/pkg/domain"
+	"snakealive/m/internal/domain"
+	logs "snakealive/m/pkg/logger"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"go.uber.org/zap"

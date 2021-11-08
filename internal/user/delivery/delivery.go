@@ -3,14 +3,14 @@ package userDelivery
 import (
 	"encoding/json"
 	"fmt"
+	"snakealive/m/internal/domain"
 	cnst "snakealive/m/pkg/constants"
-	"snakealive/m/pkg/domain"
 	"strconv"
 
 	cd "snakealive/m/internal/cookie/delivery"
-	logs "snakealive/m/internal/logger"
 	ur "snakealive/m/internal/user/repository"
 	uu "snakealive/m/internal/user/usecase"
+	logs "snakealive/m/pkg/logger"
 
 	"github.com/fasthttp/router"
 	"github.com/google/uuid"
@@ -19,30 +19,19 @@ import (
 	"go.uber.org/zap"
 )
 
-type UserHandler interface {
-	Login(ctx *fasthttp.RequestCtx)
-	Registration(ctx *fasthttp.RequestCtx)
-	Logout(ctx *fasthttp.RequestCtx)
-	GetProfile(ctx *fasthttp.RequestCtx)
-	UpdateProfile(ctx *fasthttp.RequestCtx)
-	DeleteProfile(ctx *fasthttp.RequestCtx)
-	DeleteProfileByEmail(ctx *fasthttp.RequestCtx)
-	UploadAvatar(ctx *fasthttp.RequestCtx)
-}
-
 type userHandler struct {
 	UserUseCase   domain.UserUseCase
-	CookieHandler cd.CookieHandler
+	CookieHandler domain.CookieHandler
 }
 
-func NewUserHandler(UserUseCase domain.UserUseCase, CookieHandler cd.CookieHandler) UserHandler {
+func NewUserHandler(UserUseCase domain.UserUseCase, CookieHandler domain.CookieHandler) domain.UserHandler {
 	return &userHandler{
 		UserUseCase:   UserUseCase,
 		CookieHandler: CookieHandler,
 	}
 }
 
-func CreateDelivery(db *pgxpool.Pool) UserHandler {
+func CreateDelivery(db *pgxpool.Pool) domain.UserHandler {
 	cookieLayer := cd.CreateDelivery(db)
 	userLayer := NewUserHandler(uu.NewUserUseCase(ur.NewUserStorage(db)), cookieLayer)
 	return userLayer
@@ -60,15 +49,7 @@ func SetUpUserRouter(db *pgxpool.Pool, r *router.Router) *router.Router {
 	return r
 }
 
-func (s *userHandler) Login(ctx *fasthttp.RequestCtx) {
-	logger := logs.GetLogger()
-	logger.Info(string(ctx.Path()),
-		zap.String("method", string(ctx.Method())),
-		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
-		zap.String("url", string(ctx.Path())),
-	)
-
-	user := new(domain.User)
+func (s *userHandler) Bind(user *domain.User, ctx *fasthttp.RequestCtx, logger *zap.Logger) {
 	if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {
 		logger.Error("error while unmarshalling JSON: ", zap.Error(err))
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
@@ -81,6 +62,18 @@ func (s *userHandler) Login(ctx *fasthttp.RequestCtx) {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
+}
+
+func (s *userHandler) Login(ctx *fasthttp.RequestCtx) {
+	logger := logs.GetLogger()
+	logger.Info(string(ctx.Path()),
+		zap.String("method", string(ctx.Method())),
+		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
+		zap.String("url", string(ctx.Path())),
+	)
+
+	user := new(domain.User)
+	s.Bind(user, ctx, logger)
 
 	code, err := s.UserUseCase.Login(user)
 	ctx.SetStatusCode(code)
@@ -107,11 +100,7 @@ func (s *userHandler) Registration(ctx *fasthttp.RequestCtx) {
 
 	user := new(domain.User)
 
-	if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {
-		logger.Error("error while unmarshalling JSON: ", zap.Error(err))
-		ctx.SetStatusCode(fasthttp.StatusBadRequest)
-		return
-	}
+	s.Bind(user, ctx, logger)
 
 	code, err := s.UserUseCase.Registration(user)
 	ctx.SetStatusCode(code)
@@ -175,11 +164,7 @@ func (s *userHandler) UpdateProfile(ctx *fasthttp.RequestCtx) {
 	}
 
 	updatedUser := new(domain.User)
-	if err := json.Unmarshal(ctx.PostBody(), &updatedUser); err != nil {
-		logger.Error("error while unmarshalling JSON: ", zap.Error(err))
-		ctx.SetStatusCode(fasthttp.StatusBadRequest)
-		return
-	}
+	s.Bind(updatedUser, ctx, logger)
 
 	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
 	foundUser, err := s.CookieHandler.GetUser(hash)

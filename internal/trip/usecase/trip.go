@@ -2,8 +2,8 @@ package TripUseCase
 
 import (
 	"encoding/json"
-	logs "snakealive/m/internal/logger"
-	"snakealive/m/pkg/domain"
+	"snakealive/m/internal/domain"
+	logs "snakealive/m/pkg/logger"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/microcosm-cc/bluemonday"

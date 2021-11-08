@@ -1,5 +1,7 @@
 package domain
 
+import "github.com/valyala/fasthttp"
+
 type Place struct {
 	Id          int      `json:"id"`
 	Name        string   `json:"name"`
@@ -20,6 +22,11 @@ type TopPlace struct {
 }
 
 type TopPlaces []TopPlace
+
+type PlaceHandler interface {
+	PlacesByCountry(ctx *fasthttp.RequestCtx)
+	Place(ctx *fasthttp.RequestCtx)
+}
 
 type PlaceStorage interface {
 	GetById(id int) (value Place, err error)

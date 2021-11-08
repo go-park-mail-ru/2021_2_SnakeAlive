@@ -1,5 +1,7 @@
 package domain
 
+import "github.com/valyala/fasthttp"
+
 //go:generate mockgen -source=user.go -destination=/mocks/mock.go
 //mockgen -source=user.go -destination=mocks/mock_doer.go -package=mocks
 
@@ -17,6 +19,17 @@ type PublicUser struct {
 	Name    string `json:"name" valid:"required"`
 	Surname string `json:"surname" valid:"required"`
 	Avatar  string `json:"avatar"`
+}
+
+type UserHandler interface {
+	Login(ctx *fasthttp.RequestCtx)
+	Registration(ctx *fasthttp.RequestCtx)
+	Logout(ctx *fasthttp.RequestCtx)
+	GetProfile(ctx *fasthttp.RequestCtx)
+	UpdateProfile(ctx *fasthttp.RequestCtx)
+	DeleteProfile(ctx *fasthttp.RequestCtx)
+	DeleteProfileByEmail(ctx *fasthttp.RequestCtx)
+	UploadAvatar(ctx *fasthttp.RequestCtx)
 }
 
 type UserStorage interface {

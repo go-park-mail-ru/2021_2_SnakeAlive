@@ -2,14 +2,14 @@ package tripDelivery
 
 import (
 	"encoding/json"
-	"snakealive/m/pkg/domain"
+	"snakealive/m/internal/domain"
 	"strconv"
 
 	cd "snakealive/m/internal/cookie/delivery"
-	logs "snakealive/m/internal/logger"
 	tr "snakealive/m/internal/trip/repository"
 	tu "snakealive/m/internal/trip/usecase"
 	cnst "snakealive/m/pkg/constants"
+	logs "snakealive/m/pkg/logger"
 
 	"github.com/fasthttp/router"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -17,26 +17,19 @@ import (
 	"go.uber.org/zap"
 )
 
-type TripHandler interface {
-	Trip(ctx *fasthttp.RequestCtx)
-	AddTrip(ctx *fasthttp.RequestCtx)
-	Update(ctx *fasthttp.RequestCtx)
-	Delete(ctx *fasthttp.RequestCtx)
-}
-
 type tripHandler struct {
 	TripUseCase   domain.TripUseCase
-	CookieHandler cd.CookieHandler
+	CookieHandler domain.CookieHandler
 }
 
-func NewTripHandler(TripUseCase domain.TripUseCase, CookieHandler cd.CookieHandler) TripHandler {
+func NewTripHandler(TripUseCase domain.TripUseCase, CookieHandler domain.CookieHandler) domain.TripHandler {
 	return &tripHandler{
 		TripUseCase:   TripUseCase,
 		CookieHandler: CookieHandler,
 	}
 }
 
-func CreateDelivery(db *pgxpool.Pool) TripHandler {
+func CreateDelivery(db *pgxpool.Pool) domain.TripHandler {
 	cookieLayer := cd.CreateDelivery(db)
 	tripLayer := NewTripHandler(tu.NewTripUseCase(tr.NewTripStorage(db)), cookieLayer)
 	return tripLayer

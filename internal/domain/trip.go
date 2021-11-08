@@ -1,10 +1,19 @@
 package domain
 
+import "github.com/valyala/fasthttp"
+
 type Trip struct {
 	Id          int       `json:"id"`
 	Title       string    `json:"title" valid:"required"`
 	Description string    `json:"description"`
 	Days        [][]Place `json:"days" valid:"required"`
+}
+
+type TripHandler interface {
+	Trip(ctx *fasthttp.RequestCtx)
+	AddTrip(ctx *fasthttp.RequestCtx)
+	Update(ctx *fasthttp.RequestCtx)
+	Delete(ctx *fasthttp.RequestCtx)
 }
 
 type TripStorage interface {

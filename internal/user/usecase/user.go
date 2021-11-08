@@ -3,9 +3,9 @@ package userUseCase
 import (
 	"encoding/json"
 	"errors"
-	logs "snakealive/m/internal/logger"
+	"snakealive/m/internal/domain"
 	cnst "snakealive/m/pkg/constants"
-	"snakealive/m/pkg/domain"
+	logs "snakealive/m/pkg/logger"
 
 	"github.com/asaskevich/govalidator"
 	"github.com/microcosm-cc/bluemonday"

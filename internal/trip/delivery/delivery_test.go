@@ -3,15 +3,15 @@ package tripDelivery
 import (
 	"fmt"
 	cu "snakealive/m/internal/cookie/usecase"
+	"snakealive/m/internal/domain"
+	service_mocks "snakealive/m/internal/domain/mocks"
 	tu "snakealive/m/internal/trip/usecase"
 	cnst "snakealive/m/pkg/constants"
-	"snakealive/m/pkg/domain"
-	service_mocks "snakealive/m/pkg/domain/mocks"
 	"strconv"
 	"testing"
 
 	cd "snakealive/m/internal/cookie/delivery"
-	logs "snakealive/m/internal/logger"
+	logs "snakealive/m/pkg/logger"
 
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"

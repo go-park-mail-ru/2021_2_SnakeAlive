@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"context"
 	cd "snakealive/m/internal/country/delivery"
-	logs "snakealive/m/internal/logger"
 	pd "snakealive/m/internal/place/delivery"
 	rd "snakealive/m/internal/review/delivery"
 	td "snakealive/m/internal/trip/delivery"
 	ud "snakealive/m/internal/user/delivery"
+	logs "snakealive/m/pkg/logger"
 
 	"github.com/fasthttp/router"
 	"github.com/grpc-ecosystem/go-grpc-middleware/logging/zap/ctxzap"

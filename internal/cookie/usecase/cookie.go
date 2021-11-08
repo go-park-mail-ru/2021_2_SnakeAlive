@@ -1,6 +1,6 @@
 package cookieUseCase
 
-import "snakealive/m/pkg/domain"
+import "snakealive/m/internal/domain"
 
 func NewCookieUseCase(cookieStorage domain.CookieStorage) domain.CookieUseCase {
 	return cookieUseCase{cookieStorage: cookieStorage}

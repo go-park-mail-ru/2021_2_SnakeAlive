@@ -6,7 +6,7 @@ package mocks
 
 import (
 	reflect "reflect"
-	domain "snakealive/m/pkg/domain"
+	domain "snakealive/m/internal/domain"
 
 	gomock "github.com/golang/mock/gomock"
 )
