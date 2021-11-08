@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"snakealive/m/internal/domain"
 	cnst "snakealive/m/pkg/constants"
-	"strconv"
 
 	cd "snakealive/m/internal/cookie/delivery"
 	ur "snakealive/m/internal/user/repository"
@@ -283,7 +282,7 @@ func (s *userHandler) UploadAvatar(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	avatar := strconv.Itoa(foundUser.Id) + cnst.Format
+	avatar := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(foundUser.Email))) + cnst.Format
 
 	formFile, err := ctx.FormFile(cnst.FormFileKey)
 	if err != nil {
@@ -299,13 +298,9 @@ func (s *userHandler) UploadAvatar(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	err = s.UserUseCase.AddAvatar(foundUser, avatar)
-	if err != nil {
-		logger.Error("unable to add avatar for user")
-		ctx.SetStatusCode(fasthttp.StatusBadRequest)
-		return
-	}
-	ctx.SetStatusCode(fasthttp.StatusOK)
+	code, bytes := s.UserUseCase.AddAvatar(foundUser, avatar)
+	ctx.SetStatusCode(code)
+	ctx.Write(bytes)
 	logger.Info(string(ctx.Path()),
 		zap.Int("status", ctx.Response.StatusCode()),
 	)

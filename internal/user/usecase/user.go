@@ -110,11 +110,12 @@ func (u userUseCase) Registration(user *domain.User) (int, error) {
 func (u userUseCase) GetProfile(hash string, foundUser domain.User) (int, []byte) {
 	logger := logs.GetLogger()
 
-	response := map[string]string{"name": foundUser.Name, "surname": foundUser.Surname}
+	response := map[string]string{"name": foundUser.Name, "surname": foundUser.Surname,
+		"avatar": foundUser.Avatar, "description": foundUser.Description}
 	bytes, err := json.Marshal(response)
 	if err != nil {
 		logger.Error("error while marshalling JSON: %s", zap.Error(err))
-		return fasthttp.StatusOK, []byte("{}")
+		return fasthttp.StatusBadRequest, []byte("{}")
 	}
 	return fasthttp.StatusOK, bytes
 }
@@ -134,7 +135,8 @@ func (u userUseCase) UpdateProfile(updatedUser *domain.User, foundUser domain.Us
 		return fasthttp.StatusBadRequest, nil
 	}
 
-	response := map[string]string{"name": cleanUser.Name, "surname": cleanUser.Surname, "email": cleanUser.Email}
+	response := map[string]string{"name": cleanUser.Name, "surname": cleanUser.Surname, "email": cleanUser.Email,
+		"avatar": cleanUser.Avatar, "description": cleanUser.Description}
 	bytes, err := json.Marshal(response)
 	if err != nil {
 		logger.Error("error while marshalling JSON: ", zap.Error(err))
@@ -154,8 +156,19 @@ func (u userUseCase) DeleteUserByEmail(user domain.User) int {
 	return fasthttp.StatusOK
 }
 
-func (u userUseCase) AddAvatar(user domain.User, avatar string) error {
-	return u.userStorage.AddAvatar(user.Id, avatar)
+func (u userUseCase) AddAvatar(user domain.User, avatar string) (int, []byte) {
+	err := u.userStorage.AddAvatar(user.Id, avatar)
+	if err != nil {
+		return fasthttp.StatusBadRequest, []byte("{}")
+	}
+
+	response := map[string]string{"avatar": avatar}
+	bytes, err := json.Marshal(response)
+	if err != nil {
+		return fasthttp.StatusBadRequest, []byte("{}")
+	}
+
+	return fasthttp.StatusOK, bytes
 }
 
 func (u userUseCase) SanitizeUser(user domain.User) domain.User {
@@ -165,5 +178,6 @@ func (u userUseCase) SanitizeUser(user domain.User) domain.User {
 	user.Surname = sanitizer.Sanitize(user.Surname)
 	user.Email = sanitizer.Sanitize(user.Email)
 	user.Password = sanitizer.Sanitize(user.Password)
+	user.Description = sanitizer.Sanitize(user.Description)
 	return user
 }

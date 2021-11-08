@@ -32,7 +32,7 @@ func (u *UserStorage) Add(value domain.User) error {
 		value.Surname,
 		value.Password,
 		value.Email,
-		value.Avatar,
+		value.Description,
 	)
 	return err
 }
@@ -85,7 +85,7 @@ func (u *UserStorage) GetByEmail(key string) (value domain.User, err error) {
 	err = conn.QueryRow(context.Background(),
 		cnst.GetUserByEmailQuery,
 		key,
-	).Scan(&user.Id, &user.Name, &user.Surname, &user.Password, &user.Email, &user.Avatar)
+	).Scan(&user.Id, &user.Name, &user.Surname, &user.Password, &user.Email, &user.Avatar, &user.Description)
 
 	return user, err
 }
@@ -104,7 +104,7 @@ func (u *UserStorage) GetById(id int) (value domain.User, err error) {
 	err = conn.QueryRow(context.Background(),
 		cnst.GetUserByIdQuery,
 		id,
-	).Scan(&user.Id, &user.Name, &user.Surname, &user.Password, &user.Email, &user.Avatar)
+	).Scan(&user.Id, &user.Name, &user.Surname, &user.Password, &user.Email, &user.Avatar, &user.Description)
 
 	return user, err
 }
@@ -119,11 +119,11 @@ func (u *UserStorage) GetPublicById(id int) (value domain.PublicUser, err error)
 		return user, err
 	}
 	defer conn.Release()
-	const GetPublicUserByIdQuery = `SELECT id, name, surname, avatar FROM Users WHERE id = $1`
+	const GetPublicUserByIdQuery = `SELECT id, name, surname, avatar, description FROM Users WHERE id = $1`
 	err = conn.QueryRow(context.Background(),
 		GetPublicUserByIdQuery,
 		id,
-	).Scan(&user.Id, &user.Name, &user.Surname, &user.Avatar)
+	).Scan(&user.Id, &user.Name, &user.Surname, &user.Avatar, &user.Description)
 
 	return user, err
 }
@@ -145,6 +145,7 @@ func (u *UserStorage) Update(id int, value domain.User) error {
 		value.Email,
 		value.Password,
 		value.Avatar,
+		value.Description,
 		id,
 	)
 	return err

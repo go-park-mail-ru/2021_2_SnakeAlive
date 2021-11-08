@@ -13,6 +13,7 @@ CREATE TABLE Users (
   email TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL,
   avatar TEXT,
+  description TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -64,8 +65,8 @@ CREATE TABLE TripsPlaces (
   trip_id INT NOT NULL,
   day INT NOT NULL,
   "order" INT NOT NULL,
-  CONSTRAINT fk_trip FOREIGN KEY(trip_id) REFERENCES trips(id),
-  CONSTRAINT fk_place FOREIGN KEY(place_id) REFERENCES places(id)
+  CONSTRAINT fk_trip FOREIGN KEY(trip_id) REFERENCES trips(id) ON DELETE CASCADE,
+  CONSTRAINT fk_place FOREIGN KEY(place_id) REFERENCES places(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Reviews (

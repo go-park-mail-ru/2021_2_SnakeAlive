@@ -48,7 +48,7 @@ func (c *cookieStorage) Get(value string) (user domain.User, err error) {
 	err = conn.QueryRow(context.Background(),
 		cnst.GetCookieQuery,
 		value,
-	).Scan(&user.Id, &user.Name, &user.Surname, &user.Password, &user.Email)
+	).Scan(&user.Id, &user.Name, &user.Surname, &user.Password, &user.Email, &user.Description)
 
 	return user, err
 
