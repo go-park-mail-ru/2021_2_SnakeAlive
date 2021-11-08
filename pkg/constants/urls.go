@@ -20,4 +20,4 @@ const TripURL = "/trip/{id}"
 
 const UploadURL = "/upload"
 
-const StaticServerURL = "localhost:3000"
+const StaticServerURL = "http://194.58.104.204:3000"
