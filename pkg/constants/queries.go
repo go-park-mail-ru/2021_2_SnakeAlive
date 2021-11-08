@@ -1,7 +1,7 @@
 package constants
 
 const AddCookieQuery = `INSERT INTO Cookies ("hash", "user_id") VALUES ($1, $2)`
-const GetCookieQuery = `SELECT U.id, U.name, U.surname, U.password, U.email, U.description
+const GetCookieQuery = `SELECT U.id, U.name, U.surname, U.password, U.email, U.description, U.avatar
 						FROM Users AS U JOIN Cookies AS C ON U.id = C.user_id
 						WHERE C.hash = $1`
 const DeleteCookieQuery = `DELETE FROM Cookies WHERE hash = $1`
@@ -34,6 +34,6 @@ const DeleteUserByIdQuery = `DELETE FROM Users WHERE id = $1`
 const DeleteUserByEmailQuery = `DELETE FROM Users WHERE email = $1`
 const GetUserByEmailQuery = `SELECT id, name, surname, password, email, avatar, description FROM Users WHERE email = $1`
 const GetUserByIdQuery = `SELECT id, name, surname, password, email, avatar, description FROM Users WHERE id = $1`
-const UpdateUserQuery = `UPDATE Users SET "name" = $1, "surname" = $2, "email" = $3, "password" = $4, "avatar" = $5, 
-	"description" = $6 WHERE id = $7`
+const UpdateUserQuery = `UPDATE Users SET "name" = $1, "surname" = $2, "email" = $3, "password" = $4,
+	"description" = $5 WHERE id = $6`
 const AddAvatarQuery = `UPDATE Users SET "avatar" = $1 WHERE id = $2`

@@ -19,3 +19,5 @@ const TripPostURL = "/trip"
 const TripURL = "/trip/{id}"
 
 const UploadURL = "/upload"
+
+const StaticServerURL = "localhost:3000"

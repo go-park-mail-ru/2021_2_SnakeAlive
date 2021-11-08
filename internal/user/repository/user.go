@@ -144,7 +144,6 @@ func (u *UserStorage) Update(id int, value domain.User) error {
 		value.Surname,
 		value.Email,
 		value.Password,
-		value.Avatar,
 		value.Description,
 		id,
 	)

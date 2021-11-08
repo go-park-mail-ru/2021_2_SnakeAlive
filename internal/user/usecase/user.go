@@ -136,7 +136,7 @@ func (u userUseCase) UpdateProfile(updatedUser *domain.User, foundUser domain.Us
 	}
 
 	response := map[string]string{"name": cleanUser.Name, "surname": cleanUser.Surname, "email": cleanUser.Email,
-		"avatar": cleanUser.Avatar, "description": cleanUser.Description}
+		"avatar": foundUser.Avatar, "description": cleanUser.Description}
 	bytes, err := json.Marshal(response)
 	if err != nil {
 		logger.Error("error while marshalling JSON: ", zap.Error(err))

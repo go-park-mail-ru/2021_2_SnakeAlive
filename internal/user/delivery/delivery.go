@@ -298,7 +298,8 @@ func (s *userHandler) UploadAvatar(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	code, bytes := s.UserUseCase.AddAvatar(foundUser, avatar)
+	avatarURL := cnst.StaticServerURL + "/" + avatar
+	code, bytes := s.UserUseCase.AddAvatar(foundUser, avatarURL)
 	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
 	logger.Info(string(ctx.Path()),
