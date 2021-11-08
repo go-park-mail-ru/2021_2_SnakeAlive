@@ -12,7 +12,7 @@ CREATE TABLE Users (
   surname TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL,
-  avatar TEXT,
+  avatar TEXT DEFAULT 'default.jpg',
   description TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
