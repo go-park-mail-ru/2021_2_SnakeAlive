@@ -46,18 +46,19 @@ func (u *placeStorage) GetPlacesByCountry(value string) (domain.TopPlaces, error
 		return places, err
 	}
 	defer conn.Release()
-
+	const GetPlacesByCountryQuery = `select id, name, tags, photos, country, avg(rating) over (partition by id) as total_rating from Places where country = $1 order by total_rating desc limit 10`
 	rows, err := conn.Query(context.Background(),
-		cnst.GetPlacesByCountryQuery,
+		GetPlacesByCountryQuery,
 		value)
 	if err != nil {
 		logger.Error("error while getting list of places from database")
+
 		return places, err
 	}
 
 	var sight domain.TopPlace
 	for rows.Next() {
-		rows.Scan(&sight.Id, &sight.Name, &sight.Tags, &sight.Photos, &sight.UserId, &sight.Review)
+		rows.Scan(&sight.Id, &sight.Name, &sight.Tags, &sight.Photos, &sight.Country, &sight.Rating)
 		places = append(places, sight)
 	}
 

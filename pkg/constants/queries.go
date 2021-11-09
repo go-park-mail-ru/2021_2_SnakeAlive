@@ -7,9 +7,6 @@ const GetCookieQuery = `SELECT U.id, U.name, U.surname, U.password, U.email, U.d
 const DeleteCookieQuery = `DELETE FROM Cookies WHERE hash = $1`
 
 const GetPlaceByIdQuery = `SELECT id, name, country, rating, tags, description, photos FROM Places WHERE id = $1`
-const GetPlacesByCountryQuery = `SELECT pl.id, pl.name, pl.tags, pl.photos, rw.user_id, rw.text
-									FROM Places AS pl LEFT JOIN Reviews AS rw ON pl.id = rw.place_id
-									WHERE pl.country = $1 LIMIT 10`
 
 const AddReviewQuery = `INSERT INTO public.reviews (title, text, rating, user_id, place_id) VALUES ($1, $2, $3, $4, $5) RETURNING id`
 
