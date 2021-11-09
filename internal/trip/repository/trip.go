@@ -59,7 +59,7 @@ func (t *tripStorage) GetById(id int) (value domain.Trip, err error) {
 	err = conn.QueryRow(context.Background(),
 		cnst.GetTripQuery,
 		id,
-	).Scan(&trip.Id, &trip.Title, &trip.Description, &trip.Days)
+	).Scan(&trip.Id, &trip.Title, &trip.Description)
 	if err != nil {
 		logger.Error("error while scanning trip info")
 		return trip, err

@@ -19,7 +19,7 @@ const GetReviewAuthorQuery = `SELECT user_id FROM Reviews WHERE id = $1`
 
 const AddTripQuery = `INSERT INTO Trips ("title", "description", "days", "user_id", "origin") 
 						VALUES ($1, $2, $3, $4, $5) RETURNING id`
-const GetTripQuery = `SELECT id, title, description, days FROM Trips WHERE id = $1`
+const GetTripQuery = `SELECT id, title, description FROM Trips WHERE id = $1`
 const GetPlaceForTripQuery = `SELECT pl.id, pl.name, pl.tags, pl.description, pl.rating, pl.country, pl.photos, tr.day
 								FROM TripsPlaces AS tr JOIN Places AS pl ON tr.place_id = pl.id WHERE tr.trip_id = $1
 								ORDER BY tr.day, tr.order`
