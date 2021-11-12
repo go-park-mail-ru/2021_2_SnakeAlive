@@ -291,14 +291,14 @@ func (s *userHandler) UploadAvatar(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	err = fasthttp.SaveMultipartFile(formFile, cnst.StaticPath+"/"+avatar)
+	err = fasthttp.SaveMultipartFile(formFile, cnst.StaticPath+cnst.AvatarDirPath+avatar)
 	if err != nil {
 		logger.Error("unable to save file")
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
 
-	avatarURL := cnst.StaticServerURL + "/" + avatar
+	avatarURL := cnst.StaticServerURL + cnst.AvatarDirPath + avatar
 	code, bytes := s.UserUseCase.AddAvatar(foundUser, avatarURL)
 	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
