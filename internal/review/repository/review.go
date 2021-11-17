@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"snakealive/m/internal/domain"
-	cnst "snakealive/m/pkg/constants"
 	logs "snakealive/m/pkg/logger"
 
 	pgxpool "github.com/jackc/pgx/v4/pgxpool"
@@ -19,6 +18,14 @@ func NewReviewStorage(DB *pgxpool.Pool) domain.ReviewStorage {
 	return &reviewStorage{dataHolder: DB}
 }
 
+const AddReviewQuery = `INSERT INTO public.reviews (title, text, rating, user_id, place_id) VALUES ($1, $2, $3, $4, $5) RETURNING id`
+
+const GetReviewByIdQuery = `SELECT id, title, text, rating, user_id, place_id FROM Reviews WHERE id = $1`
+
+const DeleteReviewQuery = `DELETE FROM Reviews WHERE id = $1`
+
+const GetReviewAuthorQuery = `SELECT user_id FROM Reviews WHERE id = $1`
+
 func (u *reviewStorage) Add(value domain.Review, userId int) (int, error) {
 	logger := logs.GetLogger()
 	insertedId := 0
@@ -30,7 +37,7 @@ func (u *reviewStorage) Add(value domain.Review, userId int) (int, error) {
 	defer conn.Release()
 
 	err = conn.QueryRow(context.Background(),
-		cnst.AddReviewQuery,
+		AddReviewQuery,
 		value.Title,
 		value.Text,
 		value.Rating,
@@ -91,7 +98,7 @@ func (u *reviewStorage) Get(id int) (domain.Review, error) {
 	defer conn.Release()
 
 	err = conn.QueryRow(context.Background(),
-		cnst.GetReviewByIdQuery,
+		GetReviewByIdQuery,
 		id,
 	).Scan(&review.Id, &review.Title, &review.Text, &review.Rating, &review.UserId, &review.PlaceId)
 	if err != nil {
@@ -112,7 +119,7 @@ func (u *reviewStorage) Delete(id int) error {
 	defer conn.Release()
 
 	_, err = conn.Exec(context.Background(),
-		cnst.DeleteReviewQuery,
+		DeleteReviewQuery,
 		id,
 	)
 	return err
@@ -130,7 +137,7 @@ func (u *reviewStorage) GetReviewAuthor(id int) int {
 
 	var author int
 	err = conn.QueryRow(context.Background(),
-		cnst.GetReviewAuthorQuery,
+		GetReviewAuthorQuery,
 		id,
 	).Scan(&author)
 

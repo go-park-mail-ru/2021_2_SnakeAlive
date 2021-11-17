@@ -33,55 +33,30 @@ func CreateDelivery(db *pgxpool.Pool) domain.CountryHandler {
 
 func SetUpCountryRouter(db *pgxpool.Pool, r *router.Router) *router.Router {
 	countryHandler := CreateDelivery(db)
-	r.GET(cnst.CountryListURL, countryHandler.GetCountriesList)
-	r.GET(cnst.CountryIdURL, countryHandler.GetById)
-	r.GET(cnst.CountryNameURL, countryHandler.GetByName)
+	r.GET(cnst.CountryListURL, logs.AccessLogMiddleware(countryHandler.GetCountriesList))
+	r.GET(cnst.CountryIdURL, logs.AccessLogMiddleware(countryHandler.GetById))
+	r.GET(cnst.CountryNameURL, logs.AccessLogMiddleware(countryHandler.GetByName))
 	return r
 }
 
 func (s *counryHandler) GetCountriesList(ctx *fasthttp.RequestCtx) {
-	logger := logs.GetLogger()
-	logger.Info(string(ctx.Path()),
-		zap.String("method", string(ctx.Method())),
-		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
-		zap.String("url", string(ctx.Path())),
-	)
-
 	code, bytes := s.CountryUseCase.GetCountriesList()
 
 	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
-	logger.Info(string(ctx.Path()),
-		zap.Int("status", ctx.Response.StatusCode()),
-	)
 }
 
 func (s *counryHandler) GetByName(ctx *fasthttp.RequestCtx) {
-	logger := logs.GetLogger()
-	logger.Info(string(ctx.Path()),
-		zap.String("method", string(ctx.Method())),
-		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
-		zap.String("url", string(ctx.Path())),
-	)
-
 	param, _ := ctx.UserValue("name").(string)
 	trans := entities.CountryTrans[param]
 	code, bytes := s.CountryUseCase.GetByName(trans)
 
 	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
-	logger.Info(string(ctx.Path()),
-		zap.Int("status", ctx.Response.StatusCode()),
-	)
 }
 
 func (s *counryHandler) GetById(ctx *fasthttp.RequestCtx) {
 	logger := logs.GetLogger()
-	logger.Info(string(ctx.Path()),
-		zap.String("method", string(ctx.Method())),
-		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
-		zap.String("url", string(ctx.Path())),
-	)
 
 	param, err := strconv.Atoi(ctx.UserValue("id").(string))
 	if err != nil {
@@ -93,7 +68,4 @@ func (s *counryHandler) GetById(ctx *fasthttp.RequestCtx) {
 
 	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
-	logger.Info(string(ctx.Path()),
-		zap.Int("status", ctx.Response.StatusCode()),
-	)
 }

@@ -42,53 +42,44 @@ func CreateDelivery(db *pgxpool.Pool) domain.ReviewHandler {
 
 func SetUpReviewRouter(db *pgxpool.Pool, r *router.Router) *router.Router {
 	reviewHandler := CreateDelivery(db)
-	r.POST(cnst.ReviewAddURL, reviewHandler.AddReviewToPlace)
-	r.GET(cnst.ReviewURL, reviewHandler.ReviewsByPlace)
-	r.DELETE(cnst.ReviewURL, reviewHandler.DelReview)
+	r.POST(cnst.ReviewAddURL, logs.AccessLogMiddleware(reviewHandler.AddReviewToPlace))
+	r.GET(cnst.ReviewURL, logs.AccessLogMiddleware(reviewHandler.ReviewsByPlace))
+	r.DELETE(cnst.ReviewURL, logs.AccessLogMiddleware(reviewHandler.DelReview))
 	return r
 }
 
 func (s *reviewHandler) ReviewsByPlace(ctx *fasthttp.RequestCtx) {
 	logger := logs.GetLogger()
-	logger.Info(string(ctx.Path()),
-		zap.String("method", string(ctx.Method())),
-		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
-		zap.String("url", string(ctx.Path())),
-	)
 
 	id, _ := strconv.Atoi(ctx.UserValue("id").(string))
 	cookieHash := string(ctx.Request.Header.Cookie(cnst.CookieName))
+
 	var user domain.User
 	user, err := s.CookieHandler.GetUser(cookieHash)
 	if err != nil {
 		logger.Error("unable to determine user")
 		user = domain.User{}
 	}
+
 	skip, err := strconv.Atoi(string(ctx.QueryArgs().Peek("skip")))
 	if err != nil {
 		logger.Error("unable to get query arg skip")
 		skip = cnst.DefaultSkip
 	}
+
 	limit, err := strconv.Atoi(string(ctx.QueryArgs().Peek("limit")))
 	if err != nil {
 		logger.Error("unable to get query arg limit")
 		limit = 0
 	}
+
 	code, bytes := s.ReviewUseCase.GetReviewsListByPlaceId(id, user, limit, skip)
 	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
-	logger.Info(string(ctx.Path()),
-		zap.Int("status", ctx.Response.StatusCode()),
-	)
 }
 
 func (s *reviewHandler) AddReviewToPlace(ctx *fasthttp.RequestCtx) {
 	logger := logs.GetLogger()
-	logger.Info(string(ctx.Path()),
-		zap.String("method", string(ctx.Method())),
-		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
-		zap.String("url", string(ctx.Path())),
-	)
 
 	if !s.CookieHandler.CheckCookie(ctx) {
 		logger.Error("user is unauthorized")
@@ -119,18 +110,10 @@ func (s *reviewHandler) AddReviewToPlace(ctx *fasthttp.RequestCtx) {
 		logger.Error("error while registering user in")
 		return
 	}
-	logger.Info(string(ctx.Path()),
-		zap.Int("status", ctx.Response.StatusCode()),
-	)
 }
 
 func (s *reviewHandler) DelReview(ctx *fasthttp.RequestCtx) {
 	logger := logs.GetLogger()
-	logger.Info(string(ctx.Path()),
-		zap.String("method", string(ctx.Method())),
-		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
-		zap.String("url", string(ctx.Path())),
-	)
 
 	if !s.CookieHandler.CheckCookie(ctx) {
 		logger.Error("user is unauthorized")
@@ -155,7 +138,12 @@ func (s *reviewHandler) DelReview(ctx *fasthttp.RequestCtx) {
 	}
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	s.ReviewUseCase.Delete(id)
-	logger.Info(string(ctx.Path()),
-		zap.Int("status", ctx.Response.StatusCode()),
-	)
+
+	response := map[string]int{"status": fasthttp.StatusOK}
+	bytes, err := json.Marshal(response)
+	if err != nil {
+		logger.Error("error while marshalling JSON: %s", zap.Error(err))
+		return
+	}
+	ctx.Write(bytes)
 }

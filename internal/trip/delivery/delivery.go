@@ -38,21 +38,16 @@ func CreateDelivery(db *pgxpool.Pool) domain.TripHandler {
 func SetUpTripRouter(db *pgxpool.Pool, r *router.Router) *router.Router {
 	tripHandler := CreateDelivery(db)
 
-	r.GET(cnst.TripURL, tripHandler.Trip)
-	r.POST(cnst.TripPostURL, tripHandler.AddTrip)
-	r.PATCH(cnst.TripURL, tripHandler.Update)
-	r.DELETE(cnst.TripURL, tripHandler.Delete)
+	r.GET(cnst.TripURL, logs.AccessLogMiddleware(tripHandler.Trip))
+	r.POST(cnst.TripPostURL, logs.AccessLogMiddleware(tripHandler.AddTrip))
+	r.PATCH(cnst.TripURL, logs.AccessLogMiddleware(tripHandler.Update))
+	r.DELETE(cnst.TripURL, logs.AccessLogMiddleware(tripHandler.Delete))
 
 	return r
 }
 
 func (s *tripHandler) Trip(ctx *fasthttp.RequestCtx) {
 	logger := logs.GetLogger()
-	logger.Info(string(ctx.Path()),
-		zap.String("method", string(ctx.Method())),
-		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
-		zap.String("url", string(ctx.Path())),
-	)
 
 	if !s.CookieHandler.CheckCookie(ctx) {
 		logger.Error("user is unauthorized")
@@ -74,18 +69,10 @@ func (s *tripHandler) Trip(ctx *fasthttp.RequestCtx) {
 
 	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
-	logger.Info(string(ctx.Path()),
-		zap.Int("status", ctx.Response.StatusCode()),
-	)
 }
 
 func (s *tripHandler) AddTrip(ctx *fasthttp.RequestCtx) {
 	logger := logs.GetLogger()
-	logger.Info(string(ctx.Path()),
-		zap.String("method", string(ctx.Method())),
-		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
-		zap.String("url", string(ctx.Path())),
-	)
 
 	if !s.CookieHandler.CheckCookie(ctx) {
 		logger.Error("user is unauthorized")
@@ -120,18 +107,10 @@ func (s *tripHandler) AddTrip(ctx *fasthttp.RequestCtx) {
 
 	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
-	logger.Info(string(ctx.Path()),
-		zap.Int("status", ctx.Response.StatusCode()),
-	)
 }
 
 func (s *tripHandler) Update(ctx *fasthttp.RequestCtx) {
 	logger := logs.GetLogger()
-	logger.Info(string(ctx.Path()),
-		zap.String("method", string(ctx.Method())),
-		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
-		zap.String("url", string(ctx.Path())),
-	)
 
 	if !s.CookieHandler.CheckCookie(ctx) {
 		logger.Error("user is unauthorized")
@@ -167,18 +146,10 @@ func (s *tripHandler) Update(ctx *fasthttp.RequestCtx) {
 
 	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
-	logger.Info(string(ctx.Path()),
-		zap.Int("status", ctx.Response.StatusCode()),
-	)
 }
 
 func (s *tripHandler) Delete(ctx *fasthttp.RequestCtx) {
 	logger := logs.GetLogger()
-	logger.Info(string(ctx.Path()),
-		zap.String("method", string(ctx.Method())),
-		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
-		zap.String("url", string(ctx.Path())),
-	)
 
 	if !s.CookieHandler.CheckCookie(ctx) {
 		logger.Error("user is unauthorized")
@@ -203,7 +174,12 @@ func (s *tripHandler) Delete(ctx *fasthttp.RequestCtx) {
 		return
 	}
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	logger.Info(string(ctx.Path()),
-		zap.Int("status", ctx.Response.StatusCode()),
-	)
+
+	response := map[string]int{"status": fasthttp.StatusOK}
+	bytes, err := json.Marshal(response)
+	if err != nil {
+		logger.Error("error while marshalling JSON: %s", zap.Error(err))
+		return
+	}
+	ctx.Write(bytes)
 }

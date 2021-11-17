@@ -38,13 +38,13 @@ func CreateDelivery(db *pgxpool.Pool) domain.UserHandler {
 
 func SetUpUserRouter(db *pgxpool.Pool, r *router.Router) *router.Router {
 	userHandler := CreateDelivery(db)
-	r.POST(cnst.LoginURL, userHandler.Login)
-	r.POST(cnst.RegisterURL, userHandler.Registration)
-	r.GET(cnst.ProfileURL, userHandler.GetProfile)
-	r.PATCH(cnst.ProfileURL, userHandler.UpdateProfile)
-	r.DELETE(cnst.ProfileURL, userHandler.DeleteProfile)
-	r.DELETE(cnst.LogoutURL, userHandler.Logout)
-	r.POST(cnst.UploadURL, userHandler.UploadAvatar)
+	r.POST(cnst.LoginURL, logs.AccessLogMiddleware(userHandler.Login))
+	r.POST(cnst.RegisterURL, logs.AccessLogMiddleware(userHandler.Registration))
+	r.GET(cnst.ProfileURL, logs.AccessLogMiddleware(userHandler.GetProfile))
+	r.PATCH(cnst.ProfileURL, logs.AccessLogMiddleware(userHandler.UpdateProfile))
+	r.DELETE(cnst.ProfileURL, logs.AccessLogMiddleware(userHandler.DeleteProfile))
+	r.DELETE(cnst.LogoutURL, logs.AccessLogMiddleware(userHandler.Logout))
+	r.POST(cnst.UploadURL, logs.AccessLogMiddleware(userHandler.UploadAvatar))
 	return r
 }
 
@@ -65,11 +65,6 @@ func (s *userHandler) Bind(user *domain.User, ctx *fasthttp.RequestCtx, logger *
 
 func (s *userHandler) Login(ctx *fasthttp.RequestCtx) {
 	logger := logs.GetLogger()
-	logger.Info(string(ctx.Path()),
-		zap.String("method", string(ctx.Method())),
-		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
-		zap.String("url", string(ctx.Path())),
-	)
 
 	user := new(domain.User)
 	s.Bind(user, ctx, logger)
@@ -84,9 +79,6 @@ func (s *userHandler) Login(ctx *fasthttp.RequestCtx) {
 	с := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
 	foundUser, _ := s.UserUseCase.GetByEmail(user.Email)
 	s.CookieHandler.SetCookieAndToken(ctx, с, foundUser.Id)
-	logger.Info(string(ctx.Path()),
-		zap.Int("status", ctx.Response.StatusCode()),
-	)
 }
 
 func (s *userHandler) Registration(ctx *fasthttp.RequestCtx) {
@@ -202,9 +194,18 @@ func (s *userHandler) DeleteProfile(ctx *fasthttp.RequestCtx) {
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
 		return
 	}
+	ctx.SetStatusCode(fasthttp.StatusOK)
 
 	s.UserUseCase.DeleteProfile(hash, foundUser)
 	s.CookieHandler.DeleteCookie(ctx, string(ctx.Request.Header.Cookie(cnst.CookieName)))
+
+	response := map[string]int{"status": fasthttp.StatusOK}
+	bytes, err := json.Marshal(response)
+	if err != nil {
+		logger.Error("error while marshalling JSON: %s", zap.Error(err))
+		return
+	}
+	ctx.Write(bytes)
 	logger.Info(string(ctx.Path()),
 		zap.Int("status", ctx.Response.StatusCode()),
 	)
@@ -254,7 +255,16 @@ func (s *userHandler) Logout(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
+
 	s.CookieHandler.DeleteCookie(ctx, string(ctx.Request.Header.Cookie(cnst.CookieName)))
+	response := map[string]int{"status": fasthttp.StatusOK}
+	bytes, err := json.Marshal(response)
+	if err != nil {
+		logger.Error("error while marshalling JSON: %s", zap.Error(err))
+		return
+	}
+	ctx.Write(bytes)
+
 	logger.Info(string(ctx.Path()),
 		zap.Int("status", ctx.Response.StatusCode()),
 	)

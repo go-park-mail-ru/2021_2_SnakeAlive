@@ -33,18 +33,13 @@ func CreateDelivery(db *pgxpool.Pool) domain.PlaceHandler {
 
 func SetUpPlaceRouter(db *pgxpool.Pool, r *router.Router) *router.Router {
 	placeHandler := CreateDelivery(db)
-	r.GET(cnst.SightsByCountruURL, placeHandler.PlacesByCountry)
-	r.GET(cnst.SightURL, placeHandler.Place)
+	r.GET(cnst.SightsByCountruURL, logs.AccessLogMiddleware(placeHandler.PlacesByCountry))
+	r.GET(cnst.SightURL, logs.AccessLogMiddleware(placeHandler.Place))
 	return r
 }
 
 func (s *placeHandler) PlacesByCountry(ctx *fasthttp.RequestCtx) {
 	logger := logs.GetLogger()
-	logger.Info(string(ctx.Path()),
-		zap.String("method", string(ctx.Method())),
-		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
-		zap.String("url", string(ctx.Path())),
-	)
 
 	param, _ := ctx.UserValue("name").(string)
 	trans := entities.CountryTrans[param]
@@ -58,18 +53,10 @@ func (s *placeHandler) PlacesByCountry(ctx *fasthttp.RequestCtx) {
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	ctx.Write(bytes)
-	logger.Info(string(ctx.Path()),
-		zap.Int("status", ctx.Response.StatusCode()),
-	)
 }
 
 func (s *placeHandler) Place(ctx *fasthttp.RequestCtx) {
 	logger := logs.GetLogger()
-	logger.Info(string(ctx.Path()),
-		zap.String("method", string(ctx.Method())),
-		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
-		zap.String("url", string(ctx.Path())),
-	)
 
 	param, err := strconv.Atoi(ctx.UserValue("id").(string))
 	if err != nil {
@@ -88,7 +75,4 @@ func (s *placeHandler) Place(ctx *fasthttp.RequestCtx) {
 	code, bytes := s.PlaceUseCase.GetSight(sight)
 	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
-	logger.Info(string(ctx.Path()),
-		zap.Int("status", ctx.Response.StatusCode()),
-	)
 }

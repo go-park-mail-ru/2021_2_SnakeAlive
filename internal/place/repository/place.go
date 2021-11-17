@@ -3,7 +3,6 @@ package placeRepository
 import (
 	"context"
 	"snakealive/m/internal/domain"
-	cnst "snakealive/m/pkg/constants"
 	logs "snakealive/m/pkg/logger"
 
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -17,6 +16,8 @@ func NewPlaceStorage(DB *pgxpool.Pool) domain.PlaceStorage {
 	return &placeStorage{dataHolder: DB}
 }
 
+const GetPlaceByIdQuery = `SELECT id, name, country, rating, tags, description, photos FROM Places WHERE id = $1`
+
 func (u *placeStorage) GetById(id int) (value domain.Place, err error) {
 	logger := logs.GetLogger()
 
@@ -29,7 +30,7 @@ func (u *placeStorage) GetById(id int) (value domain.Place, err error) {
 
 	var sight domain.Place
 	err = conn.QueryRow(context.Background(),
-		cnst.GetPlaceByIdQuery,
+		GetPlaceByIdQuery,
 		id,
 	).Scan(&sight.Id, &sight.Name, &sight.Country, &sight.Rating, &sight.Tags, &sight.Description, &sight.Photos)
 

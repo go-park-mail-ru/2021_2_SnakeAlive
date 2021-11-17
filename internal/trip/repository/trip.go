@@ -3,7 +3,6 @@ package tripRepository
 import (
 	"context"
 	"snakealive/m/internal/domain"
-	cnst "snakealive/m/pkg/constants"
 	logs "snakealive/m/pkg/logger"
 
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -17,6 +16,25 @@ func NewTripStorage(DB *pgxpool.Pool) domain.TripStorage {
 	return &tripStorage{dataHolder: DB}
 }
 
+const AddTripQuery = `INSERT INTO Trips ("title", "description", "days", "user_id", "origin") 
+						VALUES ($1, $2, $3, $4, $5) RETURNING id`
+
+const GetTripQuery = `SELECT id, title, description FROM Trips WHERE id = $1`
+
+const GetPlaceForTripQuery = `SELECT pl.id, pl.name, pl.tags, pl.description, pl.rating, pl.country, pl.photos, tr.day
+								FROM TripsPlaces AS tr JOIN Places AS pl ON tr.place_id = pl.id WHERE tr.trip_id = $1
+								ORDER BY tr.day, tr.order`
+
+const UpdateTripQuery = `UPDATE Trips SET "title" = $1, "description" = $2, "days" = $3, "origin" = $4 WHERE id = $5`
+
+const DeleteTripQuery = `DELETE FROM Trips WHERE id = $1`
+
+const DeletePlacesForTripQuery = `DELETE FROM TripsPlaces WHERE trip_id = $1`
+
+const AddPlacesForTripQuery = `INSERT INTO TripsPlaces ("trip_id", "place_id", "day", "order") VALUES ($1, $2, $3, $4)`
+
+const GetTripAuthorQuery = `SELECT user_id FROM Trips WHERE id = $1`
+
 func (t *tripStorage) Add(value domain.Trip, user domain.User) (int, error) {
 	logger := logs.GetLogger()
 	var tripId int
@@ -29,7 +47,7 @@ func (t *tripStorage) Add(value domain.Trip, user domain.User) (int, error) {
 	defer conn.Release()
 
 	err = conn.QueryRow(context.Background(),
-		cnst.AddTripQuery,
+		AddTripQuery,
 		value.Title,
 		value.Description,
 		len(value.Days),
@@ -57,7 +75,7 @@ func (t *tripStorage) GetById(id int) (value domain.Trip, err error) {
 	defer conn.Release()
 
 	err = conn.QueryRow(context.Background(),
-		cnst.GetTripQuery,
+		GetTripQuery,
 		id,
 	).Scan(&trip.Id, &trip.Title, &trip.Description)
 	if err != nil {
@@ -66,7 +84,7 @@ func (t *tripStorage) GetById(id int) (value domain.Trip, err error) {
 	}
 
 	rows, err := conn.Query(context.Background(),
-		cnst.GetPlaceForTripQuery,
+		GetPlaceForTripQuery,
 		id)
 	if err != nil {
 		logger.Error("error while getting trip places")
@@ -102,7 +120,7 @@ func (t *tripStorage) Update(id int, value domain.Trip) error {
 	defer conn.Release()
 
 	_, err = conn.Exec(context.Background(),
-		cnst.UpdateTripQuery,
+		UpdateTripQuery,
 		value.Title,
 		value.Description,
 		len(value.Days),
@@ -133,7 +151,7 @@ func (t *tripStorage) Delete(id int) error {
 		return err
 	}
 	_, err = conn.Exec(context.Background(),
-		cnst.DeleteTripQuery,
+		DeleteTripQuery,
 		id,
 	)
 	return err
@@ -150,7 +168,7 @@ func (t *tripStorage) deletePlaces(tripId int) error {
 	defer conn.Release()
 
 	_, err = conn.Exec(context.Background(),
-		cnst.DeletePlacesForTripQuery,
+		DeletePlacesForTripQuery,
 		tripId,
 	)
 	return err
@@ -169,7 +187,7 @@ func (t *tripStorage) addPlaces(value [][]domain.Place, tripId int) error {
 	for day, places := range value {
 		for ind, place := range places {
 			_, err = conn.Exec(context.Background(),
-				cnst.AddPlacesForTripQuery,
+				AddPlacesForTripQuery,
 				tripId,
 				place.Id,
 				day,
@@ -192,7 +210,7 @@ func (t *tripStorage) GetTripAuthor(id int) int {
 
 	var author int
 	err = conn.QueryRow(context.Background(),
-		cnst.GetTripAuthorQuery,
+		GetTripAuthorQuery,
 		id,
 	).Scan(&author)
 
