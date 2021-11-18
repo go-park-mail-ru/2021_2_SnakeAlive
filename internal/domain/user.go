@@ -12,7 +12,7 @@ type User struct {
 	Email       string `json:"email" valid:"required,email,maxstringlength(254)"`
 	Password    string `json:"password" valid:"required,stringlength(8|254)"`
 	Avatar      string `json:"avatar"`
-	Description string `json:description`
+	Description string `json:"description"`
 }
 
 type PublicUser struct {
