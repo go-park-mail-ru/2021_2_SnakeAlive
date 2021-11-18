@@ -9,12 +9,12 @@ package auth_service
 import (
 	context "context"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
-	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -647,7 +647,7 @@ var file_pkg_services_auth_api_proto_goTypes = []interface{}{
 	(*UpdateUserRequest)(nil),       // 5: services.auth_service.UpdateUserRequest
 	(*Session)(nil),                 // 6: services.auth_service.Session
 	(*ValidateSessionResponse)(nil), // 7: services.auth_service.ValidateSessionResponse
-	(*empty.Empty)(nil),             // 8: google.protobuf.Empty
+	(*emptypb.Empty)(nil),           // 8: google.protobuf.Empty
 }
 var file_pkg_services_auth_api_proto_depIdxs = []int32{
 	6, // 0: services.auth_service.AuthService.ValidateSession:input_type -> services.auth_service.Session
@@ -805,7 +805,7 @@ const _ = grpc.SupportPackageIsVersion6
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AuthServiceClient interface {
 	ValidateSession(ctx context.Context, in *Session, opts ...grpc.CallOption) (*ValidateSessionResponse, error)
-	LogoutUser(ctx context.Context, in *Session, opts ...grpc.CallOption) (*empty.Empty, error)
+	LogoutUser(ctx context.Context, in *Session, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	LoginUser(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	RegisterUser(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
@@ -829,8 +829,8 @@ func (c *authServiceClient) ValidateSession(ctx context.Context, in *Session, op
 	return out, nil
 }
 
-func (c *authServiceClient) LogoutUser(ctx context.Context, in *Session, opts ...grpc.CallOption) (*empty.Empty, error) {
-	out := new(empty.Empty)
+func (c *authServiceClient) LogoutUser(ctx context.Context, in *Session, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/services.auth_service.AuthService/LogoutUser", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -877,7 +877,7 @@ func (c *authServiceClient) UpdateUser(ctx context.Context, in *UpdateUserReques
 // AuthServiceServer is the server API for AuthService service.
 type AuthServiceServer interface {
 	ValidateSession(context.Context, *Session) (*ValidateSessionResponse, error)
-	LogoutUser(context.Context, *Session) (*empty.Empty, error)
+	LogoutUser(context.Context, *Session) (*emptypb.Empty, error)
 	LoginUser(context.Context, *LoginRequest) (*LoginResponse, error)
 	RegisterUser(context.Context, *RegisterRequest) (*LoginResponse, error)
 	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
@@ -891,7 +891,7 @@ type UnimplementedAuthServiceServer struct {
 func (*UnimplementedAuthServiceServer) ValidateSession(context.Context, *Session) (*ValidateSessionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ValidateSession not implemented")
 }
-func (*UnimplementedAuthServiceServer) LogoutUser(context.Context, *Session) (*empty.Empty, error) {
+func (*UnimplementedAuthServiceServer) LogoutUser(context.Context, *Session) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LogoutUser not implemented")
 }
 func (*UnimplementedAuthServiceServer) LoginUser(context.Context, *LoginRequest) (*LoginResponse, error) {
