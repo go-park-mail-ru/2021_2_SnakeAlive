@@ -7,16 +7,15 @@ import (
 )
 
 func main() {
-	logs.BuildLogger()
-	logger := logs.GetLogger()
+	l := logs.BuildLogger()
 
 	fs := http.FileServer(http.Dir(cnst.StaticPath))
 	http.Handle("/", fs)
 
-	logger.Info("starting server at :3000")
+	l.Logger.Info("starting server at :3000")
 	err := http.ListenAndServe(":3000", nil)
 	if err != nil {
-		logger.Fatal("failed to start file server")
+		l.Logger.Fatal("failed to start file server")
 		return
 	}
 }

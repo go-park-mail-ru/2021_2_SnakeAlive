@@ -16,7 +16,6 @@ import (
 	"github.com/fasthttp/router"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/valyala/fasthttp"
-	"go.uber.org/zap"
 )
 
 type reviewHandler struct {
@@ -33,43 +32,38 @@ func NewReviewHandler(ReviewUseCase domain.ReviewUseCase, CookieHandler domain.C
 	}
 }
 
-func CreateDelivery(db *pgxpool.Pool) domain.ReviewHandler {
-	cookieLayer := cd.CreateDelivery(db)
-	userLayer := ud.CreateDelivery(db)
-	reviewLayer := NewReviewHandler(ru.NewReviewUseCase(rr.NewReviewStorage(db), ur.NewUserStorage(db)), cookieLayer, userLayer)
+func CreateDelivery(db *pgxpool.Pool, l *logs.Logger) domain.ReviewHandler {
+	cookieLayer := cd.CreateDelivery(db, l)
+	userLayer := ud.CreateDelivery(db, l)
+	reviewLayer := NewReviewHandler(ru.NewReviewUseCase(rr.NewReviewStorage(db), ur.NewUserStorage(db), l), cookieLayer, userLayer)
 	return reviewLayer
 }
 
-func SetUpReviewRouter(db *pgxpool.Pool, r *router.Router) *router.Router {
-	reviewHandler := CreateDelivery(db)
-	r.POST(cnst.ReviewAddURL, logs.AccessLogMiddleware(reviewHandler.AddReviewToPlace))
-	r.GET(cnst.ReviewURL, logs.AccessLogMiddleware(reviewHandler.ReviewsByPlace))
-	r.DELETE(cnst.ReviewURL, logs.AccessLogMiddleware(reviewHandler.DelReview))
+func SetUpReviewRouter(db *pgxpool.Pool, r *router.Router, l *logs.Logger) *router.Router {
+	reviewHandler := CreateDelivery(db, l)
+	r.POST(cnst.ReviewAddURL, logs.AccessLogMiddleware(l, reviewHandler.AddReviewToPlace))
+	r.GET(cnst.ReviewURL, logs.AccessLogMiddleware(l, reviewHandler.ReviewsByPlace))
+	r.DELETE(cnst.ReviewURL, logs.AccessLogMiddleware(l, reviewHandler.DelReview))
 	return r
 }
 
 func (s *reviewHandler) ReviewsByPlace(ctx *fasthttp.RequestCtx) {
-	logger := logs.GetLogger()
-
 	id, _ := strconv.Atoi(ctx.UserValue("id").(string))
 	cookieHash := string(ctx.Request.Header.Cookie(cnst.CookieName))
 
 	var user domain.User
 	user, err := s.CookieHandler.GetUser(cookieHash)
 	if err != nil {
-		logger.Error("unable to determine user")
 		user = domain.User{}
 	}
 
 	skip, err := strconv.Atoi(string(ctx.QueryArgs().Peek("skip")))
 	if err != nil {
-		logger.Error("unable to get query arg skip")
 		skip = cnst.DefaultSkip
 	}
 
 	limit, err := strconv.Atoi(string(ctx.QueryArgs().Peek("limit")))
 	if err != nil {
-		logger.Error("unable to get query arg limit")
 		limit = 0
 	}
 
@@ -79,10 +73,7 @@ func (s *reviewHandler) ReviewsByPlace(ctx *fasthttp.RequestCtx) {
 }
 
 func (s *reviewHandler) AddReviewToPlace(ctx *fasthttp.RequestCtx) {
-	logger := logs.GetLogger()
-
 	if !s.CookieHandler.CheckCookie(ctx) {
-		logger.Error("user is unauthorized")
 		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
 		return
 	}
@@ -90,7 +81,6 @@ func (s *reviewHandler) AddReviewToPlace(ctx *fasthttp.RequestCtx) {
 
 	foundUser, err := s.CookieHandler.GetUser(hash)
 	if err != nil {
-		logger.Error("unable to determine user")
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
@@ -98,7 +88,6 @@ func (s *reviewHandler) AddReviewToPlace(ctx *fasthttp.RequestCtx) {
 	newReview := new(domain.Review)
 
 	if err := json.Unmarshal(ctx.PostBody(), &newReview); err != nil {
-		logger.Error("error while unmarshalling JSON: %s", zap.Error(err))
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
@@ -107,16 +96,12 @@ func (s *reviewHandler) AddReviewToPlace(ctx *fasthttp.RequestCtx) {
 	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
 	if err != nil {
-		logger.Error("error while registering user in")
 		return
 	}
 }
 
 func (s *reviewHandler) DelReview(ctx *fasthttp.RequestCtx) {
-	logger := logs.GetLogger()
-
 	if !s.CookieHandler.CheckCookie(ctx) {
-		logger.Error("user is unauthorized")
 		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
 		return
 	}
@@ -125,14 +110,12 @@ func (s *reviewHandler) DelReview(ctx *fasthttp.RequestCtx) {
 
 	foundUser, err := s.CookieHandler.GetUser(hash)
 	if err != nil || !s.ReviewUseCase.CheckAuthor(foundUser, id) {
-		logger.Error("user doesn't have permission for this action")
 		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
 		return
 	}
 
 	_, err = s.ReviewUseCase.Get(id)
 	if err != nil {
-		logger.Error("review not found")
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
 		return
 	}
@@ -142,7 +125,6 @@ func (s *reviewHandler) DelReview(ctx *fasthttp.RequestCtx) {
 	response := map[string]int{"status": fasthttp.StatusOK}
 	bytes, err := json.Marshal(response)
 	if err != nil {
-		logger.Error("error while marshalling JSON: %s", zap.Error(err))
 		return
 	}
 	ctx.Write(bytes)

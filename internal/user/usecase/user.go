@@ -13,12 +13,16 @@ import (
 	"go.uber.org/zap"
 )
 
-func NewUserUseCase(userStorage domain.UserStorage) domain.UserUseCase {
-	return userUseCase{userStorage: userStorage}
+func NewUserUseCase(userStorage domain.UserStorage, l *logs.Logger) domain.UserUseCase {
+	return userUseCase{
+		userStorage: userStorage,
+		l:           l,
+	}
 }
 
 type userUseCase struct {
 	userStorage domain.UserStorage
+	l           *logs.Logger
 }
 
 func (u userUseCase) GetByEmail(key string) (value domain.User, err error) {
@@ -38,11 +42,9 @@ func (u userUseCase) Add(user domain.User) error {
 }
 
 func (u userUseCase) Update(id int, updatedUser domain.User) error {
-	logger := logs.GetLogger()
-
 	user, err := u.GetByEmail(updatedUser.Email)
 	if err != nil && user.Id != id {
-		logger.Error("user not found")
+		u.l.Logger.Error("user not found")
 		return errors.New("failed to get user")
 	}
 
@@ -54,28 +56,24 @@ func (u userUseCase) Delete(id int) error {
 }
 
 func (u userUseCase) Validate(user *domain.User) bool {
-	logger := logs.GetLogger()
-
 	if !govalidator.IsEmail(user.Email) ||
 		!govalidator.StringLength(user.Password, cnst.MinPasswordLength, cnst.MaxPasswordLength) ||
 		!govalidator.MaxStringLength(user.Email, cnst.MaxEmailLength) {
-		logger.Error("error while validating user")
+		u.l.Logger.Error("error while validating user")
 		return false
 	}
 	return true
 }
 
 func (u userUseCase) Login(user *domain.User) (int, error) {
-	logger := logs.GetLogger()
-
 	foundUser, err := u.GetByEmail(user.Email)
 	if err != nil {
-		logger.Error("unable to find user")
+		u.l.Logger.Error("unable to find user")
 		return fasthttp.StatusNotFound, err
 	}
 
 	if foundUser.Password != user.Password {
-		logger.Error("wrong password")
+		u.l.Logger.Error("wrong password")
 		return fasthttp.StatusBadRequest, err
 	}
 
@@ -83,24 +81,22 @@ func (u userUseCase) Login(user *domain.User) (int, error) {
 }
 
 func (u userUseCase) Registration(user *domain.User) (int, error) {
-	logger := logs.GetLogger()
-
 	_, err := govalidator.ValidateStruct(user)
 	if err != nil {
-		logger.Error("error while validating user")
+		u.l.Logger.Error("error while validating user")
 		return fasthttp.StatusBadRequest, err
 	}
 
 	_, err = u.GetByEmail(user.Email)
 	if err == nil {
-		logger.Error("user with this email already exists")
+		u.l.Logger.Error("user with this email already exists")
 		return fasthttp.StatusBadRequest, err
 	}
 	cleanUser := u.SanitizeUser(*user)
 
 	err = u.Add(cleanUser)
 	if err != nil {
-		logger.Error("error while adding user")
+		u.l.Logger.Error("error while adding user")
 		return fasthttp.StatusBadRequest, err
 	}
 
@@ -108,30 +104,26 @@ func (u userUseCase) Registration(user *domain.User) (int, error) {
 }
 
 func (u userUseCase) GetProfile(hash string, foundUser domain.User) (int, []byte) {
-	logger := logs.GetLogger()
-
 	response := map[string]string{"name": foundUser.Name, "surname": foundUser.Surname, "email": foundUser.Email,
 		"avatar": foundUser.Avatar, "description": foundUser.Description}
 	bytes, err := json.Marshal(response)
 	if err != nil {
-		logger.Error("error while marshalling JSON: %s", zap.Error(err))
+		u.l.Logger.Error("error while marshalling JSON: %s", zap.Error(err))
 		return fasthttp.StatusBadRequest, []byte("{}")
 	}
 	return fasthttp.StatusOK, bytes
 }
 
 func (u userUseCase) UpdateProfile(updatedUser *domain.User, foundUser domain.User, hash string) (int, []byte) {
-	logger := logs.GetLogger()
-
 	_, err := govalidator.ValidateStruct(updatedUser)
 	if err != nil {
-		logger.Error("error while validating user")
+		u.l.Logger.Error("error while validating user")
 		return fasthttp.StatusBadRequest, nil
 	}
 	cleanUser := u.SanitizeUser(*updatedUser)
 
 	if err = u.Update(foundUser.Id, cleanUser); err != nil {
-		logger.Error("user with this email already exists")
+		u.l.Logger.Error("user with this email already exists")
 		return fasthttp.StatusBadRequest, nil
 	}
 
@@ -139,7 +131,7 @@ func (u userUseCase) UpdateProfile(updatedUser *domain.User, foundUser domain.Us
 		"avatar": foundUser.Avatar, "description": cleanUser.Description}
 	bytes, err := json.Marshal(response)
 	if err != nil {
-		logger.Error("error while marshalling JSON: ", zap.Error(err))
+		u.l.Logger.Error("error while marshalling JSON: ", zap.Error(err))
 		return fasthttp.StatusBadRequest, nil
 	}
 

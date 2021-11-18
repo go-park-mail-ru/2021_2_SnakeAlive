@@ -13,7 +13,6 @@ import (
 	"github.com/fasthttp/router"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/valyala/fasthttp"
-	"go.uber.org/zap"
 )
 
 type counryHandler struct {
@@ -26,16 +25,16 @@ func NewCountryHandler(CountryUseCase domain.CountryUseCase) domain.CountryHandl
 	}
 }
 
-func CreateDelivery(db *pgxpool.Pool) domain.CountryHandler {
-	countryLayer := NewCountryHandler(cu.NewCountryUseCase(cr.NewCountryStorage(db)))
+func CreateDelivery(db *pgxpool.Pool, l *logs.Logger) domain.CountryHandler {
+	countryLayer := NewCountryHandler(cu.NewCountryUseCase(cr.NewCountryStorage(db), l))
 	return countryLayer
 }
 
-func SetUpCountryRouter(db *pgxpool.Pool, r *router.Router) *router.Router {
-	countryHandler := CreateDelivery(db)
-	r.GET(cnst.CountryListURL, logs.AccessLogMiddleware(countryHandler.GetCountriesList))
-	r.GET(cnst.CountryIdURL, logs.AccessLogMiddleware(countryHandler.GetById))
-	r.GET(cnst.CountryNameURL, logs.AccessLogMiddleware(countryHandler.GetByName))
+func SetUpCountryRouter(db *pgxpool.Pool, r *router.Router, l *logs.Logger) *router.Router {
+	countryHandler := CreateDelivery(db, l)
+	r.GET(cnst.CountryListURL, logs.AccessLogMiddleware(l, countryHandler.GetCountriesList))
+	r.GET(cnst.CountryIdURL, logs.AccessLogMiddleware(l, countryHandler.GetById))
+	r.GET(cnst.CountryNameURL, logs.AccessLogMiddleware(l, countryHandler.GetByName))
 	return r
 }
 
@@ -56,11 +55,8 @@ func (s *counryHandler) GetByName(ctx *fasthttp.RequestCtx) {
 }
 
 func (s *counryHandler) GetById(ctx *fasthttp.RequestCtx) {
-	logger := logs.GetLogger()
-
 	param, err := strconv.Atoi(ctx.UserValue("id").(string))
 	if err != nil {
-		logger.Error("error while getting sid param: ", zap.Error(err))
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}

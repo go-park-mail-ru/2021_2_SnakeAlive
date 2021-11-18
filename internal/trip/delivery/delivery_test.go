@@ -20,7 +20,7 @@ import (
 )
 
 func TestHandler_AddTrip(t *testing.T) {
-	logs.BuildLogger()
+	l := logs.BuildLogger()
 
 	user := domain.User{
 		Id:       1,
@@ -74,15 +74,15 @@ func TestHandler_AddTrip(t *testing.T) {
 
 	ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
 
-	cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
-	tripLayer := NewTripHandler(tu.NewTripUseCase(tripRepo), cookieLayer)
+	cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo, &l))
+	tripLayer := NewTripHandler(tu.NewTripUseCase(tripRepo, &l), cookieLayer)
 	tripLayer.AddTrip(ctx)
 
 	assert.Equal(t, expectedStatusCode, ctx.Response.Header.StatusCode())
 }
 
 func TestHandler_Trip(t *testing.T) {
-	logs.BuildLogger()
+	l := logs.BuildLogger()
 
 	user := domain.User{
 		Id:       1,
@@ -129,15 +129,15 @@ func TestHandler_Trip(t *testing.T) {
 
 	ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
 
-	cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
-	tripLayer := NewTripHandler(tu.NewTripUseCase(tripRepo), cookieLayer)
+	cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo, &l))
+	tripLayer := NewTripHandler(tu.NewTripUseCase(tripRepo, &l), cookieLayer)
 	tripLayer.Trip(ctx)
 
 	assert.Equal(t, expectedStatusCode, ctx.Response.Header.StatusCode())
 }
 
 func TestHandler_UpdateTrip(t *testing.T) {
-	logs.BuildLogger()
+	l := logs.BuildLogger()
 
 	user := domain.User{
 		Id:       1,
@@ -197,15 +197,15 @@ func TestHandler_UpdateTrip(t *testing.T) {
 
 	ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
 
-	cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
-	tripLayer := NewTripHandler(tu.NewTripUseCase(tripRepo), cookieLayer)
+	cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo, &l))
+	tripLayer := NewTripHandler(tu.NewTripUseCase(tripRepo, &l), cookieLayer)
 	tripLayer.Update(ctx)
 
 	assert.Equal(t, expectedStatusCode, ctx.Response.Header.StatusCode())
 }
 
 func TestHandler_DeleteTrip(t *testing.T) {
-	logs.BuildLogger()
+	l := logs.BuildLogger()
 
 	user := domain.User{
 		Id:       1,
@@ -252,8 +252,8 @@ func TestHandler_DeleteTrip(t *testing.T) {
 
 	ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
 
-	cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
-	tripLayer := NewTripHandler(tu.NewTripUseCase(tripRepo), cookieLayer)
+	cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo, &l))
+	tripLayer := NewTripHandler(tu.NewTripUseCase(tripRepo, &l), cookieLayer)
 	tripLayer.Delete(ctx)
 
 	assert.Equal(t, expectedStatusCode, ctx.Response.Header.StatusCode())

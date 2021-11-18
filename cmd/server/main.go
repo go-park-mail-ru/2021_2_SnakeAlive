@@ -17,13 +17,13 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-func SetUpRouter(db *pgxpool.Pool) *router.Router {
+func SetUpRouter(db *pgxpool.Pool, l *logs.Logger) *router.Router {
 	r := router.New()
-	r = ud.SetUpUserRouter(db, r)
-	r = pd.SetUpPlaceRouter(db, r)
-	r = td.SetUpTripRouter(db, r)
-	r = rd.SetUpReviewRouter(db, r)
-	r = cd.SetUpCountryRouter(db, r)
+	r = ud.SetUpUserRouter(db, r, l)
+	r = pd.SetUpPlaceRouter(db, r, l)
+	r = td.SetUpTripRouter(db, r, l)
+	r = rd.SetUpReviewRouter(db, r, l)
+	r = cd.SetUpCountryRouter(db, r, l)
 
 	return r
 }
@@ -48,25 +48,24 @@ func corsMiddleware(handler func(ctx *fasthttp.RequestCtx)) func(ctx *fasthttp.R
 }
 
 func main() {
-	logs.BuildLogger()
-	logger := logs.GetLogger()
+	l := logs.BuildLogger()
 
-	ctx := ctxzap.ToContext(context.Background(), logger)
+	ctx := ctxzap.ToContext(context.Background(), l.Logger)
 
-	logger.Info("starting server at :8080")
+	l.Logger.Info("starting server at :8080")
 
 	url := "postgres://tripadvisor:12345@localhost:5432/tripadvisor"
 	dbpool, err := pgxpool.Connect(ctx, url)
 	if err != nil {
-		logger.Fatal("unable to connect to database")
+		l.Logger.Fatal("unable to connect to database")
 		return
 	}
 	defer dbpool.Close()
 
-	r := SetUpRouter(dbpool)
+	r := SetUpRouter(dbpool, &l)
 
 	if err := fasthttp.ListenAndServe(":8080", corsMiddleware(r.Handler)); err != nil {
-		logger.Fatal("failed to start server")
+		l.Logger.Fatal("failed to start server")
 		return
 	}
 }

@@ -11,20 +11,22 @@ import (
 	"go.uber.org/zap"
 )
 
-func NewTripUseCase(tripStorage domain.TripStorage) domain.TripUseCase {
-	return tripUsecase{tripStorage: tripStorage}
+func NewTripUseCase(tripStorage domain.TripStorage, l *logs.Logger) domain.TripUseCase {
+	return tripUsecase{
+		tripStorage: tripStorage,
+		l:           l,
+	}
 }
 
 type tripUsecase struct {
 	tripStorage domain.TripStorage
+	l           *logs.Logger
 }
 
 func (u tripUsecase) Add(value domain.Trip, user domain.User) (int, error) {
-	logger := logs.GetLogger()
-
 	_, err := govalidator.ValidateStruct(value)
 	if err != nil {
-		logger.Error("error while validating trip struct")
+		u.l.Logger.Error("error while validating trip struct")
 		return 0, err
 	}
 	cleanTrip := u.SanitizeTrip(value)
@@ -33,22 +35,20 @@ func (u tripUsecase) Add(value domain.Trip, user domain.User) (int, error) {
 }
 
 func (u tripUsecase) GetById(id int) (int, []byte) {
-	logger := logs.GetLogger()
-
 	value, err := u.tripStorage.GetById(id)
 	if err != nil {
-		logger.Error("error while getting trip: ", zap.Error(err))
+		u.l.Logger.Error("error while getting trip: ", zap.Error(err))
 		return fasthttp.StatusBadRequest, nil
 	}
 
 	if value.Id == 0 {
-		logger.Error("trip not found")
+		u.l.Logger.Error("trip not found")
 		return fasthttp.StatusNotFound, nil
 	}
 
 	bytes, err := json.Marshal(value)
 	if err != nil {
-		logger.Error("error while marshalling JSON: ", zap.Error(err))
+		u.l.Logger.Error("error while marshalling JSON: ", zap.Error(err))
 		return fasthttp.StatusBadRequest, nil
 	}
 
@@ -56,11 +56,9 @@ func (u tripUsecase) GetById(id int) (int, []byte) {
 }
 
 func (u tripUsecase) Update(id int, updatedTrip domain.Trip) error {
-	logger := logs.GetLogger()
-
 	_, err := govalidator.ValidateStruct(updatedTrip)
 	if err != nil {
-		logger.Error("error while validating trip struct")
+		u.l.Logger.Error("error while validating trip struct")
 		return err
 	}
 	cleanTrip := u.SanitizeTrip(updatedTrip)

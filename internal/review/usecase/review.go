@@ -11,13 +11,17 @@ import (
 	"go.uber.org/zap"
 )
 
-func NewReviewUseCase(reviewStorage domain.ReviewStorage, userStorage domain.UserStorage) domain.ReviewUseCase {
-	return reviewUseCase{reviewStorage: reviewStorage, userStorage: userStorage}
+func NewReviewUseCase(reviewStorage domain.ReviewStorage, userStorage domain.UserStorage, l *logs.Logger) domain.ReviewUseCase {
+	return reviewUseCase{
+		reviewStorage: reviewStorage,
+		userStorage:   userStorage,
+		l:             l}
 }
 
 type reviewUseCase struct {
 	reviewStorage domain.ReviewStorage
 	userStorage   domain.UserStorage
+	l             *logs.Logger
 }
 
 type ReviewUser struct {
@@ -27,7 +31,6 @@ type ReviewUser struct {
 }
 
 func (u reviewUseCase) Add(review domain.Review, user domain.User) (int, []byte, error) {
-	logger := logs.GetLogger()
 	cleanReview := u.SanitizeReview(review)
 	insertedId, err := u.reviewStorage.Add(cleanReview, user.Id)
 	if err != nil {
@@ -36,7 +39,7 @@ func (u reviewUseCase) Add(review domain.Review, user domain.User) (int, []byte,
 
 	bytes, err := json.Marshal(insertedId)
 	if err != nil {
-		logger.Error("error while marshalling JSON: ", zap.Error(err))
+		u.l.Logger.Error("error while marshalling JSON: ", zap.Error(err))
 		return fasthttp.StatusOK, []byte("{}"), err
 	}
 	return fasthttp.StatusOK, bytes, err
@@ -47,11 +50,10 @@ func (u reviewUseCase) Get(id int) (domain.Review, error) {
 }
 
 func (u reviewUseCase) GetReviewsListByPlaceId(id int, user domain.User, limit int, skip int) (int, []byte) {
-	logger := logs.GetLogger()
 	user = u.SanitizeUser(user)
 	reviews, err := u.reviewStorage.GetListByPlace(id, limit, skip)
 	if err != nil {
-		logger.Error("reviews not found: ", zap.Error(err))
+		u.l.Logger.Error("reviews not found: ", zap.Error(err))
 		return fasthttp.StatusNotFound, []byte("{}")
 	}
 
@@ -62,7 +64,7 @@ func (u reviewUseCase) GetReviewsListByPlaceId(id int, user domain.User, limit i
 		ru.Review = reviews[i]
 		ru.User, err = u.userStorage.GetPublicById(reviews[i].UserId)
 		if err != nil {
-			logger.Error("error while get user in reviews list: ", zap.Error(err))
+			u.l.Logger.Error("error while get user in reviews list: ", zap.Error(err))
 			return fasthttp.StatusOK, []byte("{}")
 		}
 		ru.Owner = u.CheckAuthor(user, reviews[i].Id)
@@ -72,7 +74,7 @@ func (u reviewUseCase) GetReviewsListByPlaceId(id int, user domain.User, limit i
 
 	bytes, err := json.Marshal(reviewData)
 	if err != nil {
-		logger.Error("error while marshalling JSON: ", zap.Error(err))
+		u.l.Logger.Error("error while marshalling JSON: ", zap.Error(err))
 		return fasthttp.StatusOK, []byte("{}")
 	}
 	fmt.Println("bytes= ", bytes)

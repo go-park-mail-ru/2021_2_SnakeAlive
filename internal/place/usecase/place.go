@@ -9,12 +9,16 @@ import (
 	"go.uber.org/zap"
 )
 
-func NewPlaceUseCase(placeStorage domain.PlaceStorage) domain.PlaceUseCase {
-	return placeUsecase{placeStorage: placeStorage}
+func NewPlaceUseCase(placeStorage domain.PlaceStorage, l *logs.Logger) domain.PlaceUseCase {
+	return placeUsecase{
+		placeStorage: placeStorage,
+		l:            l,
+	}
 }
 
 type placeUsecase struct {
 	placeStorage domain.PlaceStorage
+	l            *logs.Logger
 }
 
 func (u placeUsecase) GetById(id int) (value domain.Place, err error) {
@@ -22,28 +26,24 @@ func (u placeUsecase) GetById(id int) (value domain.Place, err error) {
 }
 
 func (u placeUsecase) GetSight(sight domain.Place) (int, []byte) {
-	logger := logs.GetLogger()
-
 	response, err := json.Marshal(sight)
 	if err != nil {
-		logger.Error("error while marshalling JSON: ", zap.Error(err))
+		u.l.Logger.Error("error while marshalling JSON: ", zap.Error(err))
 		return fasthttp.StatusBadRequest, []byte("{}")
 	}
 	return fasthttp.StatusOK, response
 }
 
 func (u placeUsecase) GetPlacesByCountry(value string) ([]byte, error) {
-	logger := logs.GetLogger()
-
 	places, err := u.placeStorage.GetPlacesByCountry(value)
 	if err != nil {
-		logger.Error("error while getting places by country")
+		u.l.Logger.Error("error while getting places by country")
 		return []byte{}, err
 	}
 
 	bytes, err := json.Marshal(places)
 	if err != nil {
-		logger.Error("error while marshalling JSON: ", zap.Error(err))
+		u.l.Logger.Error("error while marshalling JSON: ", zap.Error(err))
 	}
 	return bytes, err
 }

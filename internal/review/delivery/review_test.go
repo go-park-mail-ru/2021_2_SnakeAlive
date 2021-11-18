@@ -100,11 +100,11 @@ func TestHandler_ReviewsByPlace(t *testing.T) {
 		},
 	}
 	ctx := &fasthttp.RequestCtx{}
+	l := logs.BuildLogger()
 
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
-		logs.BuildLogger()
 
 		repo := service_mocks.NewMockReviewStorage(c)
 		tc.mockReviewBehavior(repo, tc.inputReview)
@@ -114,9 +114,9 @@ func TestHandler_ReviewsByPlace(t *testing.T) {
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
-		cookieLayer := cd.CreateDelivery(SetUpDB())
-		userLayer := ud.CreateDelivery(SetUpDB())
-		reviewLayer := NewReviewHandler(ru.NewReviewUseCase(repo, userRepo), cookieLayer, userLayer)
+		cookieLayer := cd.CreateDelivery(SetUpDB(), &l)
+		userLayer := ud.CreateDelivery(SetUpDB(), &l)
+		reviewLayer := NewReviewHandler(ru.NewReviewUseCase(repo, userRepo, &l), cookieLayer, userLayer)
 
 		ctx.SetUserValue("id", fmt.Sprint(tc.urlArg))
 		reviewLayer.ReviewsByPlace(ctx)
@@ -154,6 +154,7 @@ func TestHandler_AddReviewToPlace(t *testing.T) {
 		},
 	}
 	ctx := &fasthttp.RequestCtx{}
+	l := logs.BuildLogger()
 	mockGetUser := func(r *service_mocks.MockCookieStorage, cookie string, user domain.User) {
 		r.EXPECT().Get(gomock.Any()).Return(user, nil).AnyTimes()
 	}
@@ -161,7 +162,6 @@ func TestHandler_AddReviewToPlace(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
-		logs.BuildLogger()
 
 		cookieRepo := service_mocks.NewMockCookieStorage(c)
 		cookie := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
@@ -175,9 +175,9 @@ func TestHandler_AddReviewToPlace(t *testing.T) {
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
-		cookieLayer := cd.CreateDelivery(SetUpDB())
-		userLayer := ud.CreateDelivery(SetUpDB())
-		reviewLayer := NewReviewHandler(ru.NewReviewUseCase(repo, userRepo), cookieLayer, userLayer)
+		cookieLayer := cd.CreateDelivery(SetUpDB(), &l)
+		userLayer := ud.CreateDelivery(SetUpDB(), &l)
+		reviewLayer := NewReviewHandler(ru.NewReviewUseCase(repo, userRepo, &l), cookieLayer, userLayer)
 
 		ctx.SetUserValue("id", fmt.Sprint(tc.urlArg))
 
@@ -209,11 +209,11 @@ func TestHandler_AddReviewToPlace2(t *testing.T) {
 		},
 	}
 	ctx := &fasthttp.RequestCtx{}
+	l := logs.BuildLogger()
 
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
-		logs.BuildLogger()
 
 		repo := service_mocks.NewMockReviewStorage(c)
 		tc.mockReviewBehavior(repo, tc.inputReview)
@@ -223,9 +223,9 @@ func TestHandler_AddReviewToPlace2(t *testing.T) {
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
-		cookieLayer := cd.CreateDelivery(SetUpDB())
-		userLayer := ud.CreateDelivery(SetUpDB())
-		reviewLayer := NewReviewHandler(ru.NewReviewUseCase(repo, userRepo), cookieLayer, userLayer)
+		cookieLayer := cd.CreateDelivery(SetUpDB(), &l)
+		userLayer := ud.CreateDelivery(SetUpDB(), &l)
+		reviewLayer := NewReviewHandler(ru.NewReviewUseCase(repo, userRepo, &l), cookieLayer, userLayer)
 
 		ctx.SetUserValue("id", fmt.Sprint(tc.urlArg))
 
@@ -256,11 +256,11 @@ func TestHandler_DelReview(t *testing.T) {
 		},
 	}
 	ctx := &fasthttp.RequestCtx{}
+	l := logs.BuildLogger()
 
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
-		logs.BuildLogger()
 
 		repo := service_mocks.NewMockReviewStorage(c)
 		tc.mockReviewBehavior(repo, tc.inputReview)
@@ -270,9 +270,9 @@ func TestHandler_DelReview(t *testing.T) {
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
-		cookieLayer := cd.CreateDelivery(SetUpDB())
-		userLayer := ud.CreateDelivery(SetUpDB())
-		reviewLayer := NewReviewHandler(ru.NewReviewUseCase(repo, userRepo), cookieLayer, userLayer)
+		cookieLayer := cd.CreateDelivery(SetUpDB(), &l)
+		userLayer := ud.CreateDelivery(SetUpDB(), &l)
+		reviewLayer := NewReviewHandler(ru.NewReviewUseCase(repo, userRepo, &l), cookieLayer, userLayer)
 
 		ctx.SetUserValue("id", fmt.Sprint(tc.urlArg))
 
@@ -333,6 +333,7 @@ func TestHandler_DelReview2(t *testing.T) {
 		},
 	}
 	ctx := &fasthttp.RequestCtx{}
+	l := logs.BuildLogger()
 
 	mockGetUser := func(r *service_mocks.MockCookieStorage, cookie string, user domain.User) {
 		r.EXPECT().Get(cookie).Return(user, nil).AnyTimes()
@@ -341,7 +342,6 @@ func TestHandler_DelReview2(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
-		logs.BuildLogger()
 
 		repo := service_mocks.NewMockReviewStorage(c)
 		tc.mockReviewBehavior(repo, tc.inputReview)
@@ -358,9 +358,9 @@ func TestHandler_DelReview2(t *testing.T) {
 		cookie := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
 		mockGetUser(cookieRepo, cookie, user)
 
-		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
-		userLayer := ud.CreateDelivery(SetUpDB())
-		reviewLayer := NewReviewHandler(ru.NewReviewUseCase(repo, userRepo), cookieLayer, userLayer)
+		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo, &l))
+		userLayer := ud.CreateDelivery(SetUpDB(), &l)
+		reviewLayer := NewReviewHandler(ru.NewReviewUseCase(repo, userRepo, &l), cookieLayer, userLayer)
 
 		ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
 		reviewLayer.DelReview(ctx)

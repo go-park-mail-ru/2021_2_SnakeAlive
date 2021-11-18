@@ -3,7 +3,6 @@ package placeRepository
 import (
 	"context"
 	"snakealive/m/internal/domain"
-	logs "snakealive/m/pkg/logger"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 )
@@ -19,11 +18,8 @@ func NewPlaceStorage(DB *pgxpool.Pool) domain.PlaceStorage {
 const GetPlaceByIdQuery = `SELECT id, name, country, rating, tags, description, photos FROM Places WHERE id = $1`
 
 func (u *placeStorage) GetById(id int) (value domain.Place, err error) {
-	logger := logs.GetLogger()
-
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
-		logger.Error("error while aquiring connection")
 		return domain.Place{}, err
 	}
 	defer conn.Release()
@@ -38,12 +34,10 @@ func (u *placeStorage) GetById(id int) (value domain.Place, err error) {
 }
 
 func (u *placeStorage) GetPlacesByCountry(value string) (domain.TopPlaces, error) {
-	logger := logs.GetLogger()
 	places := make(domain.TopPlaces, 0)
 
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
-		logger.Error("error while aquiring connection")
 		return places, err
 	}
 	defer conn.Release()
@@ -52,8 +46,6 @@ func (u *placeStorage) GetPlacesByCountry(value string) (domain.TopPlaces, error
 		GetPlacesByCountryQuery,
 		value)
 	if err != nil {
-		logger.Error("error while getting list of places from database")
-
 		return places, err
 	}
 

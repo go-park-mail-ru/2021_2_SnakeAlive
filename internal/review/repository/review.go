@@ -4,10 +4,8 @@ import (
 	"context"
 	"errors"
 	"snakealive/m/internal/domain"
-	logs "snakealive/m/pkg/logger"
 
 	pgxpool "github.com/jackc/pgx/v4/pgxpool"
-	"go.uber.org/zap"
 )
 
 type reviewStorage struct {
@@ -27,11 +25,9 @@ const DeleteReviewQuery = `DELETE FROM Reviews WHERE id = $1`
 const GetReviewAuthorQuery = `SELECT user_id FROM Reviews WHERE id = $1`
 
 func (u *reviewStorage) Add(value domain.Review, userId int) (int, error) {
-	logger := logs.GetLogger()
 	insertedId := 0
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
-		logger.Error("error while aquiring connection")
 		return insertedId, err
 	}
 	defer conn.Release()
@@ -45,19 +41,15 @@ func (u *reviewStorage) Add(value domain.Review, userId int) (int, error) {
 		value.PlaceId,
 	).Scan(&insertedId)
 	if err != nil {
-		logger.Error("error while adding review: ", zap.Error(err))
 		return insertedId, err
 	}
 	return insertedId, err
 }
 
 func (u *reviewStorage) GetListByPlace(id int, limit int, skip int) (domain.ReviewsNoPlace, error) {
-	logger := logs.GetLogger()
-
 	reviews := make(domain.ReviewsNoPlace, 0)
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
-		logger.Error("error while aquiring connection")
 		return reviews, err
 	}
 	defer conn.Release()
@@ -66,7 +58,6 @@ func (u *reviewStorage) GetListByPlace(id int, limit int, skip int) (domain.Revi
 		GetReviewsByPlaceQuery,
 		id, limit, skip)
 	if err != nil {
-		logger.Error("error while getting places from database")
 		return reviews, err
 	}
 
@@ -76,23 +67,18 @@ func (u *reviewStorage) GetListByPlace(id int, limit int, skip int) (domain.Revi
 		reviews = append(reviews, review)
 	}
 	if rows.Err() != nil {
-		logger.Error("error while scanning places from database")
 		return reviews, err
 	}
 	if len(reviews) == 0 {
-		logger.Error("no reviews found")
 		return reviews, errors.New("no reviews")
 	}
 	return reviews, err
 }
 
 func (u *reviewStorage) Get(id int) (domain.Review, error) {
-	logger := logs.GetLogger()
-
 	var review domain.Review
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
-		logger.Error("error while aquiring connection")
 		return review, err
 	}
 	defer conn.Release()
@@ -102,18 +88,15 @@ func (u *reviewStorage) Get(id int) (domain.Review, error) {
 		id,
 	).Scan(&review.Id, &review.Title, &review.Text, &review.Rating, &review.UserId, &review.PlaceId)
 	if err != nil {
-		logger.Error("error while scanning places: ", zap.Error(err))
 		return review, err
 	}
+
 	return review, err
 }
 
 func (u *reviewStorage) Delete(id int) error {
-	logger := logs.GetLogger()
-
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
-		logger.Error("error while aquiring connection")
 		return err
 	}
 	defer conn.Release()
@@ -126,11 +109,8 @@ func (u *reviewStorage) Delete(id int) error {
 }
 
 func (u *reviewStorage) GetReviewAuthor(id int) int {
-	logger := logs.GetLogger()
-
 	conn, err := u.dataHolder.Acquire(context.Background())
 	if err != nil {
-		logger.Error("error while aquiring connection")
 		return 0
 	}
 	defer conn.Release()
@@ -142,7 +122,6 @@ func (u *reviewStorage) GetReviewAuthor(id int) int {
 	).Scan(&author)
 
 	if err != nil {
-		logger.Error("error while finding author of review: ", zap.Error(err))
 		return 0
 	}
 	return author

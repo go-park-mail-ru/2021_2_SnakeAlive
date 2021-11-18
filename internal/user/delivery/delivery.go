@@ -15,7 +15,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/valyala/fasthttp"
-	"go.uber.org/zap"
 )
 
 type userHandler struct {
@@ -30,49 +29,44 @@ func NewUserHandler(UserUseCase domain.UserUseCase, CookieHandler domain.CookieH
 	}
 }
 
-func CreateDelivery(db *pgxpool.Pool) domain.UserHandler {
-	cookieLayer := cd.CreateDelivery(db)
-	userLayer := NewUserHandler(uu.NewUserUseCase(ur.NewUserStorage(db)), cookieLayer)
+func CreateDelivery(db *pgxpool.Pool, l *logs.Logger) domain.UserHandler {
+	cookieLayer := cd.CreateDelivery(db, l)
+	userLayer := NewUserHandler(uu.NewUserUseCase(ur.NewUserStorage(db), l), cookieLayer)
 	return userLayer
 }
 
-func SetUpUserRouter(db *pgxpool.Pool, r *router.Router) *router.Router {
-	userHandler := CreateDelivery(db)
-	r.POST(cnst.LoginURL, logs.AccessLogMiddleware(userHandler.Login))
-	r.POST(cnst.RegisterURL, logs.AccessLogMiddleware(userHandler.Registration))
-	r.GET(cnst.ProfileURL, logs.AccessLogMiddleware(userHandler.GetProfile))
-	r.PATCH(cnst.ProfileURL, logs.AccessLogMiddleware(userHandler.UpdateProfile))
-	r.DELETE(cnst.ProfileURL, logs.AccessLogMiddleware(userHandler.DeleteProfile))
-	r.DELETE(cnst.LogoutURL, logs.AccessLogMiddleware(userHandler.Logout))
-	r.POST(cnst.UploadURL, logs.AccessLogMiddleware(userHandler.UploadAvatar))
+func SetUpUserRouter(db *pgxpool.Pool, r *router.Router, l *logs.Logger) *router.Router {
+	userHandler := CreateDelivery(db, l)
+	r.POST(cnst.LoginURL, logs.AccessLogMiddleware(l, userHandler.Login))
+	r.POST(cnst.RegisterURL, logs.AccessLogMiddleware(l, userHandler.Registration))
+	r.GET(cnst.ProfileURL, logs.AccessLogMiddleware(l, userHandler.GetProfile))
+	r.PATCH(cnst.ProfileURL, logs.AccessLogMiddleware(l, userHandler.UpdateProfile))
+	r.DELETE(cnst.ProfileURL, logs.AccessLogMiddleware(l, userHandler.DeleteProfile))
+	r.DELETE(cnst.LogoutURL, logs.AccessLogMiddleware(l, userHandler.Logout))
+	r.POST(cnst.UploadURL, logs.AccessLogMiddleware(l, userHandler.UploadAvatar))
 	return r
 }
 
-func (s *userHandler) Bind(user *domain.User, ctx *fasthttp.RequestCtx, logger *zap.Logger) {
+func (s *userHandler) Bind(user *domain.User, ctx *fasthttp.RequestCtx) {
 	if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {
-		logger.Error("error while unmarshalling JSON: ", zap.Error(err))
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
 
 	valid := s.UserUseCase.Validate(user)
 	if !valid {
-		logger.Error("error while validating user")
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
 }
 
 func (s *userHandler) Login(ctx *fasthttp.RequestCtx) {
-	logger := logs.GetLogger()
-
 	user := new(domain.User)
-	s.Bind(user, ctx, logger)
+	s.Bind(user, ctx)
 
 	code, err := s.UserUseCase.Login(user)
 	ctx.SetStatusCode(code)
 	if err != nil {
-		logger.Error("error while logging user in")
 		return
 	}
 
@@ -82,42 +76,24 @@ func (s *userHandler) Login(ctx *fasthttp.RequestCtx) {
 }
 
 func (s *userHandler) Registration(ctx *fasthttp.RequestCtx) {
-	logger := logs.GetLogger()
-	logger.Info(string(ctx.Path()),
-		zap.String("method", string(ctx.Method())),
-		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
-		zap.String("url", string(ctx.Path())),
-	)
 
 	user := new(domain.User)
 
-	s.Bind(user, ctx, logger)
+	s.Bind(user, ctx)
 
 	code, err := s.UserUseCase.Registration(user)
 	ctx.SetStatusCode(code)
 	if err != nil {
-		logger.Error("error while registering user")
 		return
 	}
 
 	с := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
 	newUser, _ := s.UserUseCase.GetByEmail(user.Email)
 	s.CookieHandler.SetCookieAndToken(ctx, с, newUser.Id)
-	logger.Info(string(ctx.Path()),
-		zap.Int("status", ctx.Response.StatusCode()),
-	)
 }
 
 func (s *userHandler) GetProfile(ctx *fasthttp.RequestCtx) {
-	logger := logs.GetLogger()
-	logger.Info(string(ctx.Path()),
-		zap.String("method", string(ctx.Method())),
-		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
-		zap.String("url", string(ctx.Path())),
-	)
-
 	if !s.CookieHandler.CheckCookie(ctx) {
-		logger.Error("user is unauthorized")
 		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
 		return
 	}
@@ -126,7 +102,6 @@ func (s *userHandler) GetProfile(ctx *fasthttp.RequestCtx) {
 
 	foundUser, err := s.CookieHandler.GetUser(hash)
 	if err != nil {
-		logger.Error("unable to determine user")
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
 		return
 	}
@@ -135,32 +110,20 @@ func (s *userHandler) GetProfile(ctx *fasthttp.RequestCtx) {
 
 	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
-	logger.Info(string(ctx.Path()),
-		zap.Int("status", ctx.Response.StatusCode()),
-	)
 }
 
 func (s *userHandler) UpdateProfile(ctx *fasthttp.RequestCtx) {
-	logger := logs.GetLogger()
-	logger.Info(string(ctx.Path()),
-		zap.String("method", string(ctx.Method())),
-		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
-		zap.String("url", string(ctx.Path())),
-	)
-
 	if !s.CookieHandler.CheckCookie(ctx) {
-		logger.Error("user is unauthorized")
 		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
 		return
 	}
 
 	updatedUser := new(domain.User)
-	s.Bind(updatedUser, ctx, logger)
+	s.Bind(updatedUser, ctx)
 
 	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
 	foundUser, err := s.CookieHandler.GetUser(hash)
 	if err != nil {
-		logger.Error("uunable to determine user")
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
 		return
 	}
@@ -168,21 +131,10 @@ func (s *userHandler) UpdateProfile(ctx *fasthttp.RequestCtx) {
 	code, bytes := s.UserUseCase.UpdateProfile(updatedUser, foundUser, hash)
 	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
-	logger.Info(string(ctx.Path()),
-		zap.Int("status", ctx.Response.StatusCode()),
-	)
 }
 
 func (s *userHandler) DeleteProfile(ctx *fasthttp.RequestCtx) {
-	logger := logs.GetLogger()
-	logger.Info(string(ctx.Path()),
-		zap.String("method", string(ctx.Method())),
-		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
-		zap.String("url", string(ctx.Path())),
-	)
-
 	if !s.CookieHandler.CheckCookie(ctx) {
-		logger.Error("user is unauthorized")
 		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
 		return
 	}
@@ -190,7 +142,6 @@ func (s *userHandler) DeleteProfile(ctx *fasthttp.RequestCtx) {
 	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
 	foundUser, err := s.CookieHandler.GetUser(hash)
 	if err != nil {
-		logger.Error("unable to determine user")
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
 		return
 	}
@@ -202,25 +153,13 @@ func (s *userHandler) DeleteProfile(ctx *fasthttp.RequestCtx) {
 	response := map[string]int{"status": fasthttp.StatusOK}
 	bytes, err := json.Marshal(response)
 	if err != nil {
-		logger.Error("error while marshalling JSON: %s", zap.Error(err))
 		return
 	}
 	ctx.Write(bytes)
-	logger.Info(string(ctx.Path()),
-		zap.Int("status", ctx.Response.StatusCode()),
-	)
 }
 
 func (s *userHandler) DeleteProfileByEmail(ctx *fasthttp.RequestCtx) {
-	logger := logs.GetLogger()
-	logger.Info(string(ctx.Path()),
-		zap.String("method", string(ctx.Method())),
-		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
-		zap.String("url", string(ctx.Path())),
-	)
-
 	if !s.CookieHandler.CheckCookie(ctx) {
-		logger.Error("user is unauthorized")
 		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
 		return
 	}
@@ -228,28 +167,16 @@ func (s *userHandler) DeleteProfileByEmail(ctx *fasthttp.RequestCtx) {
 	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
 	foundUser, err := s.CookieHandler.GetUser(hash)
 	if err != nil {
-		logger.Error("uable to determine user")
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
 		return
 	}
 
 	s.UserUseCase.DeleteUserByEmail(foundUser)
 	s.CookieHandler.DeleteCookie(ctx, string(ctx.Request.Header.Cookie(cnst.CookieName)))
-	logger.Info(string(ctx.Path()),
-		zap.Int("status", ctx.Response.StatusCode()),
-	)
 }
 
 func (s *userHandler) Logout(ctx *fasthttp.RequestCtx) {
-	logger := logs.GetLogger()
-	logger.Info(string(ctx.Path()),
-		zap.String("method", string(ctx.Method())),
-		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
-		zap.String("url", string(ctx.Path())),
-	)
-
 	if !s.CookieHandler.CheckCookie(ctx) {
-		logger.Error("user is unauthorized")
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
@@ -260,26 +187,13 @@ func (s *userHandler) Logout(ctx *fasthttp.RequestCtx) {
 	response := map[string]int{"status": fasthttp.StatusOK}
 	bytes, err := json.Marshal(response)
 	if err != nil {
-		logger.Error("error while marshalling JSON: %s", zap.Error(err))
 		return
 	}
 	ctx.Write(bytes)
-
-	logger.Info(string(ctx.Path()),
-		zap.Int("status", ctx.Response.StatusCode()),
-	)
 }
 
 func (s *userHandler) UploadAvatar(ctx *fasthttp.RequestCtx) {
-	logger := logs.GetLogger()
-	logger.Info(string(ctx.Path()),
-		zap.String("method", string(ctx.Method())),
-		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
-		zap.String("url", string(ctx.Path())),
-	)
-
 	if !s.CookieHandler.CheckCookie(ctx) {
-		logger.Error("user is unauthorized")
 		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
 		return
 	}
@@ -287,7 +201,6 @@ func (s *userHandler) UploadAvatar(ctx *fasthttp.RequestCtx) {
 	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
 	foundUser, err := s.CookieHandler.GetUser(hash)
 	if err != nil {
-		logger.Error("user is unauthorized")
 		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
 		return
 	}
@@ -296,14 +209,12 @@ func (s *userHandler) UploadAvatar(ctx *fasthttp.RequestCtx) {
 
 	formFile, err := ctx.FormFile(cnst.FormFileKey)
 	if err != nil {
-		logger.Error("no formfile found")
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
 
 	err = fasthttp.SaveMultipartFile(formFile, cnst.StaticPath+cnst.AvatarDirPath+avatar)
 	if err != nil {
-		logger.Error("unable to save file")
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
@@ -312,7 +223,4 @@ func (s *userHandler) UploadAvatar(ctx *fasthttp.RequestCtx) {
 	code, bytes := s.UserUseCase.AddAvatar(foundUser, avatarURL)
 	ctx.SetStatusCode(code)
 	ctx.Write(bytes)
-	logger.Info(string(ctx.Path()),
-		zap.Int("status", ctx.Response.StatusCode()),
-	)
 }

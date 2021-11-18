@@ -12,7 +12,6 @@ import (
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/valyala/fasthttp"
-	"go.uber.org/zap"
 )
 
 type cookieHandler struct {
@@ -25,8 +24,8 @@ func NewCookieHandler(CookieUseCase domain.CookieUseCase) domain.CookieHandler {
 	}
 }
 
-func CreateDelivery(db *pgxpool.Pool) domain.CookieHandler {
-	cookieLayer := NewCookieHandler(cu.NewCookieUseCase(cr.NewCookieStorage(db)))
+func CreateDelivery(db *pgxpool.Pool, l *logs.Logger) domain.CookieHandler {
+	cookieLayer := NewCookieHandler(cu.NewCookieUseCase(cr.NewCookieStorage(db), l))
 	return cookieLayer
 }
 
@@ -60,12 +59,8 @@ func (s *cookieHandler) DeleteCookie(ctx *fasthttp.RequestCtx, cookie string) {
 }
 
 func (s *cookieHandler) CheckCookie(ctx *fasthttp.RequestCtx) bool {
-	logger := logs.GetLogger()
 	cookieHash := string(ctx.Request.Header.Cookie(cnst.CookieName))
 	_, err := s.CookieUseCase.Get(cookieHash)
-	if err != nil {
-		logger.Error("unable to find cookie")
-	}
 	return err == nil
 }
 
@@ -74,18 +69,10 @@ func (s *cookieHandler) GetUser(cookie string) (user domain.User, err error) {
 }
 
 func setToken(ctx *fasthttp.RequestCtx, hash string) {
-	logger := logs.GetLogger()
-
 	t := ent.Token{
 		Token: hash,
 	}
 
-	bytes, err := json.Marshal(t)
-	if err != nil {
-		logger.Error("error while marshalling JSON: ", zap.Error(err))
-		ctx.Write([]byte("{}"))
-		return
-	}
-
+	bytes, _ := json.Marshal(t)
 	ctx.Write(bytes)
 }

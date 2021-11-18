@@ -106,15 +106,15 @@ func TestHandler_Login(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
-		logs.BuildLogger()
+		l := logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
-		cookieLayer := cd.CreateDelivery(SetUpDB())
-		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+		cookieLayer := cd.CreateDelivery(SetUpDB(), &l)
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo, &l), cookieLayer)
 		userLayer.Login(ctx)
 
 		assert.Equal(t, ctx.Response.Header.StatusCode(), tc.expectedStatusCode)
@@ -179,15 +179,15 @@ func TestHandler_Register(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
-		logs.BuildLogger()
+		l := logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
-		cookieLayer := cd.CreateDelivery(SetUpDB())
-		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+		cookieLayer := cd.CreateDelivery(SetUpDB(), &l)
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo, &l), cookieLayer)
 		userLayer.Registration(ctx)
 
 		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
@@ -214,15 +214,15 @@ func TestHandler_Logout(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
-		logs.BuildLogger()
+		l := logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
-		cookieLayer := cd.CreateDelivery(SetUpDB())
-		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+		cookieLayer := cd.CreateDelivery(SetUpDB(), &l)
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo, &l), cookieLayer)
 		userLayer.Logout(ctx)
 
 		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
@@ -263,7 +263,7 @@ func TestHandler_Logout2(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
-		logs.BuildLogger()
+		l := logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
@@ -273,8 +273,8 @@ func TestHandler_Logout2(t *testing.T) {
 
 		cookieRepo := service_mocks.NewMockCookieStorage(c)
 		cookie := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(user.Email)))
-		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
-		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo, &l))
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo, &l), cookieLayer)
 
 		ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
 		mockGetUser(cookieRepo, cookie, user)
@@ -307,15 +307,15 @@ func TestHandler_GetProfile(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
-		logs.BuildLogger()
+		l := logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
-		cookieLayer := cd.CreateDelivery(SetUpDB())
-		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+		cookieLayer := cd.CreateDelivery(SetUpDB(), &l)
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo, &l), cookieLayer)
 
 		userLayer.GetProfile(ctx)
 
@@ -350,7 +350,7 @@ func TestHandler_GetProfile2(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
-		logs.BuildLogger()
+		l := logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
@@ -362,8 +362,8 @@ func TestHandler_GetProfile2(t *testing.T) {
 		ctx.Request.AppendBody([]byte(tc.inputBody))
 		ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
 
-		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
-		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo, &l))
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo, &l), cookieLayer)
 
 		userLayer.GetProfile(ctx)
 
@@ -393,15 +393,15 @@ func TestHandler_UpdateProfile(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
-		logs.BuildLogger()
+		l := logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
-		cookieLayer := cd.CreateDelivery(SetUpDB())
-		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+		cookieLayer := cd.CreateDelivery(SetUpDB(), &l)
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo, &l), cookieLayer)
 
 		userLayer.UpdateProfile(ctx)
 
@@ -443,7 +443,7 @@ func TestHandler_UpdateProfile2(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
-		logs.BuildLogger()
+		l := logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
@@ -456,8 +456,8 @@ func TestHandler_UpdateProfile2(t *testing.T) {
 		mockGetUser(cookieRepo, cookie, user)
 		ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
 
-		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
-		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo, &l))
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo, &l), cookieLayer)
 
 		userLayer.UpdateProfile(ctx)
 
@@ -488,15 +488,15 @@ func TestHandler_DeleteProfile(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
-		logs.BuildLogger()
+		l := logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
-		cookieLayer := cd.CreateDelivery(SetUpDB())
-		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+		cookieLayer := cd.CreateDelivery(SetUpDB(), &l)
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo, &l), cookieLayer)
 
 		userLayer.DeleteProfile(ctx)
 
@@ -533,7 +533,7 @@ func TestHandler_DeleteProfile2(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
-		logs.BuildLogger()
+		l := logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
@@ -546,8 +546,8 @@ func TestHandler_DeleteProfile2(t *testing.T) {
 		ctx.Request.AppendBody([]byte(tc.inputBody))
 		ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
 
-		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
-		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo, &l))
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo, &l), cookieLayer)
 
 		userLayer.DeleteProfile(ctx)
 
@@ -584,7 +584,7 @@ func TestHandler_DeleteProfileByEmail2(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
-		logs.BuildLogger()
+		l := logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
@@ -598,8 +598,8 @@ func TestHandler_DeleteProfileByEmail2(t *testing.T) {
 
 		ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
 
-		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
-		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo, &l))
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo, &l), cookieLayer)
 
 		userLayer.DeleteProfileByEmail(ctx)
 
@@ -630,15 +630,15 @@ func TestHandler_DeleteProfileByEmail(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
-		logs.BuildLogger()
+		l := logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
-		cookieLayer := cd.CreateDelivery(SetUpDB())
-		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+		cookieLayer := cd.CreateDelivery(SetUpDB(), &l)
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo, &l), cookieLayer)
 		userLayer.DeleteProfileByEmail(ctx)
 
 		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
@@ -668,15 +668,15 @@ func TestHandler_UploadAvatar(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
-		logs.BuildLogger()
+		l := logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
 
 		ctx.Request.SetBody(nil)
 		ctx.Request.AppendBody([]byte(tc.inputBody))
-		cookieLayer := cd.CreateDelivery(SetUpDB())
-		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+		cookieLayer := cd.CreateDelivery(SetUpDB(), &l)
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo, &l), cookieLayer)
 		userLayer.UploadAvatar(ctx)
 
 		assert.Equal(t, tc.expectedStatusCode, ctx.Response.Header.StatusCode())
@@ -725,7 +725,7 @@ func TestHandler_UploadAvatar2(t *testing.T) {
 	for _, tc := range tests {
 		c := gomock.NewController(t)
 		defer c.Finish()
-		logs.BuildLogger()
+		l := logs.BuildLogger()
 
 		repo := service_mocks.NewMockUserStorage(c)
 		tc.mockBehavior(repo, tc.inputUser)
@@ -737,8 +737,8 @@ func TestHandler_UploadAvatar2(t *testing.T) {
 		ctx.Request.AppendBody([]byte(tc.inputBody))
 		ctx.Request.Header.SetCookie(cnst.CookieName, cookie)
 
-		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo))
-		userLayer := NewUserHandler(uu.NewUserUseCase(repo), cookieLayer)
+		cookieLayer := cd.NewCookieHandler(cu.NewCookieUseCase(cookieRepo, &l))
+		userLayer := NewUserHandler(uu.NewUserUseCase(repo, &l), cookieLayer)
 
 		userLayer.UploadAvatar(ctx)
 

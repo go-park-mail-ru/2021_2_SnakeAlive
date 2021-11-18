@@ -13,7 +13,6 @@ import (
 	"github.com/fasthttp/router"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/valyala/fasthttp"
-	"go.uber.org/zap"
 )
 
 type placeHandler struct {
@@ -26,27 +25,24 @@ func NewPlaceHandler(PlaceUseCase domain.PlaceUseCase) domain.PlaceHandler {
 	}
 }
 
-func CreateDelivery(db *pgxpool.Pool) domain.PlaceHandler {
-	placeLayer := NewPlaceHandler(pu.NewPlaceUseCase(pr.NewPlaceStorage(db)))
+func CreateDelivery(db *pgxpool.Pool, l *logs.Logger) domain.PlaceHandler {
+	placeLayer := NewPlaceHandler(pu.NewPlaceUseCase(pr.NewPlaceStorage(db), l))
 	return placeLayer
 }
 
-func SetUpPlaceRouter(db *pgxpool.Pool, r *router.Router) *router.Router {
-	placeHandler := CreateDelivery(db)
-	r.GET(cnst.SightsByCountruURL, logs.AccessLogMiddleware(placeHandler.PlacesByCountry))
-	r.GET(cnst.SightURL, logs.AccessLogMiddleware(placeHandler.Place))
+func SetUpPlaceRouter(db *pgxpool.Pool, r *router.Router, l *logs.Logger) *router.Router {
+	placeHandler := CreateDelivery(db, l)
+	r.GET(cnst.SightsByCountruURL, logs.AccessLogMiddleware(l, placeHandler.PlacesByCountry))
+	r.GET(cnst.SightURL, logs.AccessLogMiddleware(l, placeHandler.Place))
 	return r
 }
 
 func (s *placeHandler) PlacesByCountry(ctx *fasthttp.RequestCtx) {
-	logger := logs.GetLogger()
-
 	param, _ := ctx.UserValue("name").(string)
 	trans := entities.CountryTrans[param]
 	bytes, err := s.PlaceUseCase.GetPlacesByCountry(trans)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
-		logger.Error("error while getting list of places: ", zap.Error(err))
 		ctx.Write([]byte("{}"))
 		return
 	}
@@ -56,18 +52,14 @@ func (s *placeHandler) PlacesByCountry(ctx *fasthttp.RequestCtx) {
 }
 
 func (s *placeHandler) Place(ctx *fasthttp.RequestCtx) {
-	logger := logs.GetLogger()
-
 	param, err := strconv.Atoi(ctx.UserValue("id").(string))
 	if err != nil {
-		logger.Error("error while getting sid param: ", zap.Error(err))
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
 
 	sight, err := s.PlaceUseCase.GetById(param)
 	if err != nil {
-		logger.Error("error while getting sight: ", zap.Error(err))
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
 		return
 	}

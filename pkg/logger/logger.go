@@ -6,9 +6,11 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-var logger *zap.Logger
+type Logger struct {
+	Logger *zap.Logger
+}
 
-func BuildLogger() {
+func BuildLogger() Logger {
 	var zapCfg = zap.NewProductionConfig()
 	zapCfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 
@@ -17,16 +19,14 @@ func BuildLogger() {
 		panic(err)
 	}
 
-	logger = log
+	var logs Logger
+	logs.Logger = log
+	return logs
 }
 
-func GetLogger() *zap.Logger {
-	return logger
-}
-
-func AccessLogMiddleware(handler func(ctx *fasthttp.RequestCtx)) func(ctx *fasthttp.RequestCtx) {
+func AccessLogMiddleware(l *Logger, handler func(ctx *fasthttp.RequestCtx)) func(ctx *fasthttp.RequestCtx) {
 	return func(ctx *fasthttp.RequestCtx) {
-		logger.Info(string(ctx.Path()),
+		l.Logger.Info(string(ctx.Path()),
 			zap.String("method", string(ctx.Method())),
 			zap.String("remote_addr", string(ctx.RemoteAddr().String())),
 			zap.String("url", string(ctx.Path())),
@@ -34,7 +34,7 @@ func AccessLogMiddleware(handler func(ctx *fasthttp.RequestCtx)) func(ctx *fasth
 
 		handler(ctx)
 
-		logger.Info(string(ctx.Path()),
+		l.Logger.Info(string(ctx.Path()),
 			zap.Int("status", ctx.Response.StatusCode()),
 		)
 	}

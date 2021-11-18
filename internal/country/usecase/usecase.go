@@ -9,25 +9,29 @@ import (
 	"go.uber.org/zap"
 )
 
-func NewCountryUseCase(countryStorage domain.CountryStorage) domain.CountryUseCase {
-	return countryUsecase{countryStorage: countryStorage}
+func NewCountryUseCase(countryStorage domain.CountryStorage, l *logs.Logger) domain.CountryUseCase {
+	return countryUsecase{
+		countryStorage: countryStorage,
+		l:              l,
+	}
 }
 
 type countryUsecase struct {
 	countryStorage domain.CountryStorage
+	l              *logs.Logger
 }
 
 func (u countryUsecase) GetCountriesList() (int, []byte) {
-	logger := logs.GetLogger()
 	var code int
 	countries, err := u.countryStorage.GetCountriesList()
 	if err != nil {
-		logger.Error("error while GetCountriesList: ", zap.Error(err))
+		u.l.Logger.Error("error while GetCountriesList: ", zap.Error(err))
 		code = fasthttp.StatusInternalServerError
 	}
+
 	bytes, err := json.Marshal(countries)
 	if err != nil {
-		logger.Error("error while marshalling JSON: ", zap.Error(err))
+		u.l.Logger.Error("error while marshalling JSON: ", zap.Error(err))
 		code = fasthttp.StatusInternalServerError
 	}
 	code = fasthttp.StatusOK
@@ -35,12 +39,11 @@ func (u countryUsecase) GetCountriesList() (int, []byte) {
 }
 
 func (u countryUsecase) GetById(id int) (int, []byte) {
-	logger := logs.GetLogger()
 	var code int
 	code = fasthttp.StatusOK
 	country, err := u.countryStorage.GetById(id)
 	if err != nil {
-		logger.Error("error while GetById: ", zap.Error(err))
+		u.l.Logger.Error("error while GetById: ", zap.Error(err))
 		code = fasthttp.StatusNotFound
 		return code, []byte("{}")
 	}
@@ -50,7 +53,7 @@ func (u countryUsecase) GetById(id int) (int, []byte) {
 	}
 	bytes, err := json.Marshal(country)
 	if err != nil {
-		logger.Error("error while marshalling JSON: ", zap.Error(err))
+		u.l.Logger.Error("error while marshalling JSON: ", zap.Error(err))
 		code = fasthttp.StatusInternalServerError
 	}
 
@@ -58,12 +61,11 @@ func (u countryUsecase) GetById(id int) (int, []byte) {
 }
 
 func (u countryUsecase) GetByName(name string) (int, []byte) {
-	logger := logs.GetLogger()
 	var code int
 	code = fasthttp.StatusOK
 	country, err := u.countryStorage.GetByName(name)
 	if err != nil {
-		logger.Error("error while GetByName: ", zap.Error(err))
+		u.l.Logger.Error("error while GetByName: ", zap.Error(err))
 		code = fasthttp.StatusNotFound
 		return code, []byte("{}")
 	}
@@ -73,7 +75,7 @@ func (u countryUsecase) GetByName(name string) (int, []byte) {
 	}
 	bytes, err := json.Marshal(country)
 	if err != nil {
-		logger.Error("error while marshalling JSON: ", zap.Error(err))
+		u.l.Logger.Error("error while marshalling JSON: ", zap.Error(err))
 		code = fasthttp.StatusInternalServerError
 	}
 	return code, bytes

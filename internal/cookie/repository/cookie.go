@@ -3,7 +3,6 @@ package cookieRepository
 import (
 	"context"
 	"snakealive/m/internal/domain"
-	logs "snakealive/m/pkg/logger"
 
 	pgxpool "github.com/jackc/pgx/v4/pgxpool"
 )
@@ -25,11 +24,8 @@ const GetCookieQuery = `SELECT U.id, U.name, U.surname, U.password, U.email, U.d
 const DeleteCookieQuery = `DELETE FROM Cookies WHERE hash = $1`
 
 func (c *cookieStorage) Add(key string, userId int) error {
-	logger := logs.GetLogger()
-
 	conn, err := c.dataHolder.Acquire(context.Background())
 	if err != nil {
-		logger.Error("error while aquiring connection")
 		return err
 	}
 	defer conn.Release()
@@ -43,11 +39,9 @@ func (c *cookieStorage) Add(key string, userId int) error {
 }
 
 func (c *cookieStorage) Get(value string) (user domain.User, err error) {
-	logger := logs.GetLogger()
 
 	conn, err := c.dataHolder.Acquire(context.Background())
 	if err != nil {
-		logger.Error("error while aquiring connection")
 		return user, err
 	}
 	defer conn.Release()
@@ -61,11 +55,8 @@ func (c *cookieStorage) Get(value string) (user domain.User, err error) {
 
 }
 func (c *cookieStorage) Delete(value string) error {
-	logger := logs.GetLogger()
-
 	conn, err := c.dataHolder.Acquire(context.Background())
 	if err != nil {
-		logger.Error("error while aquiring connection")
 		return err
 	}
 	defer conn.Release()
