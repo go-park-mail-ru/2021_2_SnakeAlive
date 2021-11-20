@@ -19,7 +19,7 @@ var (
 
 var (
 	PreparedAuthErrors = map[codes.Code]error_adapter.HttpError{
-		codes.NotFound: error_adapter.HttpError{
+		codes.NotFound: {
 			MSG:  "пользователь не авторизован",
 			Code: http.StatusUnauthorized,
 		},
@@ -30,7 +30,7 @@ var (
 	}
 
 	UserGatewayError = map[codes.Code]error_adapter.HttpError{
-		codes.NotFound: error_adapter.HttpError{
+		codes.NotFound: {
 			MSG:  "запись отсутствует",
 			Code: http.StatusNotFound,
 		},
