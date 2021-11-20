@@ -29,7 +29,7 @@ func SetupRouter(cfg RouterConfig) (r *router.Router) {
 	r.DELETE(cnst.LogoutURL, lgrMw(authMw(cfg.UserDelivery.Logout)))
 	r.GET(cnst.ProfileURL, lgrMw(authMw(cfg.UserDelivery.GetProfile)))
 	r.PATCH(cnst.ProfileURL, lgrMw(authMw(cfg.UserDelivery.UpdateProfile)))
-	r.POST(cnst.RegisterURL, lgrMw(authMw(cfg.UserDelivery.Register)))
+	r.POST(cnst.RegisterURL, lgrMw(cfg.UserDelivery.Register))
 
 	return
 }
