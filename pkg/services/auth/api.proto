@@ -66,6 +66,7 @@ message UpdateUserRequest {
   string email = 4;
   string description = 5;
   string password = 6;
+  string image = 7;
 }
 
 message Session {

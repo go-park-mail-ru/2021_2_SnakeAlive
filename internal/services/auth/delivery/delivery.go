@@ -13,6 +13,7 @@ import (
 type authDelivery struct {
 	authUsecase  usecase.AuthUseCase
 	errorAdapter error_adapter.ErrorAdapter
+	auth_service.UnimplementedAuthServiceServer
 }
 
 func (a authDelivery) ValidateSession(ctx context.Context, session *auth_service.Session) (*auth_service.ValidateSessionResponse, error) {
@@ -82,6 +83,7 @@ func (a authDelivery) UpdateUser(ctx context.Context, request *auth_service.Upda
 		Surname:     request.Surname,
 		Email:       request.Email,
 		Password:    request.Password,
+		Image:       request.Image,
 		Description: request.Description,
 	})
 	if err != nil {

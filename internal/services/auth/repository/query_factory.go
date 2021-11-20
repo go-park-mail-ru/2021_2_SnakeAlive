@@ -68,6 +68,10 @@ func (q *queryFactory) CreateUpdateUser(user *models.User) *query.Query {
 		params = append(params, user.Description)
 		optionals = append(optionals, updateUserDescription)
 	}
+	if user.Image != "" {
+		params = append(params, user.Image)
+		optionals = append(optionals, updateUserAvater)
+	}
 
 	return &query.Query{
 		Request: updateUserRequest + strings.Join(optionals, ",") + " " + updateUserReturning,

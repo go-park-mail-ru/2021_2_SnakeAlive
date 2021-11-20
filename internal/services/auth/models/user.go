@@ -12,5 +12,5 @@ type User struct {
 
 type Session struct {
 	Cookie string
-	Token string
+	Token  string
 }

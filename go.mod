@@ -18,12 +18,14 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.6.0
+	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.16
 	github.com/mwitkow/go-proto-validators v0.3.2
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	github.com/twinj/uuid v1.0.0
 	go.uber.org/zap v1.13.0
+	google.golang.org/genproto v0.0.0-20210903162649-d08c68adba83
 	google.golang.org/grpc v1.40.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0
 	google.golang.org/protobuf v1.27.1

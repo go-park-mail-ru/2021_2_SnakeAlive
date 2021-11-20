@@ -116,6 +116,12 @@ func (a *authRepository) RemoveUserSession(ctx context.Context, hash string) err
 	return nil
 }
 
-func NewAuthRepostory() AuthRepository {
-	return &authRepository{}
+func NewAuthRepository(
+	queryFactory QueryFactory,
+	conn *pgxpool.Pool,
+) AuthRepository {
+	return &authRepository{
+		queryFactory: queryFactory,
+		conn:         conn,
+	}
 }
