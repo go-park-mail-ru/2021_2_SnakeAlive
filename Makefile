@@ -3,7 +3,6 @@ protogen-api-with-validator:
     		-I. 								\
     		-I./third_party 								\
     		-I./third_party/googleapis 								\
-    		-I./third_party/grpc-gateway/v2 								\
     		--go_out=. --go_opt=paths=source_relative 				\
 			--go-grpc_out=. --go-grpc_opt=paths=source_relative \
     		--validate_out=lang=go,paths=source_relative:. \
