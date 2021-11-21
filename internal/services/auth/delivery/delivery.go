@@ -16,7 +16,7 @@ type authDelivery struct {
 	auth_service.UnimplementedAuthServiceServer
 }
 
-func (a authDelivery) ValidateSession(ctx context.Context, session *auth_service.Session) (*auth_service.ValidateSessionResponse, error) {
+func (a *authDelivery) ValidateSession(ctx context.Context, session *auth_service.Session) (*auth_service.ValidateSessionResponse, error) {
 	response, err := a.authUsecase.ValidateSession(ctx, session.Cookie)
 	if err != nil {
 		return nil, a.errorAdapter.AdaptError(err)
@@ -25,11 +25,11 @@ func (a authDelivery) ValidateSession(ctx context.Context, session *auth_service
 	return &auth_service.ValidateSessionResponse{UserId: response}, nil
 }
 
-func (a authDelivery) LogoutUser(ctx context.Context, session *auth_service.Session) (*empty.Empty, error) {
+func (a *authDelivery) LogoutUser(ctx context.Context, session *auth_service.Session) (*empty.Empty, error) {
 	return &empty.Empty{}, a.authUsecase.LogoutUser(ctx, session.Cookie)
 }
 
-func (a authDelivery) LoginUser(ctx context.Context, request *auth_service.LoginRequest) (*auth_service.LoginResponse, error) {
+func (a *authDelivery) LoginUser(ctx context.Context, request *auth_service.LoginRequest) (*auth_service.LoginResponse, error) {
 	response, err := a.authUsecase.LoginUser(ctx, &models.User{
 		Email:    request.Email,
 		Password: request.Password,
@@ -44,7 +44,7 @@ func (a authDelivery) LoginUser(ctx context.Context, request *auth_service.Login
 	}, nil
 }
 
-func (a authDelivery) RegisterUser(ctx context.Context, request *auth_service.RegisterRequest) (*auth_service.LoginResponse, error) {
+func (a *authDelivery) RegisterUser(ctx context.Context, request *auth_service.RegisterRequest) (*auth_service.LoginResponse, error) {
 	response, err := a.authUsecase.RegisterUser(ctx, &models.User{
 		Name:     request.Name,
 		Surname:  request.Surname,
@@ -61,7 +61,7 @@ func (a authDelivery) RegisterUser(ctx context.Context, request *auth_service.Re
 	}, nil
 }
 
-func (a authDelivery) GetUser(ctx context.Context, request *auth_service.GetUserRequest) (*auth_service.GetUserResponse, error) {
+func (a *authDelivery) GetUser(ctx context.Context, request *auth_service.GetUserRequest) (*auth_service.GetUserResponse, error) {
 	response, err := a.authUsecase.GetUser(ctx, request.Id)
 	if err != nil {
 		return nil, a.errorAdapter.AdaptError(err)
@@ -76,7 +76,7 @@ func (a authDelivery) GetUser(ctx context.Context, request *auth_service.GetUser
 	}, nil
 }
 
-func (a authDelivery) UpdateUser(ctx context.Context, request *auth_service.UpdateUserRequest) (*auth_service.GetUserResponse, error) {
+func (a *authDelivery) UpdateUser(ctx context.Context, request *auth_service.UpdateUserRequest) (*auth_service.GetUserResponse, error) {
 	response, err := a.authUsecase.UpdateUser(ctx, &models.User{
 		ID:          request.Id,
 		Name:        request.Name,

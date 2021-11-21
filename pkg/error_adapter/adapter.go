@@ -7,7 +7,7 @@ type errorAdapter struct {
 	errorMap map[error]error
 }
 
-func (e errorAdapter) AdaptError(err error) error {
+func (e *errorAdapter) AdaptError(err error) error {
 	if adapted, exist := e.errorMap[err]; exist {
 		return adapted
 	}

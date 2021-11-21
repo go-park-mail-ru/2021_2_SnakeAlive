@@ -19,8 +19,8 @@ type Config struct {
 	Logger *zap.Logger
 }
 
-func (c Config) Setup() error {
-	if err := envconfig.Process("GATEWAY", &c); err != nil {
+func (c *Config) Setup() error {
+	if err := envconfig.Process("GATEWAY", c); err != nil {
 		return err
 	}
 
