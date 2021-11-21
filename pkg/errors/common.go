@@ -8,6 +8,9 @@ var (
 	WrongUserPassword   = errors.New("wrong user password")
 )
 
+var DeniedAccess = errors.New("user doesn't have permission for this action")
+var TripNotFound = errors.New("trip not found")
+
 var (
 	GatewayErrorMsgSessionNotFound = "сессия отсутствует"
 )

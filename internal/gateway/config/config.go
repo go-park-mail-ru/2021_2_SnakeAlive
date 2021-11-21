@@ -3,13 +3,15 @@ package config
 import (
 	"context"
 
+	logs "snakealive/m/pkg/logger"
+
 	"github.com/kelseyhightower/envconfig"
 	"go.uber.org/zap"
-	logs "snakealive/m/pkg/logger"
 )
 
 type Config struct {
 	AuthServiceEndpoint string `envconfig:"AUTH_ENDPOINT" required:"true"`
+	TripServiceEndpoint string `envconfig:"TRIP_ENDPOINT" required:"true"`
 	HTTPPort            string `envconfig:"HTTP_PORT" required:"true"`
 
 	Ctx    context.Context

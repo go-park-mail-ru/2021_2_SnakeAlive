@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package services.trip_service;
+option go_package = "snakealive/m/pkg/services/trip;trip_service";
+
+import "third_party/go-proto-validators/validator.proto";
+import "google/protobuf/empty.proto";
+
+message TripRequest {
+    int64 trip_id = 1 [(validate.rules).int64 = {
+        gt: 0,
+    }];
+    int64 user_id = 2 [(validate.rules).int64 = {
+        gt: 0,
+    }];
+}
+
+message Sight {
+    int64 id = 1 [(validate.rules).int64 = {
+        gt: 0,
+    }];
+	string name = 2 [(validate.rules).string = {
+        min_len: 1,
+        min_bytes: 1,
+    }];
+	string country = 3 [(validate.rules).string = {
+        min_len: 1,
+        min_bytes: 1,
+    }];
+	float rating = 4;
+	repeated string tags = 5;
+	string description = 6;
+	repeated string photos = 7;
+}
+
+message Day {
+    repeated Sight sights = 1;
+}
+
+message Trip {
+    int64 id = 1 [(validate.rules).int64 = {
+        gt: 0,
+    }];
+	string title = 2 [(validate.rules).string = {
+        min_len: 1,
+        min_bytes: 1,
+    }];
+	string description = 3;
+	repeated Day days = 4;
+}
+
+message ModifyTripRequest {
+    Trip trip = 1;
+    int64 user_id = 2 [(validate.rules).int64 = {
+        gt: 0,
+    }];
+}
+
+service TripService {
+    rpc GetTrip(TripRequest) returns (Trip) {}
+	rpc AddTrip(ModifyTripRequest) returns (Trip) {}
+	rpc Update(ModifyTripRequest) returns (Trip) {}
+	rpc Delete(TripRequest) returns (google.protobuf.Empty) {}
+}

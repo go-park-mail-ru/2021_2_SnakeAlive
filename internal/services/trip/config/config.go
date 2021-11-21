@@ -10,9 +10,8 @@ import (
 )
 
 type Config struct {
-	DBUrl     string `envconfig:"USER_DB_URL" required:"true"`
-	GRPCPort  string `envconfig:"USER_GRPC_PORT" required:"true"`
-	PrefixLen int    `envconfig:"PREFIX_LEN" required:"true"`
+	DBUrl    string `envconfig:"TRIP_DB_URL" required:"true"`
+	GRPCPort string `envconfig:"TRIP_GRPC_PORT" required:"true"`
 
 	Ctx    context.Context
 	Cancel func()
