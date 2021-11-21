@@ -20,12 +20,12 @@ protogen-all-service:
 	make protogen-api-trip-service
 
 prepare-auth_service-env:
-	export USER_DB_URL="postgres://localhost:5432/tripadvisor" && \
-			export USER_GRPC_PORT=":10123" && export USER_PREFIX_LEN="0"
+	export USER_DB_URL="postgres://tripadvisor:12345@localhost:5432/tripadvisor" && \
+			export USER_GRPC_PORT="10123" && export USER_PREFIX_LEN="0"
 
 
 prepare-trip_service-env:
-	export TRIP_DB_URL="postgres://localhost:5432/tripadvisor" && \
+	export TRIP_DB_URL="postgres://tripadvisor:12345@localhost:5432/tripadvisor" && \
 			export TRIP_GRPC_PORT="6666"
 
 prepare-gateway-env:

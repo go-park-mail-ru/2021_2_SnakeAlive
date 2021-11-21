@@ -16,17 +16,9 @@ message TripRequest {
 }
 
 message Sight {
-    int64 id = 1 [(validate.rules).int64 = {
-        gt: 0,
-    }];
-	string name = 2 [(validate.rules).string = {
-        min_len: 1,
-        min_bytes: 1,
-    }];
-	string country = 3 [(validate.rules).string = {
-        min_len: 1,
-        min_bytes: 1,
-    }];
+    int64 id = 1;
+	string name = 2;
+	string country = 3;
 	float rating = 4;
 	repeated string tags = 5;
 	string description = 6;
@@ -38,9 +30,7 @@ message Day {
 }
 
 message Trip {
-    int64 id = 1 [(validate.rules).int64 = {
-        gt: 0,
-    }];
+    int64 id = 1;
 	string title = 2 [(validate.rules).string = {
         min_len: 1,
         min_bytes: 1,

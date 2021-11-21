@@ -176,60 +176,11 @@ func (m *Sight) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetId() <= 0 {
-		err := SightValidationError{
-			field:  "Id",
-			reason: "value must be greater than 0",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Id
 
-	if utf8.RuneCountInString(m.GetName()) < 1 {
-		err := SightValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Name
 
-	if len(m.GetName()) < 1 {
-		err := SightValidationError{
-			field:  "Name",
-			reason: "value length must be at least 1 bytes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if utf8.RuneCountInString(m.GetCountry()) < 1 {
-		err := SightValidationError{
-			field:  "Country",
-			reason: "value length must be at least 1 runes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
-
-	if len(m.GetCountry()) < 1 {
-		err := SightValidationError{
-			field:  "Country",
-			reason: "value length must be at least 1 bytes",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Country
 
 	// no validation rules for Rating
 
@@ -463,16 +414,7 @@ func (m *Trip) validate(all bool) error {
 
 	var errors []error
 
-	if m.GetId() <= 0 {
-		err := TripValidationError{
-			field:  "Id",
-			reason: "value must be greater than 0",
-		}
-		if !all {
-			return err
-		}
-		errors = append(errors, err)
-	}
+	// no validation rules for Id
 
 	if utf8.RuneCountInString(m.GetTitle()) < 1 {
 		err := TripValidationError{

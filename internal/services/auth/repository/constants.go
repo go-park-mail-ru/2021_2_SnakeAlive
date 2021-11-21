@@ -1,9 +1,9 @@
 package repository
 
 const (
-	getUserByEmailRequest = "SELECT id, password FROM Users WHERE email = ?;"
-	getUserByIDRequest    = "SELECT name, surname, email, avatar, description FROM Users WHERE id =?;"
-	createUserRequest     = "INSERT INTO Users (name, surname, email, password) VALUES (?,?,?,?) RETURNING id;"
+	getUserByEmailRequest = "SELECT id, password FROM Users WHERE email = $1"
+	getUserByIDRequest    = "SELECT name, surname, email, avatar, description FROM Users WHERE id = $1"
+	createUserRequest     = "INSERT INTO Users (name, surname, email, password) VALUES ($1,$2,$3,$4) RETURNING id"
 	updateUserRequest     = "UPDATE Users WHERE id = ? SET "
 	updateUserName        = "name=?"
 	updateUserSurname     = "surname=?"
@@ -12,7 +12,7 @@ const (
 	updateUserDescription = "description=?"
 	updateUserAvater      = "avatar=?"
 	updateUserReturning   = "RETURNING name, surname, email, avatar, description;"
-	createUserSession     = "INSERT INTO Cookies (user_id, hash) VALUES (?, ?);"
-	validateUserSession   = "SELECT user_id FROM Cookies WHERE hash = ?;"
-	removeUserSession     = "DELETE FROM Cookies WHERE hash = ?;"
+	createUserSession     = "INSERT INTO Cookies (user_id, hash) VALUES ($1, $2)"
+	validateUserSession   = "SELECT user_id FROM Cookies WHERE hash = $1"
+	removeUserSession     = "DELETE FROM Cookies WHERE hash = $1"
 )
