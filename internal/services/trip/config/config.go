@@ -10,8 +10,8 @@ import (
 )
 
 type Config struct {
-	DBUrl    string `envconfig:"TRIP_DB_URL" required:"true"`
-	GRPCPort string `envconfig:"TRIP_GRPC_PORT" required:"true"`
+	DBUrl    string `envconfig:"DB_URL" required:"true"`
+	GRPCPort string `envconfig:"GRPC_PORT" required:"true"`
 
 	Ctx    context.Context
 	Cancel func()
@@ -19,7 +19,7 @@ type Config struct {
 }
 
 func (c Config) Setup() error {
-	if err := envconfig.Process("USER", &c); err != nil {
+	if err := envconfig.Process("TRIP", &c); err != nil {
 		return err
 	}
 
