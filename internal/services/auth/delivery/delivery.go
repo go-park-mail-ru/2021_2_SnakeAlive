@@ -19,7 +19,7 @@ type authDelivery struct {
 func (a *authDelivery) ValidateSession(ctx context.Context, session *auth_service.Session) (*auth_service.ValidateSessionResponse, error) {
 	response, err := a.authUsecase.ValidateSession(ctx, session.Cookie)
 	if err != nil {
-		return nil, a.errorAdapter.AdaptError(err)
+		return &auth_service.ValidateSessionResponse{}, a.errorAdapter.AdaptError(err)
 	}
 
 	return &auth_service.ValidateSessionResponse{UserId: response}, nil
@@ -35,7 +35,7 @@ func (a *authDelivery) LoginUser(ctx context.Context, request *auth_service.Logi
 		Password: request.Password,
 	})
 	if err != nil {
-		return nil, a.errorAdapter.AdaptError(err)
+		return &auth_service.LoginResponse{}, a.errorAdapter.AdaptError(err)
 	}
 
 	return &auth_service.LoginResponse{
@@ -52,7 +52,7 @@ func (a *authDelivery) RegisterUser(ctx context.Context, request *auth_service.R
 		Password: request.Password,
 	})
 	if err != nil {
-		return nil, a.errorAdapter.AdaptError(err)
+		return &auth_service.LoginResponse{}, a.errorAdapter.AdaptError(err)
 	}
 
 	return &auth_service.LoginResponse{
@@ -64,7 +64,7 @@ func (a *authDelivery) RegisterUser(ctx context.Context, request *auth_service.R
 func (a *authDelivery) GetUser(ctx context.Context, request *auth_service.GetUserRequest) (*auth_service.GetUserResponse, error) {
 	response, err := a.authUsecase.GetUser(ctx, request.Id)
 	if err != nil {
-		return nil, a.errorAdapter.AdaptError(err)
+		return &auth_service.GetUserResponse{}, a.errorAdapter.AdaptError(err)
 	}
 
 	return &auth_service.GetUserResponse{
@@ -87,7 +87,7 @@ func (a *authDelivery) UpdateUser(ctx context.Context, request *auth_service.Upd
 		Description: request.Description,
 	})
 	if err != nil {
-		return nil, a.errorAdapter.AdaptError(err)
+		return &auth_service.GetUserResponse{}, a.errorAdapter.AdaptError(err)
 	}
 
 	return &auth_service.GetUserResponse{

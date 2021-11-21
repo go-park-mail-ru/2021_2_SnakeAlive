@@ -25,7 +25,7 @@ func SetupServer(cfg config.Config) (server *grpc.Server, cancel func(), err err
 	}
 
 	authRepo := repository.NewLoggingMiddleware(
-		cfg.Logger,
+		cfg.Logger.Sugar(),
 		repository.NewAuthRepository(
 			repository.NewQueryFactory(), conn,
 		),
