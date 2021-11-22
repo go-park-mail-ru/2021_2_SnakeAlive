@@ -30,7 +30,7 @@ func SetUpRouter(db *pgxpool.Pool) *router.Router {
 
 func corsMiddleware(handler func(ctx *fasthttp.RequestCtx)) func(ctx *fasthttp.RequestCtx) {
 	return func(ctx *fasthttp.RequestCtx) {
-		ctx.Response.Header.Set("Access-Control-Allow-Origin", "http://194.58.104.204") // set domain
+		ctx.Response.Header.Set("Access-Control-Allow-Origin", "http://localhost:2000") // set domain
 		ctx.Response.Header.Set("Content-Type", "application/json; charset=utf8")
 		ctx.Response.Header.Set("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
 		ctx.Response.Header.Set("Access-Control-Allow-Headers", "Origin, Content-Type")

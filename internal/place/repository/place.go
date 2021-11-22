@@ -31,7 +31,7 @@ func (u *placeStorage) GetById(id int) (value domain.Place, err error) {
 	err = conn.QueryRow(context.Background(),
 		cnst.GetPlaceByIdQuery,
 		id,
-	).Scan(&sight.Id, &sight.Name, &sight.Country, &sight.Rating, &sight.Tags, &sight.Description, &sight.Photos)
+	).Scan(&sight.Id, &sight.Name, &sight.Country, &sight.Lat, &sight.Lng, &sight.Rating, &sight.Tags, &sight.Description, &sight.Photos)
 
 	return sight, err
 }

@@ -6,6 +6,8 @@ type Place struct {
 	Id          int      `json:"id"`
 	Name        string   `json:"name"`
 	Country     string   `json:"country"`
+	Lat         float32  `json:"lat"`
+	Lng         float32  `json:"lng"`
 	Rating      float32  `json:"rating"`
 	Tags        []string `json:"tags"`
 	Description string   `json:"description"`

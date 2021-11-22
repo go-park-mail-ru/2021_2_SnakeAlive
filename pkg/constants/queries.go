@@ -6,7 +6,7 @@ const GetCookieQuery = `SELECT U.id, U.name, U.surname, U.password, U.email, U.d
 						WHERE C.hash = $1`
 const DeleteCookieQuery = `DELETE FROM Cookies WHERE hash = $1`
 
-const GetPlaceByIdQuery = `SELECT id, name, country, rating, tags, description, photos FROM Places WHERE id = $1`
+const GetPlaceByIdQuery = `SELECT id, name, country, lat, lng, rating, tags, description, photos FROM Places WHERE id = $1`
 
 const AddReviewQuery = `INSERT INTO public.reviews (title, text, rating, user_id, place_id) VALUES ($1, $2, $3, $4, $5) RETURNING id`
 
