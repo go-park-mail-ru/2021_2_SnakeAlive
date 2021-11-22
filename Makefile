@@ -30,3 +30,10 @@ prepare-trip_service-env:
 
 prepare-gateway-env:
 	export GATEWAY_HTTP_PORT=":8080" && export GATEWAY_AUTH_ENDPOINT="localhost:10123" && export GATEWAY_TRIP_ENDPOINT="localhost:6666"
+
+run-auth:
+	make prepare-auth_service-env && go run cmd/auth_service/main.go
+run-trip:
+	make prepare-trip_service-env && go run cmd/trip_service/main.go
+run-gateway:
+	make prepare-gateway-env && go run cmd/gateway/main.go

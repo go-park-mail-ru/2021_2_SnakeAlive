@@ -2,8 +2,8 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 
+	"github.com/jackc/pgx/v4"
 	pgxpool "github.com/jackc/pgx/v4/pgxpool"
 	"snakealive/m/internal/services/auth/models"
 	"snakealive/m/pkg/errors"
@@ -44,7 +44,7 @@ func (a *authRepository) GetUserByEmail(ctx context.Context, email string) (*mod
 
 	user := &models.User{}
 	if err := row.Scan(&user.ID, &user.Password); err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			return nil, errors.UserDoesNotExist
 		}
 
@@ -63,7 +63,7 @@ func (a *authRepository) GetUserByID(ctx context.Context, ID int64) (*models.Use
 		&user.Name, &user.Surname, &user.Email,
 		&user.Image, &user.Description,
 	); err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			return nil, errors.UserDoesNotExist
 		}
 
@@ -97,7 +97,7 @@ func (a *authRepository) ValidateUserSession(ctx context.Context, hash string) (
 	userID := int64(0)
 	query := a.queryFactory.CreateValidateUserSession(hash)
 	if err := a.conn.QueryRow(ctx, query.Request, query.Params...).Scan(&userID); err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			return userID, errors.SessionDoesNotExist
 		}
 

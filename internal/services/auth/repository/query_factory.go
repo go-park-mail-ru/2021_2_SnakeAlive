@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"strconv"
 	"strings"
 
 	"snakealive/m/internal/services/auth/models"
@@ -48,29 +49,36 @@ func (q *queryFactory) CreateUpdateUser(user *models.User) *query.Query {
 	}
 	optionals := make([]string, 0)
 
+	pos := 2
 	if user.Name != "" {
 		params = append(params, user.Name)
-		optionals = append(optionals, updateUserName)
+		optionals = append(optionals, updateUserName+strconv.Itoa(pos))
+		pos++
 	}
 	if user.Surname != "" {
 		params = append(params, user.Surname)
-		optionals = append(optionals, updateUserSurname)
+		optionals = append(optionals, updateUserSurname+strconv.Itoa(pos))
+		pos++
 	}
 	if user.Password != "" {
 		params = append(params, user.Password)
-		optionals = append(optionals, updateUserPass)
+		optionals = append(optionals, updateUserPass+strconv.Itoa(pos))
+		pos++
 	}
 	if user.Email != "" {
 		params = append(params, user.Email)
-		optionals = append(optionals, updateUserEmail)
+		optionals = append(optionals, updateUserEmail+strconv.Itoa(pos))
+		pos++
 	}
 	if user.Description != "" {
 		params = append(params, user.Description)
-		optionals = append(optionals, updateUserDescription)
+		optionals = append(optionals, updateUserDescription+strconv.Itoa(pos))
+		pos++
 	}
 	if user.Image != "" {
 		params = append(params, user.Image)
-		optionals = append(optionals, updateUserAvater)
+		optionals = append(optionals, updateUserAvater+strconv.Itoa(pos))
+		pos++
 	}
 
 	return &query.Query{
