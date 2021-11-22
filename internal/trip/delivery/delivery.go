@@ -39,6 +39,7 @@ func SetUpTripRouter(db *pgxpool.Pool, r *router.Router) *router.Router {
 	tripHandler := CreateDelivery(db)
 
 	r.GET(cnst.TripURL, tripHandler.Trip)
+	r.GET(cnst.TripPlaceCoordURL, tripHandler.GetPlaceForTripQuery)
 	r.POST(cnst.TripPostURL, tripHandler.AddTrip)
 	r.PATCH(cnst.TripURL, tripHandler.Update)
 	r.DELETE(cnst.TripURL, tripHandler.Delete)
@@ -71,6 +72,39 @@ func (s *tripHandler) Trip(ctx *fasthttp.RequestCtx) {
 	}
 
 	code, bytes := s.TripUseCase.GetById(param)
+
+	ctx.SetStatusCode(code)
+	ctx.Write(bytes)
+	logger.Info(string(ctx.Path()),
+		zap.Int("status", ctx.Response.StatusCode()),
+	)
+}
+
+func (s *tripHandler) GetPlaceForTripQuery(ctx *fasthttp.RequestCtx) {
+	logger := logs.GetLogger()
+	logger.Info(string(ctx.Path()),
+		zap.String("method", string(ctx.Method())),
+		zap.String("remote_addr", string(ctx.RemoteAddr().String())),
+		zap.String("url", string(ctx.Path())),
+	)
+
+	if !s.CookieHandler.CheckCookie(ctx) {
+		logger.Error("user is unauthorized")
+		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
+		return
+	}
+
+	param, _ := strconv.Atoi(ctx.UserValue("id").(string))
+	hash := string(ctx.Request.Header.Cookie(cnst.CookieName))
+
+	foundUser, _ := s.CookieHandler.GetUser(hash)
+	if !s.TripUseCase.CheckAuthor(foundUser, param) {
+		logger.Error("user is unauthorized")
+		ctx.SetStatusCode(fasthttp.StatusUnauthorized)
+		return
+	}
+
+	code, bytes := s.TripUseCase.GetPlaceForTripQuery(param)
 
 	ctx.SetStatusCode(code)
 	ctx.Write(bytes)

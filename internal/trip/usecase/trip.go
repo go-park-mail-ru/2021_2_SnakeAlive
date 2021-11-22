@@ -55,6 +55,24 @@ func (u tripUsecase) GetById(id int) (int, []byte) {
 	return fasthttp.StatusOK, bytes
 }
 
+func (u tripUsecase) GetPlaceForTripQuery(id int) (int, []byte) {
+	logger := logs.GetLogger()
+
+	value, err := u.tripStorage.GetPlaceForTripQuery(id)
+	if err != nil {
+		logger.Error("error while getting trip: ", zap.Error(err))
+		return fasthttp.StatusBadRequest, nil
+	}
+
+	bytes, err := json.Marshal(value)
+	if err != nil {
+		logger.Error("error while marshalling JSON: ", zap.Error(err))
+		return fasthttp.StatusBadRequest, nil
+	}
+
+	return fasthttp.StatusOK, bytes
+}
+
 func (u tripUsecase) Update(id int, updatedTrip domain.Trip) error {
 	logger := logs.GetLogger()
 

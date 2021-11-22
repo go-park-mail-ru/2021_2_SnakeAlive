@@ -23,6 +23,14 @@ type TopPlace struct {
 	Rating  float32  `json:"rating"`
 }
 
+type PlaceCoord struct {
+	Id  int     `json:"id"`
+	Lat float32 `json:"lat"`
+	Lng float32 `json:"lng"`
+}
+
+type PlaceCoords []PlaceCoord
+
 type TopPlaces []TopPlace
 
 type PlaceHandler interface {

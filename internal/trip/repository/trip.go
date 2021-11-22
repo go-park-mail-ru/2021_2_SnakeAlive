@@ -91,6 +91,44 @@ func (t *tripStorage) GetById(id int) (value domain.Trip, err error) {
 	return trip, err
 }
 
+func (t *tripStorage) GetPlaceForTripQuery(id int) (value domain.PlaceCoords, err error) {
+	logger := logs.GetLogger()
+	var trip domain.Trip
+
+	conn, err := t.dataHolder.Acquire(context.Background())
+	if err != nil {
+		logger.Error("error while aquiring connection")
+		return domain.PlaceCoords{}, err
+	}
+	defer conn.Release()
+
+	err = conn.QueryRow(context.Background(),
+		cnst.GetTripQuery,
+		id,
+	).Scan(&trip.Id, &trip.Title, &trip.Description)
+	if err != nil {
+		logger.Error("error while scanning trip info")
+		return domain.PlaceCoords{}, err
+	}
+
+	rows, err := conn.Query(context.Background(),
+		cnst.GetTripPlaceCoord,
+		id,
+	)
+	if err != nil {
+		logger.Error("error while getting trip places")
+		return domain.PlaceCoords{}, err
+	}
+	var placeCoords []domain.PlaceCoord
+	var placeCoord domain.PlaceCoord
+	for rows.Next() {
+		rows.Scan(&placeCoord.Id, &placeCoord.Lat, &placeCoord.Lng)
+		placeCoords = append(placeCoords, placeCoord)
+	}
+
+	return placeCoords, err
+}
+
 func (t *tripStorage) Update(id int, value domain.Trip) error {
 	logger := logs.GetLogger()
 
