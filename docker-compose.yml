@@ -1,0 +1,47 @@
+version: '3.7'
+services:
+  auth_service:
+    build:
+      dockerfile: Dockerfile.auth_service
+      context: .
+      args:
+        - APP_PKG_NAME=snakealive/m
+        - GOOS=linux
+    ports:
+      - "10123:10123"
+    environment:
+      - USER_DB_URL=postgres://tripadvisor:12345@host.docker.internal:5432/tripadvisor
+      - USER_GRPC_PORT=10123
+      - USER_PREFIX_LEN=0
+
+  trip_service:
+    build:
+      dockerfile: Dockerfile.trip_service
+      context: .
+      args:
+        - APP_PKG_NAME=snakealive/m
+        - GOOS=linux
+    ports:
+      - "6666:6666"
+    environment:
+      - TRIP_DB_URL=postgres://tripadvisor:12345@host.docker.internal:5432/tripadvisor
+      - TRIP_GRPC_PORT=6666
+
+  gateway:
+    depends_on:
+      - trip_service
+      - auth_service
+    build:
+      dockerfile: Dockerfile.gateway
+      context: .
+      args:
+        - APP_PKG_NAME=snakealive/m
+        - GOOS=linux
+    ports:
+      - "8080:8080"
+    environment:
+      - GATEWAY_HTTP_PORT=:8080
+      - GATEWAY_AUTH_ENDPOINT=host.docker.internal:10123
+      - GATEWAY_TRIP_ENDPOINT=host.docker.internal:6666
+
+

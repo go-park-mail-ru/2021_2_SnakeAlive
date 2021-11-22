@@ -30,8 +30,8 @@ func (a *authUseCase) LoginUser(ctx context.Context, user *models.User) (models.
 		return models.Session{}, err
 	}
 
-	pass, _ := a.hashGenerator.DecodeString(repoUser.Password)
-	if pass != user.Password {
+	//pass, _ := a.hashGenerator.DecodeString(repoUser.Password)
+	if repoUser.Password != user.Password {
 		return models.Session{}, errors.WrongUserPassword
 	}
 
