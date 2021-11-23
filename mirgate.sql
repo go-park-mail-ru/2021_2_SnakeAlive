@@ -87,3 +87,13 @@ CREATE TABLE Countries (
   photo TEXT
 );
 
+CREATE TABLE Albums (
+  id SERIAL NOT NULL PRIMARY KEY,
+  trip_id INT NOT NULL,
+  author INT NOT NULL,
+  title TEXT,
+  description TEXT,
+  photos TEXT[],
+  CONSTRAINT fk_trip FOREIGN KEY(trip_id) REFERENCES trips(id) ON DELETE CASCADE,
+  CONSTRAINT fk_author FOREIGN KEY (author) REFERENCES users(id) ON DELETE CASCADE
+);

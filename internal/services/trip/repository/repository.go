@@ -9,11 +9,17 @@ import (
 )
 
 type TripRepository interface {
-	Add(ctx context.Context, value *models.Trip, userID int) (int, error)
-	GetById(ctx context.Context, id int) (value *models.Trip, err error)
-	Delete(ctx context.Context, id int) error
-	Update(ctx context.Context, id int, value *models.Trip) error
+	AddTrip(ctx context.Context, value *models.Trip, userID int) (int, error)
+	GetTripById(ctx context.Context, id int) (value *models.Trip, err error)
+	DeleteTrip(ctx context.Context, id int) error
+	UpdateTrip(ctx context.Context, id int, value *models.Trip) error
 	GetTripAuthor(ctx context.Context, id int) (int, error)
+
+	AddAlbum(ctx context.Context, album *models.Album, userID int) (int, error)
+	GetAlbumById(ctx context.Context, id int) (*models.Album, error)
+	DeleteAlbum(ctx context.Context, id int) error
+	UpdateAlbum(ctx context.Context, id int, album *models.Album) error
+	GetAlbumAuthor(ctx context.Context, id int) (int, error)
 }
 
 type tripRepository struct {
@@ -24,7 +30,7 @@ func NewTripRepository(DB *pgxpool.Pool) TripRepository {
 	return &tripRepository{dataHolder: DB}
 }
 
-func (t *tripRepository) Add(ctx context.Context, value *models.Trip, userID int) (int, error) {
+func (t *tripRepository) AddTrip(ctx context.Context, value *models.Trip, userID int) (int, error) {
 	var tripId int
 
 	conn, err := t.dataHolder.Acquire(context.Background())
@@ -48,7 +54,7 @@ func (t *tripRepository) Add(ctx context.Context, value *models.Trip, userID int
 	return tripId, err
 }
 
-func (t *tripRepository) GetById(ctx context.Context, id int) (*models.Trip, error) {
+func (t *tripRepository) GetTripById(ctx context.Context, id int) (*models.Trip, error) {
 	var trip models.Trip
 
 	conn, err := t.dataHolder.Acquire(context.Background())
@@ -81,7 +87,7 @@ func (t *tripRepository) GetById(ctx context.Context, id int) (*models.Trip, err
 	return &trip, err
 }
 
-func (t *tripRepository) Update(ctx context.Context, id int, value *models.Trip) error {
+func (t *tripRepository) UpdateTrip(ctx context.Context, id int, value *models.Trip) error {
 	conn, err := t.dataHolder.Acquire(context.Background())
 	if err != nil {
 		return err
@@ -103,7 +109,7 @@ func (t *tripRepository) Update(ctx context.Context, id int, value *models.Trip)
 	return err
 }
 
-func (t *tripRepository) Delete(ctx context.Context, id int) error {
+func (t *tripRepository) DeleteTrip(ctx context.Context, id int) error {
 	conn, err := t.dataHolder.Acquire(context.Background())
 	if err != nil {
 		return err
@@ -163,6 +169,93 @@ func (t *tripRepository) GetTripAuthor(ctx context.Context, id int) (int, error)
 	var author int
 	err = conn.QueryRow(context.Background(),
 		GetTripAuthorQuery,
+		id,
+	).Scan(&author)
+
+	if err != nil {
+		return 0, err
+	}
+	return author, err
+}
+
+func (t *tripRepository) AddAlbum(ctx context.Context, album *models.Album, userID int) (int, error) {
+	var albumId int
+
+	conn, err := t.dataHolder.Acquire(context.Background())
+	if err != nil {
+		return albumId, err
+	}
+	defer conn.Release()
+
+	err = conn.QueryRow(context.Background(),
+		AddAlbumQuery,
+		album.Title,
+		album.Description,
+		album.TripId,
+		userID,
+	).Scan(&albumId)
+
+	return albumId, err
+}
+
+func (t *tripRepository) GetAlbumById(ctx context.Context, id int) (*models.Album, error) {
+	var album models.Album
+
+	conn, err := t.dataHolder.Acquire(context.Background())
+	if err != nil {
+		return &album, err
+	}
+	defer conn.Release()
+
+	err = conn.QueryRow(context.Background(),
+		GetAlbumQuery,
+		id,
+	).Scan(&album.Id, &album.Title, &album.Description, &album.TripId, &album.UserId, &album.Photos)
+
+	return &album, err
+}
+
+func (t *tripRepository) DeleteAlbum(ctx context.Context, id int) error {
+	conn, err := t.dataHolder.Acquire(context.Background())
+	if err != nil {
+		return err
+	}
+	defer conn.Release()
+
+	_, err = conn.Exec(context.Background(),
+		DeleteAlbumQuery,
+		id,
+	)
+	return err
+}
+
+func (t *tripRepository) UpdateAlbum(ctx context.Context, id int, album *models.Album) error {
+	conn, err := t.dataHolder.Acquire(context.Background())
+	if err != nil {
+		return err
+	}
+	defer conn.Release()
+
+	_, err = conn.Exec(context.Background(),
+		UpdateAlbumQuery,
+		album.Title,
+		album.Description,
+		id,
+	)
+
+	return err
+}
+
+func (t *tripRepository) GetAlbumAuthor(ctx context.Context, id int) (int, error) {
+	conn, err := t.dataHolder.Acquire(context.Background())
+	if err != nil {
+		return 0, err
+	}
+	defer conn.Release()
+
+	var author int
+	err = conn.QueryRow(context.Background(),
+		GetAlbumAuthorQuery,
 		id,
 	).Scan(&author)
 

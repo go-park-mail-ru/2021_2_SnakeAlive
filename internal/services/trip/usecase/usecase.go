@@ -9,13 +9,21 @@ import (
 )
 
 type TripUseCase interface {
-	Add(ctx context.Context, value *models.Trip, userID int) (int, error)
-	GetById(ctx context.Context, id int) (*models.Trip, error)
-	Delete(ctx context.Context, id int) error
-	Update(ctx context.Context, id int, updatedTrip *models.Trip) error
+	AddTrip(ctx context.Context, value *models.Trip, userID int) (int, error)
+	GetTripById(ctx context.Context, id int) (*models.Trip, error)
+	DeleteTrip(ctx context.Context, id int) error
+	UpdateTrip(ctx context.Context, id int, updatedTrip *models.Trip) error
 
-	CheckAuthor(ctx context.Context, userID int, id int) (bool, error)
+	CheckTripAuthor(ctx context.Context, userID int, id int) (bool, error)
 	SanitizeTrip(ctx context.Context, trip *models.Trip) *models.Trip
+
+	AddAlbum(ctx context.Context, album *models.Album, userID int) (int, error)
+	GetAlbumById(ctx context.Context, id int) (*models.Album, error)
+	DeleteAlbum(ctx context.Context, id int) error
+	UpdateAlbum(ctx context.Context, id int, updatedAlbum *models.Album) error
+
+	CheckAlbumAuthor(ctx context.Context, userID int, id int) (bool, error)
+	SanitizeAlbum(ctx context.Context, album *models.Album) *models.Album
 }
 
 type tripUseCase struct {
@@ -26,27 +34,27 @@ func NewTripUseCase(tripRepository repository.TripRepository) TripUseCase {
 	return &tripUseCase{tripRepository: tripRepository}
 }
 
-func (u tripUseCase) Add(ctx context.Context, value *models.Trip, userID int) (int, error) {
+func (u tripUseCase) AddTrip(ctx context.Context, value *models.Trip, userID int) (int, error) {
 	cleanTrip := u.SanitizeTrip(ctx, value)
 
-	return u.tripRepository.Add(ctx, cleanTrip, userID)
+	return u.tripRepository.AddTrip(ctx, cleanTrip, userID)
 }
 
-func (u tripUseCase) GetById(ctx context.Context, id int) (*models.Trip, error) {
-	return u.tripRepository.GetById(ctx, id)
+func (u tripUseCase) GetTripById(ctx context.Context, id int) (*models.Trip, error) {
+	return u.tripRepository.GetTripById(ctx, id)
 }
 
-func (u tripUseCase) Update(ctx context.Context, id int, updatedTrip *models.Trip) error {
+func (u tripUseCase) UpdateTrip(ctx context.Context, id int, updatedTrip *models.Trip) error {
 	cleanTrip := u.SanitizeTrip(ctx, updatedTrip)
 
-	return u.tripRepository.Update(ctx, id, cleanTrip)
+	return u.tripRepository.UpdateTrip(ctx, id, cleanTrip)
 }
 
-func (u tripUseCase) Delete(ctx context.Context, id int) error {
-	return u.tripRepository.Delete(ctx, id)
+func (u tripUseCase) DeleteTrip(ctx context.Context, id int) error {
+	return u.tripRepository.DeleteTrip(ctx, id)
 }
 
-func (u tripUseCase) CheckAuthor(ctx context.Context, userID int, id int) (bool, error) {
+func (u tripUseCase) CheckTripAuthor(ctx context.Context, userID int, id int) (bool, error) {
 	author, err := u.tripRepository.GetTripAuthor(ctx, id)
 	return author == userID, err
 }
@@ -57,4 +65,37 @@ func (u tripUseCase) SanitizeTrip(ctx context.Context, trip *models.Trip) *model
 	trip.Title = sanitizer.Sanitize(trip.Title)
 	trip.Description = sanitizer.Sanitize(trip.Description)
 	return trip
+}
+
+func (u tripUseCase) AddAlbum(ctx context.Context, album *models.Album, userID int) (int, error) {
+	cleanAlbum := u.SanitizeAlbum(ctx, album)
+
+	return u.tripRepository.AddAlbum(ctx, cleanAlbum, userID)
+}
+
+func (u tripUseCase) GetAlbumById(ctx context.Context, id int) (*models.Album, error) {
+	return u.tripRepository.GetAlbumById(ctx, id)
+}
+
+func (u tripUseCase) DeleteAlbum(ctx context.Context, id int) error {
+	return u.tripRepository.DeleteAlbum(ctx, id)
+}
+
+func (u tripUseCase) UpdateAlbum(ctx context.Context, id int, updatedAlbum *models.Album) error {
+	cleanAlbum := u.SanitizeAlbum(ctx, updatedAlbum)
+
+	return u.tripRepository.UpdateAlbum(ctx, id, cleanAlbum)
+}
+
+func (u tripUseCase) CheckAlbumAuthor(ctx context.Context, userID int, id int) (bool, error) {
+	author, err := u.tripRepository.GetAlbumAuthor(ctx, id)
+	return author == userID, err
+}
+
+func (u tripUseCase) SanitizeAlbum(ctx context.Context, album *models.Album) *models.Album {
+	sanitizer := bluemonday.UGCPolicy()
+
+	album.Title = sanitizer.Sanitize(album.Title)
+	album.Description = sanitizer.Sanitize(album.Description)
+	return album
 }

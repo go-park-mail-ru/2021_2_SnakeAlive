@@ -4,10 +4,10 @@ package trip_service
 
 import (
 	context "context"
+	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -21,8 +21,12 @@ const _ = grpc.SupportPackageIsVersion7
 type TripServiceClient interface {
 	GetTrip(ctx context.Context, in *TripRequest, opts ...grpc.CallOption) (*Trip, error)
 	AddTrip(ctx context.Context, in *ModifyTripRequest, opts ...grpc.CallOption) (*Trip, error)
-	Update(ctx context.Context, in *ModifyTripRequest, opts ...grpc.CallOption) (*Trip, error)
-	Delete(ctx context.Context, in *TripRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpdateTrip(ctx context.Context, in *ModifyTripRequest, opts ...grpc.CallOption) (*Trip, error)
+	DeleteTrip(ctx context.Context, in *TripRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	GetAlbum(ctx context.Context, in *AlbumRequest, opts ...grpc.CallOption) (*Album, error)
+	AddAlbum(ctx context.Context, in *ModifyAlbumRequest, opts ...grpc.CallOption) (*Album, error)
+	UpdateAlbum(ctx context.Context, in *ModifyAlbumRequest, opts ...grpc.CallOption) (*Album, error)
+	DeleteAlbum(ctx context.Context, in *AlbumRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 }
 
 type tripServiceClient struct {
@@ -51,18 +55,54 @@ func (c *tripServiceClient) AddTrip(ctx context.Context, in *ModifyTripRequest, 
 	return out, nil
 }
 
-func (c *tripServiceClient) Update(ctx context.Context, in *ModifyTripRequest, opts ...grpc.CallOption) (*Trip, error) {
+func (c *tripServiceClient) UpdateTrip(ctx context.Context, in *ModifyTripRequest, opts ...grpc.CallOption) (*Trip, error) {
 	out := new(Trip)
-	err := c.cc.Invoke(ctx, "/services.trip_service.TripService/Update", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/services.trip_service.TripService/UpdateTrip", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *tripServiceClient) Delete(ctx context.Context, in *TripRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/services.trip_service.TripService/Delete", in, out, opts...)
+func (c *tripServiceClient) DeleteTrip(ctx context.Context, in *TripRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/services.trip_service.TripService/DeleteTrip", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tripServiceClient) GetAlbum(ctx context.Context, in *AlbumRequest, opts ...grpc.CallOption) (*Album, error) {
+	out := new(Album)
+	err := c.cc.Invoke(ctx, "/services.trip_service.TripService/GetAlbum", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tripServiceClient) AddAlbum(ctx context.Context, in *ModifyAlbumRequest, opts ...grpc.CallOption) (*Album, error) {
+	out := new(Album)
+	err := c.cc.Invoke(ctx, "/services.trip_service.TripService/AddAlbum", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tripServiceClient) UpdateAlbum(ctx context.Context, in *ModifyAlbumRequest, opts ...grpc.CallOption) (*Album, error) {
+	out := new(Album)
+	err := c.cc.Invoke(ctx, "/services.trip_service.TripService/UpdateAlbum", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tripServiceClient) DeleteAlbum(ctx context.Context, in *AlbumRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/services.trip_service.TripService/DeleteAlbum", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,8 +115,12 @@ func (c *tripServiceClient) Delete(ctx context.Context, in *TripRequest, opts ..
 type TripServiceServer interface {
 	GetTrip(context.Context, *TripRequest) (*Trip, error)
 	AddTrip(context.Context, *ModifyTripRequest) (*Trip, error)
-	Update(context.Context, *ModifyTripRequest) (*Trip, error)
-	Delete(context.Context, *TripRequest) (*emptypb.Empty, error)
+	UpdateTrip(context.Context, *ModifyTripRequest) (*Trip, error)
+	DeleteTrip(context.Context, *TripRequest) (*empty.Empty, error)
+	GetAlbum(context.Context, *AlbumRequest) (*Album, error)
+	AddAlbum(context.Context, *ModifyAlbumRequest) (*Album, error)
+	UpdateAlbum(context.Context, *ModifyAlbumRequest) (*Album, error)
+	DeleteAlbum(context.Context, *AlbumRequest) (*empty.Empty, error)
 	mustEmbedUnimplementedTripServiceServer()
 }
 
@@ -90,11 +134,23 @@ func (UnimplementedTripServiceServer) GetTrip(context.Context, *TripRequest) (*T
 func (UnimplementedTripServiceServer) AddTrip(context.Context, *ModifyTripRequest) (*Trip, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddTrip not implemented")
 }
-func (UnimplementedTripServiceServer) Update(context.Context, *ModifyTripRequest) (*Trip, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
+func (UnimplementedTripServiceServer) UpdateTrip(context.Context, *ModifyTripRequest) (*Trip, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateTrip not implemented")
 }
-func (UnimplementedTripServiceServer) Delete(context.Context, *TripRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+func (UnimplementedTripServiceServer) DeleteTrip(context.Context, *TripRequest) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteTrip not implemented")
+}
+func (UnimplementedTripServiceServer) GetAlbum(context.Context, *AlbumRequest) (*Album, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAlbum not implemented")
+}
+func (UnimplementedTripServiceServer) AddAlbum(context.Context, *ModifyAlbumRequest) (*Album, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddAlbum not implemented")
+}
+func (UnimplementedTripServiceServer) UpdateAlbum(context.Context, *ModifyAlbumRequest) (*Album, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateAlbum not implemented")
+}
+func (UnimplementedTripServiceServer) DeleteAlbum(context.Context, *AlbumRequest) (*empty.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAlbum not implemented")
 }
 func (UnimplementedTripServiceServer) mustEmbedUnimplementedTripServiceServer() {}
 
@@ -145,38 +201,110 @@ func _TripService_AddTrip_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TripService_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _TripService_UpdateTrip_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ModifyTripRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TripServiceServer).Update(ctx, in)
+		return srv.(TripServiceServer).UpdateTrip(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/services.trip_service.TripService/Update",
+		FullMethod: "/services.trip_service.TripService/UpdateTrip",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TripServiceServer).Update(ctx, req.(*ModifyTripRequest))
+		return srv.(TripServiceServer).UpdateTrip(ctx, req.(*ModifyTripRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TripService_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _TripService_DeleteTrip_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TripRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TripServiceServer).Delete(ctx, in)
+		return srv.(TripServiceServer).DeleteTrip(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/services.trip_service.TripService/Delete",
+		FullMethod: "/services.trip_service.TripService/DeleteTrip",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TripServiceServer).Delete(ctx, req.(*TripRequest))
+		return srv.(TripServiceServer).DeleteTrip(ctx, req.(*TripRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TripService_GetAlbum_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AlbumRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TripServiceServer).GetAlbum(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/services.trip_service.TripService/GetAlbum",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TripServiceServer).GetAlbum(ctx, req.(*AlbumRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TripService_AddAlbum_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ModifyAlbumRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TripServiceServer).AddAlbum(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/services.trip_service.TripService/AddAlbum",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TripServiceServer).AddAlbum(ctx, req.(*ModifyAlbumRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TripService_UpdateAlbum_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ModifyAlbumRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TripServiceServer).UpdateAlbum(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/services.trip_service.TripService/UpdateAlbum",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TripServiceServer).UpdateAlbum(ctx, req.(*ModifyAlbumRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TripService_DeleteAlbum_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AlbumRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TripServiceServer).DeleteAlbum(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/services.trip_service.TripService/DeleteAlbum",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TripServiceServer).DeleteAlbum(ctx, req.(*AlbumRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -197,12 +325,28 @@ var TripService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _TripService_AddTrip_Handler,
 		},
 		{
-			MethodName: "Update",
-			Handler:    _TripService_Update_Handler,
+			MethodName: "UpdateTrip",
+			Handler:    _TripService_UpdateTrip_Handler,
 		},
 		{
-			MethodName: "Delete",
-			Handler:    _TripService_Delete_Handler,
+			MethodName: "DeleteTrip",
+			Handler:    _TripService_DeleteTrip_Handler,
+		},
+		{
+			MethodName: "GetAlbum",
+			Handler:    _TripService_GetAlbum_Handler,
+		},
+		{
+			MethodName: "AddAlbum",
+			Handler:    _TripService_AddAlbum_Handler,
+		},
+		{
+			MethodName: "UpdateAlbum",
+			Handler:    _TripService_UpdateAlbum_Handler,
+		},
+		{
+			MethodName: "DeleteAlbum",
+			Handler:    _TripService_DeleteAlbum_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

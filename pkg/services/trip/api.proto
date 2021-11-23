@@ -43,9 +43,38 @@ message ModifyTripRequest {
     }];
 }
 
+message AlbumRequest {
+    int64 album_id = 1 [(validate.rules).int64 = {
+        gt: 0,
+    }];
+    int64 user_id = 2 [(validate.rules).int64 = {
+        gt: 0,
+    }];
+}
+
+message Album {
+    int64 id = 1;
+    int64 trip_id = 2;
+    int64 author = 7;
+    string title = 3;
+    string description = 4;
+    repeated string names = 5;
+    repeated string photos = 6;
+}
+
+message ModifyAlbumRequest {
+    Album album = 1;
+    int64 user_id = 2;
+}
+
 service TripService {
     rpc GetTrip(TripRequest) returns (Trip) {}
 	rpc AddTrip(ModifyTripRequest) returns (Trip) {}
-	rpc Update(ModifyTripRequest) returns (Trip) {}
-	rpc Delete(TripRequest) returns (google.protobuf.Empty) {}
+	rpc UpdateTrip(ModifyTripRequest) returns (Trip) {}
+	rpc DeleteTrip(TripRequest) returns (google.protobuf.Empty) {}
+
+    rpc GetAlbum(AlbumRequest) returns (Album) {}
+    rpc AddAlbum(ModifyAlbumRequest) returns (Album) {}
+    rpc UpdateAlbum(ModifyAlbumRequest) returns (Album) {}
+    rpc DeleteAlbum(AlbumRequest) returns (google.protobuf.Empty) {}
 }
