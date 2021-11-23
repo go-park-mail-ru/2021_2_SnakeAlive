@@ -1,8 +1,9 @@
 package placeDelivery
 
 import (
-	"snakealive/m/internal/domain"
 	"strconv"
+
+	"snakealive/m/internal/domain"
 
 	"snakealive/m/internal/entities"
 	pr "snakealive/m/internal/place/repository"
@@ -32,7 +33,7 @@ func CreateDelivery(db *pgxpool.Pool, l *logs.Logger) domain.PlaceHandler {
 
 func SetUpPlaceRouter(db *pgxpool.Pool, r *router.Router, l *logs.Logger) *router.Router {
 	placeHandler := CreateDelivery(db, l)
-	r.GET(cnst.SightsByCountruURL, logs.AccessLogMiddleware(l, placeHandler.PlacesByCountry))
+	r.GET(cnst.SightsByCountryURL, logs.AccessLogMiddleware(l, placeHandler.PlacesByCountry))
 	r.GET(cnst.SightURL, logs.AccessLogMiddleware(l, placeHandler.Place))
 	return r
 }

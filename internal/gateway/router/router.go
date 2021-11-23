@@ -1,6 +1,9 @@
 package router
 
 import (
+	"github.com/fasthttp/router"
+	"go.uber.org/zap"
+	sight_delivery "snakealive/m/internal/gateway/sight/delivery"
 	td "snakealive/m/internal/gateway/trip/delivery"
 	ud "snakealive/m/internal/gateway/user/delivery"
 	cnst "snakealive/m/pkg/constants"
@@ -8,18 +11,14 @@ import (
 	"snakealive/m/pkg/grpc_errors"
 	"snakealive/m/pkg/middlewares/http"
 	auth_service "snakealive/m/pkg/services/auth"
-	trip_service "snakealive/m/pkg/services/trip"
-
-	"github.com/fasthttp/router"
-	"go.uber.org/zap"
 )
 
 type RouterConfig struct {
-	AuthGRPC     auth_service.AuthServiceClient
-	UserDelivery ud.UserDelivery
+	AuthGRPC auth_service.AuthServiceClient
 
-	TripGRPC            trip_service.TripServiceClient
+	UserDelivery        ud.UserDelivery
 	TripGatewayDelivery td.TripGatewayDelivery
+	SightDelivery       sight_delivery.SightDelivery
 
 	Logger *zap.Logger
 }
@@ -42,6 +41,9 @@ func SetupRouter(cfg RouterConfig) (r *router.Router) {
 	r.POST(cnst.TripPostURL, lgrMw(authMw(cfg.TripGatewayDelivery.AddTrip)))
 	r.PATCH(cnst.TripURL, lgrMw(authMw(cfg.TripGatewayDelivery.Update)))
 	r.DELETE(cnst.TripURL, lgrMw(authMw(cfg.TripGatewayDelivery.Delete)))
+
+	r.GET(cnst.SightsByCountryURL, lgrMw(cfg.SightDelivery.GetSightByCountry))
+	r.GET(cnst.SightURL, lgrMw(cfg.SightDelivery.GetSightByID))
 
 	return
 }

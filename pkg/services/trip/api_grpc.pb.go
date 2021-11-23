@@ -4,10 +4,10 @@ package trip_service
 
 import (
 	context "context"
-	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -22,7 +22,7 @@ type TripServiceClient interface {
 	GetTrip(ctx context.Context, in *TripRequest, opts ...grpc.CallOption) (*Trip, error)
 	AddTrip(ctx context.Context, in *ModifyTripRequest, opts ...grpc.CallOption) (*Trip, error)
 	Update(ctx context.Context, in *ModifyTripRequest, opts ...grpc.CallOption) (*Trip, error)
-	Delete(ctx context.Context, in *TripRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	Delete(ctx context.Context, in *TripRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type tripServiceClient struct {
@@ -60,8 +60,8 @@ func (c *tripServiceClient) Update(ctx context.Context, in *ModifyTripRequest, o
 	return out, nil
 }
 
-func (c *tripServiceClient) Delete(ctx context.Context, in *TripRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
-	out := new(empty.Empty)
+func (c *tripServiceClient) Delete(ctx context.Context, in *TripRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/services.trip_service.TripService/Delete", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -76,7 +76,7 @@ type TripServiceServer interface {
 	GetTrip(context.Context, *TripRequest) (*Trip, error)
 	AddTrip(context.Context, *ModifyTripRequest) (*Trip, error)
 	Update(context.Context, *ModifyTripRequest) (*Trip, error)
-	Delete(context.Context, *TripRequest) (*empty.Empty, error)
+	Delete(context.Context, *TripRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedTripServiceServer()
 }
 
@@ -93,7 +93,7 @@ func (UnimplementedTripServiceServer) AddTrip(context.Context, *ModifyTripReques
 func (UnimplementedTripServiceServer) Update(context.Context, *ModifyTripRequest) (*Trip, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
 }
-func (UnimplementedTripServiceServer) Delete(context.Context, *TripRequest) (*empty.Empty, error) {
+func (UnimplementedTripServiceServer) Delete(context.Context, *TripRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
 func (UnimplementedTripServiceServer) mustEmbedUnimplementedTripServiceServer() {}

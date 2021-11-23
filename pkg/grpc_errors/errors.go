@@ -15,6 +15,9 @@ var (
 		errors.SessionDoesNotExist: status.Error(codes.NotFound, "session not found"),
 		errors.WrongUserPassword:   status.Error(codes.PermissionDenied, "wrong password"),
 	}
+	PreparedSightServiceErrorMap = map[error]error{
+		errors.SightDoesNotExist: status.Error(codes.NotFound, "sight not found"),
+	}
 )
 
 var (

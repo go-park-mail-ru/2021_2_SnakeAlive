@@ -15,9 +15,13 @@ protogen-api-auth-service:
 protogen-api-trip-service:
 	make protogen-api-with-validator path=pkg/services/trip/api.proto
 
-protogen-all-service:
-	make protogen-api-auth-service
-	make protogen-api-trip-service
+protogen-api-sight-service:
+	make protogen-api-with-validator path=pkg/services/sight/api.proto
+
+protogen-all-services:
+	make protogen-api-auth-service && \
+	make protogen-api-trip-service && \
+	make protogen-api-sight-service
 
 prepare-auth_service-env:
 	export USER_DB_URL="postgres://tripadvisor:12345@localhost:5432/tripadvisor" && \

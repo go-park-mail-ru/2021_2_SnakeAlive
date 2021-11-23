@@ -10,7 +10,7 @@ const CountryIdURL = "/country/id/{id}"
 const CountryListURL = "/country/list"
 
 const SightURL = "/sight/{id}"
-const SightsByCountruURL = "/sights/{name}"
+const SightsByCountryURL = "/sights/{name}"
 
 const ReviewAddURL = "/review"
 const ReviewURL = "/review/{id}"

@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package services.sight_service;
+option go_package = "snakealive/m/pkg/services/sight;sight_service";
+
+import "third_party/go-proto-validators/validator.proto";
+
+message Sight {
+  int64 id = 1;
+  string name = 2;
+  string country = 3;
+  float rating = 4;
+  repeated string tags = 5;
+  string description = 6;
+  repeated string photos = 7;
+}
+
+message GetSightsRequest {
+  string countryName = 1 [(validate.rules).string = {
+    max_len: 128,
+    min_bytes: 1,
+  }];
+}
+
+message GetSightsReponse {
+  repeated Sight sights = 1;
+}
+
+message GetSightRequest {
+  int64 id = 1 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+}
+
+message GetSightResponse {
+  Sight sight = 1;
+}
+
+service SightService {
+  rpc GetSights(GetSightsRequest) returns (GetSightsReponse) {};
+  rpc GetSight(GetSightRequest) returns (GetSightResponse) {};
+}
