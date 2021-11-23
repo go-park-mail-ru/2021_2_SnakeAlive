@@ -23,10 +23,7 @@ message Sight {
 	repeated string tags = 5;
 	string description = 6;
 	repeated string photos = 7;
-}
-
-message Day {
-    repeated Sight sights = 1;
+    int64 day = 8;
 }
 
 message Trip {
@@ -36,7 +33,7 @@ message Trip {
         min_bytes: 1,
     }];
 	string description = 3;
-	repeated Day days = 4;
+	repeated Sight sights = 4;
 }
 
 message ModifyTripRequest {

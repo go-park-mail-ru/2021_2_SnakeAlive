@@ -34,12 +34,12 @@ func NewTripGatewayUseCase(grpc tripGRPC) TripGatewayUseCase {
 }
 
 func (u *tripGatewayUseCase) Add(ctx context.Context, value *models.Trip, userID int) (*models.Trip, error) {
-	days := td.ProtoDaysFromPlaces(value.Days)
+	days := td.ProtoDaysFromPlaces(value.Sights)
 	trip := &trip_service.Trip{
 		Id:          int64(value.Id),
 		Title:       value.Title,
 		Description: value.Description,
-		Days:        days,
+		Sights:      days,
 	}
 
 	responce, err := u.tripGRPC.AddTrip(ctx,
@@ -52,13 +52,13 @@ func (u *tripGatewayUseCase) Add(ctx context.Context, value *models.Trip, userID
 		return nil, err
 	}
 
-	places := td.PlacesFromProtoDays(responce.Days)
+	places := td.PlacesFromProtoDays(responce.Sights)
 
 	return &models.Trip{
 		Id:          int(responce.Id),
 		Title:       responce.Title,
 		Description: responce.Description,
-		Days:        places,
+		Sights:      places,
 	}, nil
 }
 
@@ -75,13 +75,13 @@ func (u *tripGatewayUseCase) GetById(ctx context.Context, tripId int, userID int
 		return nil, errors.TripNotFound
 	}
 
-	places := td.PlacesFromProtoDays(responce.Days)
+	places := td.PlacesFromProtoDays(responce.Sights)
 
 	return &models.Trip{
 		Id:          int(responce.Id),
 		Title:       responce.Title,
 		Description: responce.Description,
-		Days:        places,
+		Sights:      places,
 	}, nil
 }
 
@@ -94,12 +94,12 @@ func (u *tripGatewayUseCase) Delete(ctx context.Context, id int, userID int) err
 }
 
 func (u *tripGatewayUseCase) Update(ctx context.Context, id int, updatedTrip *models.Trip, userID int) (*models.Trip, error) {
-	days := td.ProtoDaysFromPlaces(updatedTrip.Days)
+	days := td.ProtoDaysFromPlaces(updatedTrip.Sights)
 	trip := &trip_service.Trip{
-		Id:          int64(updatedTrip.Id),
+		Id:          int64(id),
 		Title:       updatedTrip.Title,
 		Description: updatedTrip.Description,
-		Days:        days,
+		Sights:      days,
 	}
 
 	responce, err := u.tripGRPC.Update(ctx,
@@ -112,12 +112,12 @@ func (u *tripGatewayUseCase) Update(ctx context.Context, id int, updatedTrip *mo
 		return nil, err
 	}
 
-	places := td.PlacesFromProtoDays(responce.Days)
+	places := td.PlacesFromProtoDays(responce.Sights)
 
 	return &models.Trip{
 		Id:          int(responce.Id),
 		Title:       responce.Title,
 		Description: responce.Description,
-		Days:        places,
+		Sights:      places,
 	}, nil
 }

@@ -13,6 +13,8 @@ services:
       - USER_DB_URL=postgres://tripadvisor:12345@host.docker.internal:5432/tripadvisor
       - USER_GRPC_PORT=10123
       - USER_PREFIX_LEN=0
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
 
   sight_service:
     build:
@@ -26,6 +28,8 @@ services:
     environment:
       - SIGHT_DB_URL=postgres://tripadvisor:12345@host.docker.internal:5432/tripadvisor
       - SIGHT_GRPC_PORT=10124
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
 
   trip_service:
     build:
@@ -39,6 +43,8 @@ services:
     environment:
       - TRIP_DB_URL=postgres://tripadvisor:12345@host.docker.internal:5432/tripadvisor
       - TRIP_GRPC_PORT=6666
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
 
   gateway:
     depends_on:
@@ -57,5 +63,7 @@ services:
       - GATEWAY_AUTH_ENDPOINT=host.docker.internal:10123
       - GATEWAY_TRIP_ENDPOINT=host.docker.internal:6666
       - GATEWAY_SIGHT_ENDPOINT=host.docker.internal:10124
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
 
 

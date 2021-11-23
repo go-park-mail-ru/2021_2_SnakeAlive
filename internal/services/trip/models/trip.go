@@ -6,5 +6,5 @@ type Trip struct {
 	Id          int
 	Title       string
 	Description string
-	Days        [][]domain.Place
+	Sights      []domain.Place
 }
