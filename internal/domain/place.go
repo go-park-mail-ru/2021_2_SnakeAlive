@@ -10,6 +10,7 @@ type Place struct {
 	Tags        []string `json:"tags"`
 	Description string   `json:"description"`
 	Photos      []string `json:"photos"`
+	Day         int      `json:"day"`
 }
 
 type TopPlace struct {

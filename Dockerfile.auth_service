@@ -16,9 +16,10 @@ WORKDIR /go/src/$APP_PKG_NAME
 COPY ./cmd ./cmd
 COPY ./internal ./internal
 COPY ./pkg ./pkg
-COPY ./vendor ./vendor
 COPY ./third_party ./third_party
 
+COPY go.mod go.mod
+RUN go mod tidy
 
 RUN go build -v \
     -o /out/service \

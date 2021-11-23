@@ -37,15 +37,14 @@ func (t *tripRepository) Add(ctx context.Context, value *models.Trip, userID int
 		AddTripQuery,
 		value.Title,
 		value.Description,
-		len(value.Days),
 		userID,
-		value.Days[0][0].Id,
+		value.Sights[0].Id,
 	).Scan(&tripId)
 	if err != nil {
 		return tripId, err
 	}
 
-	err = t.addPlaces(ctx, value.Days, tripId)
+	err = t.addPlaces(ctx, value.Sights, tripId)
 	return tripId, err
 }
 
@@ -74,19 +73,10 @@ func (t *tripRepository) GetById(ctx context.Context, id int) (*models.Trip, err
 	}
 
 	var place domain.Place
-	var places []domain.Place
-	var day int
-	currentDay := 0
 	for rows.Next() {
-		rows.Scan(&place.Id, &place.Name, &place.Tags, &place.Description, &place.Rating, &place.Country, &place.Photos, &day)
-		if day != currentDay && len(places) > 0 {
-			currentDay = day
-			trip.Days = append(trip.Days, places)
-			places = []domain.Place{}
-		}
-		places = append(places, place)
+		rows.Scan(&place.Id, &place.Name, &place.Tags, &place.Description, &place.Rating, &place.Country, &place.Photos, &place.Day)
+		trip.Sights = append(trip.Sights, place)
 	}
-	trip.Days = append(trip.Days, places)
 
 	return &trip, err
 }
@@ -102,15 +92,14 @@ func (t *tripRepository) Update(ctx context.Context, id int, value *models.Trip)
 		UpdateTripQuery,
 		value.Title,
 		value.Description,
-		len(value.Days),
-		value.Days[0][0].Id,
+		value.Sights[0].Id,
 		id,
 	)
 	if err != nil || t.deletePlaces(ctx, id) != nil {
 		return err
 	}
 
-	err = t.addPlaces(ctx, value.Days, id)
+	err = t.addPlaces(ctx, value.Sights, id)
 	return err
 }
 
@@ -145,23 +134,21 @@ func (t *tripRepository) deletePlaces(ctx context.Context, tripId int) error {
 	return err
 }
 
-func (t *tripRepository) addPlaces(ctx context.Context, value [][]domain.Place, tripId int) error {
+func (t *tripRepository) addPlaces(ctx context.Context, value []domain.Place, tripId int) error {
 	conn, err := t.dataHolder.Acquire(context.Background())
 	if err != nil {
 		return err
 	}
 	defer conn.Release()
 
-	for day, places := range value {
-		for ind, place := range places {
-			_, err = conn.Exec(context.Background(),
-				AddPlacesForTripQuery,
-				tripId,
-				place.Id,
-				day,
-				ind,
-			)
-		}
+	for ind, place := range value {
+		_, err = conn.Exec(context.Background(),
+			AddPlacesForTripQuery,
+			tripId,
+			place.Id,
+			place.Day,
+			ind,
+		)
 	}
 	return err
 }
