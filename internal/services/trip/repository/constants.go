@@ -24,4 +24,6 @@ const (
 	GetAlbumAuthorQuery = `SELECT author FROM Albums WHERE id = $1`
 	GetAlbumPhotosQuery = `SELECT photos FROM Albums WHERE id = &1`
 	AddAlbumPhotosQuery = `UPDATE Albums SET "photos" = $1 WHERE id = $2`
+
+	SightsByTripQuery = `SELECT place_id FROM TripsPlaces AS tp WHERE trip_id = $1 ORDER BY day, tp.order`
 )

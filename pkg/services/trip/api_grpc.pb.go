@@ -26,8 +26,9 @@ type TripServiceClient interface {
 	GetAlbum(ctx context.Context, in *AlbumRequest, opts ...grpc.CallOption) (*Album, error)
 	AddAlbum(ctx context.Context, in *ModifyAlbumRequest, opts ...grpc.CallOption) (*Album, error)
 	UpdateAlbum(ctx context.Context, in *ModifyAlbumRequest, opts ...grpc.CallOption) (*Album, error)
-	DeleteAlbum(ctx context.Context, in *AlbumRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	UploadPhoto(ctx context.Context, in *UploadRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteAlbum(ctx context.Context, in *AlbumRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	SightsByTrip(ctx context.Context, in *SightsRequest, opts ...grpc.CallOption) (*Sights, error)
+	UploadPhoto(ctx context.Context, in *UploadRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 }
 
 type tripServiceClient struct {
@@ -110,8 +111,18 @@ func (c *tripServiceClient) DeleteAlbum(ctx context.Context, in *AlbumRequest, o
 	return out, nil
 }
 
-func (c *tripServiceClient) UploadPhoto(ctx context.Context, in *UploadRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+
+func (c *tripServiceClient) SightsByTrip(ctx context.Context, in *SightsRequest, opts ...grpc.CallOption) (*Sights, error) {
+	out := new(Sights)
+	err := c.cc.Invoke(ctx, "/services.trip_service.TripService/SightsByTrip", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tripServiceClient) UploadPhoto(ctx context.Context, in *UploadRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/services.trip_service.TripService/UploadPhoto", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -130,8 +141,9 @@ type TripServiceServer interface {
 	GetAlbum(context.Context, *AlbumRequest) (*Album, error)
 	AddAlbum(context.Context, *ModifyAlbumRequest) (*Album, error)
 	UpdateAlbum(context.Context, *ModifyAlbumRequest) (*Album, error)
-	DeleteAlbum(context.Context, *AlbumRequest) (*emptypb.Empty, error)
-	UploadPhoto(context.Context, *UploadRequest) (*emptypb.Empty, error)
+	DeleteAlbum(context.Context, *AlbumRequest) (*empty.Empty, error)
+	SightsByTrip(context.Context, *SightsRequest) (*Sights, error)
+	UploadPhoto(context.Context, *UploadRequest) (*empty.Empty, error)
 	mustEmbedUnimplementedTripServiceServer()
 }
 
@@ -163,7 +175,11 @@ func (UnimplementedTripServiceServer) UpdateAlbum(context.Context, *ModifyAlbumR
 func (UnimplementedTripServiceServer) DeleteAlbum(context.Context, *AlbumRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteAlbum not implemented")
 }
-func (UnimplementedTripServiceServer) UploadPhoto(context.Context, *UploadRequest) (*emptypb.Empty, error) {
+
+func (UnimplementedTripServiceServer) SightsByTrip(context.Context, *SightsRequest) (*Sights, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SightsByTrip not implemented")
+}
+func (UnimplementedTripServiceServer) UploadPhoto(context.Context, *UploadRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadPhoto not implemented")
 }
 func (UnimplementedTripServiceServer) mustEmbedUnimplementedTripServiceServer() {}
@@ -323,6 +339,24 @@ func _TripService_DeleteAlbum_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TripService_SightsByTrip_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SightsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TripServiceServer).SightsByTrip(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/services.trip_service.TripService/SightsByTrip",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TripServiceServer).SightsByTrip(ctx, req.(*SightsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _TripService_UploadPhoto_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UploadRequest)
 	if err := dec(in); err != nil {
@@ -379,6 +413,10 @@ var TripService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteAlbum",
 			Handler:    _TripService_DeleteAlbum_Handler,
+		},
+		{
+			MethodName: "SightsByTrip",
+			Handler:    _TripService_SightsByTrip_Handler,
 		},
 		{
 			MethodName: "UploadPhoto",
