@@ -50,7 +50,6 @@ func SetupRouter(cfg RouterConfig) (r *router.Router) {
 	r.POST(cnst.AlbumAddURL, lgrMw(authMw(cfg.TripGatewayDelivery.AddAlbum)))
 	r.PATCH(cnst.AlbumURL, lgrMw(authMw(cfg.TripGatewayDelivery.UpdateAlbum)))
 	r.DELETE(cnst.AlbumURL, lgrMw(authMw(cfg.TripGatewayDelivery.DeleteAlbum)))
-	r.POST(cnst.UploadAlbumPhotoURL, lgrMw(authMw(cfg.TripGatewayDelivery.UploadPhoto)))
 	r.GET(cnst.SightsByTripURL, lgrMw(cfg.TripGatewayDelivery.SightsByTrip))
 
 	r.GET(cnst.SightsByCountryURL, lgrMw(cfg.SightDelivery.GetSightByCountry))
