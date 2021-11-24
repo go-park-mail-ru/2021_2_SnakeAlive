@@ -1,6 +1,7 @@
 package router
 
 import (
+	country_delivery "snakealive/m/internal/gateway/country/delivery"
 	review_delivery "snakealive/m/internal/gateway/review/delivery"
 	sight_delivery "snakealive/m/internal/gateway/sight/delivery"
 	td "snakealive/m/internal/gateway/trip/delivery"
@@ -22,6 +23,7 @@ type RouterConfig struct {
 	TripGatewayDelivery td.TripGatewayDelivery
 	SightDelivery       sight_delivery.SightDelivery
 	ReviewDelivery      review_delivery.ReviewGatewayDelivery
+	CountryDelivery     country_delivery.CountryDelivery
 
 	Logger *zap.Logger
 }
@@ -49,6 +51,7 @@ func SetupRouter(cfg RouterConfig) (r *router.Router) {
 	r.PATCH(cnst.AlbumURL, lgrMw(authMw(cfg.TripGatewayDelivery.UpdateAlbum)))
 	r.DELETE(cnst.AlbumURL, lgrMw(authMw(cfg.TripGatewayDelivery.DeleteAlbum)))
 	r.POST(cnst.UploadAlbumPhotoURL, lgrMw(authMw(cfg.TripGatewayDelivery.UploadPhoto)))
+	r.GET(cnst.SightsByTripURL, lgrMw(cfg.TripGatewayDelivery.SightsByTrip))
 
 	r.GET(cnst.SightsByCountryURL, lgrMw(cfg.SightDelivery.GetSightByCountry))
 	r.GET(cnst.SightURL, lgrMw(cfg.SightDelivery.GetSightByID))
@@ -57,6 +60,10 @@ func SetupRouter(cfg RouterConfig) (r *router.Router) {
 	r.POST(cnst.ReviewAddURL, lgrMw(authMw(cfg.ReviewDelivery.AddReviewToPlace)))
 	r.GET(cnst.ReviewURL, lgrMw(cfg.ReviewDelivery.ReviewsByPlace))
 	r.DELETE(cnst.ReviewURL, lgrMw(authMw(cfg.ReviewDelivery.DelReview)))
+
+	r.GET(cnst.CountryNameURL, lgrMw(cfg.CountryDelivery.GetCountryByName))
+	r.GET(cnst.CountryIdURL, lgrMw(cfg.CountryDelivery.GetCountryByID))
+	r.GET(cnst.CountryListURL, lgrMw(cfg.CountryDelivery.ListCountries))
 
 	return
 }

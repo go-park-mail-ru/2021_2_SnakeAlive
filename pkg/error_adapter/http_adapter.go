@@ -40,3 +40,27 @@ func NewGrpcToHttpAdapter(errorMap map[codes.Code]HttpError, defaultError HttpEr
 		defaultError: defaultError,
 	}
 }
+
+type errorToHttpAdapter struct {
+	errorMap     map[error]HttpError
+	defaultError HttpError
+}
+
+func (h *errorToHttpAdapter) AdaptError(err error) (adapted HttpError) {
+	adapted, exist := h.errorMap[err]
+	if !exist {
+		return h.defaultError
+	}
+
+	return adapted
+}
+
+func NewErrorToHttpAdapter(
+	errorMap map[error]HttpError,
+	defaultError HttpError,
+) HttpAdapter {
+	return &errorToHttpAdapter{
+		errorMap:     errorMap,
+		defaultError: defaultError,
+	}
+}

@@ -9,6 +9,12 @@ type Trip struct {
 	Sights      []domain.Place `json:"sights"`
 }
 
+type TripSight struct {
+	Id  int     `json:"id"`
+	Lng float32 `json:"lng"`
+	Lat float32 `json:"lat"`
+}
+
 type Album struct {
 	Id          int      `json:"id"`
 	TripId      int      `json:"trip_id"`

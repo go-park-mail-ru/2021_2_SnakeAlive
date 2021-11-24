@@ -26,6 +26,8 @@ type TripUseCase interface {
 	SanitizeAlbum(ctx context.Context, album *models.Album) *models.Album
 
 	UploadPhoto(ctx context.Context, filename string, id int) error
+
+	SightsByTrip(ctx context.Context, id int) (*[]int, error)
 }
 
 type tripUseCase struct {
@@ -91,6 +93,10 @@ func (u tripUseCase) UpdateAlbum(ctx context.Context, id int, updatedAlbum *mode
 func (u tripUseCase) CheckAlbumAuthor(ctx context.Context, userID int, id int) (bool, error) {
 	author, err := u.tripRepository.GetAlbumAuthor(ctx, id)
 	return author == userID, err
+}
+
+func (u tripUseCase) SightsByTrip(ctx context.Context, id int) (*[]int, error) {
+	return u.tripRepository.SightsByTrip(ctx, id)
 }
 
 func (u tripUseCase) SanitizeAlbum(ctx context.Context, album *models.Album) *models.Album {

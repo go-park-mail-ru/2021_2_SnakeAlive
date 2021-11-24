@@ -3,11 +3,12 @@ package delivery
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
+
 	"snakealive/m/internal/gateway/trip/usecase"
 	"snakealive/m/internal/services/trip/models"
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/error_adapter"
-	"strconv"
 
 	"github.com/valyala/fasthttp"
 )
@@ -22,6 +23,7 @@ type TripGatewayDelivery interface {
 	UpdateAlbum(ctx *fasthttp.RequestCtx)
 	DeleteAlbum(ctx *fasthttp.RequestCtx)
 	UploadPhoto(ctx *fasthttp.RequestCtx)
+	SightsByTrip(ctx *fasthttp.RequestCtx)
 }
 
 type tripGatewayDelivery struct {
@@ -194,7 +196,6 @@ func (s *tripGatewayDelivery) UpdateAlbum(ctx *fasthttp.RequestCtx) {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
-	fmt.Println(album)
 
 	album, err := s.manager.UpdateAlbum(ctx, param, album, userID)
 	if err != nil {
@@ -251,4 +252,23 @@ func (s *tripGatewayDelivery) UploadPhoto(ctx *fasthttp.RequestCtx) {
 	}
 	ctx.SetStatusCode(fasthttp.StatusOK)
 
+}
+
+func (s *tripGatewayDelivery) SightsByTrip(ctx *fasthttp.RequestCtx) {
+	param, _ := strconv.Atoi(ctx.UserValue("id").(string))
+
+	ids, err := s.manager.SightsByTrip(ctx, param)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	bytes, err := json.Marshal(ids)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	ctx.SetStatusCode(fasthttp.StatusOK)
+	ctx.Response.SetBody(bytes)
 }

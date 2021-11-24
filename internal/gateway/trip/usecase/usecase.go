@@ -2,13 +2,12 @@ package usecase
 
 import (
 	"context"
+
 	td "snakealive/m/internal/services/trip/delivery"
 	"snakealive/m/internal/services/trip/models"
 	"snakealive/m/pkg/errors"
+	sight_service "snakealive/m/pkg/services/sight"
 	trip_service "snakealive/m/pkg/services/trip"
-
-	"github.com/golang/protobuf/ptypes/empty"
-	"google.golang.org/grpc"
 )
 
 type TripGatewayUseCase interface {
@@ -22,26 +21,20 @@ type TripGatewayUseCase interface {
 	DeleteAlbum(ctx context.Context, id int, userID int) error
 	UpdateAlbum(ctx context.Context, id int, updatedAlbum *models.Album, userID int) (*models.Album, error)
 	UploadPhoto(ctx context.Context, filename string, userID int, id int) error
-}
 
-type tripGRPC interface {
-	GetTrip(ctx context.Context, in *trip_service.TripRequest, opts ...grpc.CallOption) (*trip_service.Trip, error)
-	AddTrip(ctx context.Context, in *trip_service.ModifyTripRequest, opts ...grpc.CallOption) (*trip_service.Trip, error)
-	UpdateTrip(ctx context.Context, in *trip_service.ModifyTripRequest, opts ...grpc.CallOption) (*trip_service.Trip, error)
-	DeleteTrip(ctx context.Context, in *trip_service.TripRequest, opts ...grpc.CallOption) (*empty.Empty, error)
-	GetAlbum(ctx context.Context, in *trip_service.AlbumRequest, opts ...grpc.CallOption) (*trip_service.Album, error)
-	AddAlbum(ctx context.Context, in *trip_service.ModifyAlbumRequest, opts ...grpc.CallOption) (*trip_service.Album, error)
-	UpdateAlbum(ctx context.Context, in *trip_service.ModifyAlbumRequest, opts ...grpc.CallOption) (*trip_service.Album, error)
-	DeleteAlbum(ctx context.Context, in *trip_service.AlbumRequest, opts ...grpc.CallOption) (*empty.Empty, error)
-	UploadPhoto(ctx context.Context, in *trip_service.UploadRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	SightsByTrip(ctx context.Context, id int) ([]models.TripSight, error)
 }
 
 type tripGatewayUseCase struct {
-	tripGRPC tripGRPC
+	tripGRPC  tripGRPC
+	sightGRPC sightGRPC
 }
 
-func NewTripGatewayUseCase(grpc tripGRPC) TripGatewayUseCase {
-	return &tripGatewayUseCase{tripGRPC: grpc}
+func NewTripGatewayUseCase(grpc tripGRPC, sightGRPC sightGRPC) TripGatewayUseCase {
+	return &tripGatewayUseCase{
+		tripGRPC:  grpc,
+		sightGRPC: sightGRPC,
+	}
 }
 
 func (u *tripGatewayUseCase) AddTrip(ctx context.Context, value *models.Trip, userID int) (*models.Trip, error) {
@@ -225,4 +218,29 @@ func (u *tripGatewayUseCase) UploadPhoto(ctx context.Context, filename string, u
 		Filename: filename,
 	})
 	return err
+}
+
+func (u *tripGatewayUseCase) SightsByTrip(ctx context.Context, id int) ([]models.TripSight, error) {
+	ids, err := u.tripGRPC.SightsByTrip(ctx, &trip_service.SightsRequest{
+		TripId: int64(id),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	sights, err := u.sightGRPC.GetSightsByIDs(ctx, &sight_service.GetSightsByIDsRequest{Ids: ids.Ids})
+	if err != nil {
+		return nil, err
+	}
+
+	adapted := make([]models.TripSight, len(sights.Sights))
+	for i, sight := range sights.Sights {
+		adapted[i] = models.TripSight{
+			Id:  int(sight.Id),
+			Lng: sight.Lng,
+			Lat: sight.Lat,
+		}
+	}
+
+	return adapted, nil
 }

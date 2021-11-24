@@ -225,6 +225,22 @@ func (s *tripDelivery) DeleteAlbum(ctx context.Context, request *trip_service.Al
 	return &empty.Empty{}, nil
 }
 
+func (s *tripDelivery) SightsByTrip(ctx context.Context, request *trip_service.SightsRequest) (*trip_service.Sights, error) {
+	sights, err := s.tripUsecase.SightsByTrip(ctx, int(request.TripId))
+	if err != nil {
+		return nil, s.errorAdapter.AdaptError(err)
+	}
+
+	var ids []int64
+	for _, id := range *sights {
+		ids = append(ids, int64(id))
+	}
+
+	return &trip_service.Sights{
+		Ids: ids,
+	}, nil
+}
+
 func ProtoDaysFromPlaces(places []domain.Place) []*trip_service.Sight {
 	var protoDays []*trip_service.Sight
 	for _, sight := range places {

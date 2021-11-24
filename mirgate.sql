@@ -115,34 +115,34 @@ CREATE TABLE Albums
 );
 
 INSERT INTO Countries ("name", "description", "photo")
-VALUES ('Россия',
+VALUES ('Russia',
         'Россия – крупнейшая страна мира, расположенная в Восточной Европе и Северной Азии и омываемая водами Тихого и Северного Ледовитого океанов.',
         'russia.jpeg');
 INSERT INTO Countries ("name", "description", "photo")
-VALUES ('Германия',
+VALUES ('Germany',
         'Германия – государство в Западной Европе с лесами, реками, горными хребтами и пляжными курортами Северного моря.',
         'germany.jpeg');
 INSERT INTO Countries ("name", "description", "photo")
-VALUES ('США',
+VALUES ('USA',
         ' Соединенные Штаты Америки – государство, состоящее из 50 штатов, занимает значительную часть Северной Америки. ',
         'usa.jpeg');
 INSERT INTO Countries ("name", "description", "photo")
-VALUES ('Великобритания',
+VALUES ('UK',
         'Великобритания (официальное название – Соединенное Королевство Великобритании и Северной Ирландии) – островное государство на северо-западе Европы, состоящее из Англии, Шотландии, Уэльса и Северной Ирландии. ',
         'uk.jpeg');
 
 INSERT INTO Users ("name", "surname", "password", "email", "description", "avatar")
-VALUES ('Алексадра', 'Волынец', 'password', 'alex@mail.ru', '', 'test.jpeg');
+VALUES ('Алексадра', 'Волынец', 'AAAcGFzc3dvcmQ=', 'alex@mail.ru', '', 'test.jpeg');
 INSERT INTO Users ("name", "surname", "password", "email", "description", "avatar")
-VALUES ('Никита', 'Черных', 'frontend123', 'nikita@mail.ru', '', 'test.jpeg');
+VALUES ('Никита', 'Черных', 'AAAZnJvbnRlbmQxMjM=', 'nikita@mail.ru', '', 'test.jpeg');
 INSERT INTO Users ("name", "surname", "password", "email", "description", "avatar")
-VALUES ('Ксения', 'Самойлова', '12345678', 'ksenia@mail.ru', '', 'test.jpeg');
+VALUES ('Ксения', 'Самойлова', 'AAAMTIzNDU2Nzg=', 'ksenia@mail.ru', '', 'test.jpeg');
 INSERT INTO Users ("name", "surname", "password", "email", "description", "avatar")
-VALUES ('Андрей', 'Кравцов', '000111000', 'andrew@mail.ru', '', 'test.jpeg');
+VALUES ('Андрей', 'Кравцов', 'AAAMDAwMTExMDAw', 'andrew@mail.ru', '', 'test.jpeg');
 
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Москва-Cити',
-        'Россия',
+        'Russia',
         55.749793,
         37.537393,
         5,
@@ -158,7 +158,7 @@ VALUES ('Москва-Cити',
 
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Воробьевы горы',
-        'Россия',
+        'Russia',
         55.7077713,
         37.5394096,
         4,
@@ -171,7 +171,7 @@ VALUES ('Воробьевы горы',
             'http://194.58.104.204:3000/places/vorobievi_gory_2.jpeg']);
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Дворцово-парковый ансамбль Петергоф',
-        'Россия',
+        'Russia',
         59.8833300,
         29.9000000,
         5,
@@ -188,7 +188,7 @@ VALUES ('Дворцово-парковый ансамбль Петергоф',
             'http://194.58.104.204:3000/places/petergof_0.jpg']);
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Аничков мост',
-        'Россия',
+        'Russia',
         59.9332352,
         30.3433533,
         4,
@@ -205,7 +205,7 @@ VALUES ('Аничков мост',
             'http://194.58.104.204:3000/places/anichkov_most_5.jpeg']);
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Эльбрус',
-        'Россия',
+        'Russia',
         43.2577100,
         42.6443500,
         3,
@@ -222,7 +222,7 @@ VALUES ('Эльбрус',
             'http://194.58.104.204:3000/places/elbrus_3.jpeg']);
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Озеро Байкал',
-        'Россия',
+        'Russia',
         53,
         108,
         5,
@@ -239,7 +239,7 @@ VALUES ('Озеро Байкал',
             'http://194.58.104.204:3000/places/ozero_baikal_4.jpeg']);
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Ростовский кремль',
-        'Россия',
+        'Russia',
         57.1838024,
         39.4146069,
         3,
@@ -254,7 +254,7 @@ VALUES ('Ростовский кремль',
             'http://194.58.104.204:3000/places/rostovskiy_kreml_3.jpeg']);
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Тауэрский мост',
-        'Великобритания',
+        'UK',
         51.5054898,
         -0.0755067,
         5,
@@ -267,7 +267,7 @@ VALUES ('Тауэрский мост',
             'http://194.58.104.204:3000/places/tauerskiy-most_2.jpeg']);
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Вестминстерское Аббатство',
-        'Великобритания',
+        'UK',
         51.4993138,
         -0.1272882,
         4,
@@ -280,7 +280,7 @@ VALUES ('Вестминстерское Аббатство',
             'http://194.58.104.204:3000/places/vestminsterskoe-abbatstvo_2.jpeg']);
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Букингемский дворец',
-        'Великобритания',
+        'UK',
         51.5012171,
         -0.1420831,
         5,
@@ -294,7 +294,7 @@ VALUES ('Букингемский дворец',
             'http://194.58.104.204:3000/places/bukingemskiy-dvorets_4.jpeg']);
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Остров Мэн',
-        'Великобритания',
+        'UK',
         54.163865,
         -4.487597,
         3,
