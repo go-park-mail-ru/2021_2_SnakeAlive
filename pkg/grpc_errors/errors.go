@@ -46,4 +46,11 @@ var (
 		MSG:  "произошла ошибка обращения во внутренний сервис",
 		Code: http.StatusBadRequest,
 	}
+
+	PreparedCountryErrors = map[error]error_adapter.HttpError{
+		errors.CountryDoesNotExist: {
+			MSG:  "запись отсутствует",
+			Code: http.StatusNotFound,
+		},
+	}
 )
