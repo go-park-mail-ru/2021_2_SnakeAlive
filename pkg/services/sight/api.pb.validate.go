@@ -873,3 +873,263 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetSightResponseValidationError{}
+
+// Validate checks the field values on SearchSightRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SearchSightRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SearchSightRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SearchSightRequestMultiError, or nil if none found.
+func (m *SearchSightRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SearchSightRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Search
+
+	if m.GetSkip() < 0 {
+		err := SearchSightRequestValidationError{
+			field:  "Skip",
+			reason: "value must be greater than or equal to 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if m.GetLimit() < 0 {
+		err := SearchSightRequestValidationError{
+			field:  "Limit",
+			reason: "value must be greater than or equal to 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return SearchSightRequestMultiError(errors)
+	}
+	return nil
+}
+
+// SearchSightRequestMultiError is an error wrapping multiple validation errors
+// returned by SearchSightRequest.ValidateAll() if the designated constraints
+// aren't met.
+type SearchSightRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SearchSightRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SearchSightRequestMultiError) AllErrors() []error { return m }
+
+// SearchSightRequestValidationError is the validation error returned by
+// SearchSightRequest.Validate if the designated constraints aren't met.
+type SearchSightRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SearchSightRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SearchSightRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SearchSightRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SearchSightRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SearchSightRequestValidationError) ErrorName() string {
+	return "SearchSightRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SearchSightRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSearchSightRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SearchSightRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SearchSightRequestValidationError{}
+
+// Validate checks the field values on SearchSightResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SearchSightResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SearchSightResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SearchSightResponseMultiError, or nil if none found.
+func (m *SearchSightResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SearchSightResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetSights() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, SearchSightResponseValidationError{
+						field:  fmt.Sprintf("Sights[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, SearchSightResponseValidationError{
+						field:  fmt.Sprintf("Sights[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SearchSightResponseValidationError{
+					field:  fmt.Sprintf("Sights[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return SearchSightResponseMultiError(errors)
+	}
+	return nil
+}
+
+// SearchSightResponseMultiError is an error wrapping multiple validation
+// errors returned by SearchSightResponse.ValidateAll() if the designated
+// constraints aren't met.
+type SearchSightResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SearchSightResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SearchSightResponseMultiError) AllErrors() []error { return m }
+
+// SearchSightResponseValidationError is the validation error returned by
+// SearchSightResponse.Validate if the designated constraints aren't met.
+type SearchSightResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SearchSightResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SearchSightResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SearchSightResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SearchSightResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SearchSightResponseValidationError) ErrorName() string {
+	return "SearchSightResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SearchSightResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSearchSightResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SearchSightResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SearchSightResponseValidationError{}

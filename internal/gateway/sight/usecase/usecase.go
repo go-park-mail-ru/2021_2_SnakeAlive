@@ -10,10 +10,34 @@ import (
 type SightGatewayUseCase interface {
 	GetSightByID(ctx context.Context, id int) (models.SightMetadata, error)
 	GetSightByCountry(ctx context.Context, country string) ([]models.Sight, error)
+	SearchSights(ctx context.Context, search string, skip, limit int) ([]models.SightSearch, error)
 }
 
 type sightGatewayUseCase struct {
 	sightGRPC sightGRPC
+}
+
+func (t *sightGatewayUseCase) SearchSights(ctx context.Context, search string, skip, limit int) ([]models.SightSearch, error) {
+	response, err := t.sightGRPC.SearchSights(ctx, &sight_service.SearchSightRequest{
+		Search: search,
+		Skip:   int64(skip),
+		Limit:  int64(limit),
+	})
+	if err != nil {
+		return []models.SightSearch{}, err
+	}
+
+	adapted := make([]models.SightSearch, len(response.Sights))
+	for i, sight := range response.Sights {
+		adapted[i] = models.SightSearch{
+			Id:   int(sight.Id),
+			Name: sight.Name,
+			Lat:  sight.Lat,
+			Lng:  sight.Lng,
+		}
+	}
+
+	return adapted, nil
 }
 
 func (t *sightGatewayUseCase) GetSightByID(ctx context.Context, id int) (models.SightMetadata, error) {

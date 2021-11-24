@@ -52,6 +52,7 @@ func SetupRouter(cfg RouterConfig) (r *router.Router) {
 
 	r.GET(cnst.SightsByCountryURL, lgrMw(cfg.SightDelivery.GetSightByCountry))
 	r.GET(cnst.SightURL, lgrMw(cfg.SightDelivery.GetSightByID))
+	r.GET(cnst.SightSerach, lgrMw(cfg.SightDelivery.SearchSights))
 
 	r.POST(cnst.ReviewAddURL, lgrMw(authMw(cfg.ReviewDelivery.AddReviewToPlace)))
 	r.GET(cnst.ReviewURL, lgrMw(cfg.ReviewDelivery.ReviewsByPlace))
