@@ -132,13 +132,13 @@ VALUES ('UK',
         'uk.jpeg');
 
 INSERT INTO Users ("name", "surname", "password", "email", "description", "avatar")
-VALUES ('Алексадра', 'Волынец', 'password', 'alex@mail.ru', '', 'test.jpeg');
+VALUES ('Алексадра', 'Волынец', 'AAAcGFzc3dvcmQ=', 'alex@mail.ru', '', 'test.jpeg');
 INSERT INTO Users ("name", "surname", "password", "email", "description", "avatar")
-VALUES ('Никита', 'Черных', 'frontend123', 'nikita@mail.ru', '', 'test.jpeg');
+VALUES ('Никита', 'Черных', 'AAAZnJvbnRlbmQxMjM=', 'nikita@mail.ru', '', 'test.jpeg');
 INSERT INTO Users ("name", "surname", "password", "email", "description", "avatar")
-VALUES ('Ксения', 'Самойлова', '12345678', 'ksenia@mail.ru', '', 'test.jpeg');
+VALUES ('Ксения', 'Самойлова', 'AAAMTIzNDU2Nzg=', 'ksenia@mail.ru', '', 'test.jpeg');
 INSERT INTO Users ("name", "surname", "password", "email", "description", "avatar")
-VALUES ('Андрей', 'Кравцов', '000111000', 'andrew@mail.ru', '', 'test.jpeg');
+VALUES ('Андрей', 'Кравцов', 'AAAMDAwMTExMDAw', 'andrew@mail.ru', '', 'test.jpeg');
 
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Москва-Cити',

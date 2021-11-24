@@ -12,7 +12,7 @@ services:
     environment:
       - USER_DB_URL=postgres://tripadvisor:12345@host.docker.internal:5432/tripadvisor
       - USER_GRPC_PORT=10123
-      - USER_PREFIX_LEN=0
+      - USER_PREFIX_LEN=3
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
 
