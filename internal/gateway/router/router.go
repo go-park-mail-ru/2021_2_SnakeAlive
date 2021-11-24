@@ -1,6 +1,7 @@
 package router
 
 import (
+	review_delivery "snakealive/m/internal/gateway/review/delivery"
 	sight_delivery "snakealive/m/internal/gateway/sight/delivery"
 	td "snakealive/m/internal/gateway/trip/delivery"
 	ud "snakealive/m/internal/gateway/user/delivery"
@@ -20,6 +21,7 @@ type RouterConfig struct {
 	UserDelivery        ud.UserDelivery
 	TripGatewayDelivery td.TripGatewayDelivery
 	SightDelivery       sight_delivery.SightDelivery
+	ReviewDelivery      review_delivery.ReviewGatewayDelivery
 
 	Logger *zap.Logger
 }
@@ -50,6 +52,10 @@ func SetupRouter(cfg RouterConfig) (r *router.Router) {
 
 	r.GET(cnst.SightsByCountryURL, lgrMw(cfg.SightDelivery.GetSightByCountry))
 	r.GET(cnst.SightURL, lgrMw(cfg.SightDelivery.GetSightByID))
+
+	r.POST(cnst.ReviewAddURL, lgrMw(authMw(cfg.ReviewDelivery.AddReviewToPlace)))
+	r.GET(cnst.ReviewURL, lgrMw(cfg.ReviewDelivery.ReviewsByPlace))
+	r.DELETE(cnst.ReviewURL, lgrMw(authMw(cfg.ReviewDelivery.DelReview)))
 
 	return
 }
