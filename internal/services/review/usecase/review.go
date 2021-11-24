@@ -12,7 +12,7 @@ type ReviewUseCase interface {
 	Add(ctx context.Context, review *models.Review, userID int) (int, error)
 	Get(ctx context.Context, id int) (*models.Review, error)
 	Delete(ctx context.Context, id int) error
-	GetReviewsListByPlaceId(ctx context.Context, id int, userID int, limit int, skip int) (*[]models.Review, error)
+	GetReviewsListByPlaceId(ctx context.Context, id int, limit int, skip int) (*[]models.Review, error)
 	CheckAuthor(ctx context.Context, userID int, id int) bool
 	SanitizeReview(ctx context.Context, review *models.Review) *models.Review
 }
@@ -38,7 +38,7 @@ func (u reviewUseCase) Delete(ctx context.Context, id int) error {
 	return u.reviewRepository.Delete(ctx, id)
 }
 
-func (u reviewUseCase) GetReviewsListByPlaceId(ctx context.Context, id int, userID int, limit int, skip int) (*[]models.Review, error) {
+func (u reviewUseCase) GetReviewsListByPlaceId(ctx context.Context, id int, limit int, skip int) (*[]models.Review, error) {
 	return u.reviewRepository.GetListByPlace(ctx, id, limit, skip)
 }
 

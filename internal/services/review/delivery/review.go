@@ -25,7 +25,7 @@ func NewReviewDelivery(reviewUsecase usecase.ReviewUseCase, errorAdapter error_a
 }
 
 func (r *reviewDelivery) ReviewByPlace(ctx context.Context, request *review_service.ReviewRequest) (*review_service.Reviews, error) {
-	reviews, err := r.reviewUsecase.GetReviewsListByPlaceId(ctx, int(request.PlaceId), int(request.UserId), int(request.Limit),
+	reviews, err := r.reviewUsecase.GetReviewsListByPlaceId(ctx, int(request.PlaceId), int(request.Limit),
 		int(request.Skip))
 
 	if err != nil {

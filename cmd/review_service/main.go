@@ -7,8 +7,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"snakealive/m/internal/services/auth/config"
-	"snakealive/m/internal/services/auth/setup"
+	"snakealive/m/internal/services/review/config"
+	"snakealive/m/internal/services/review/setup"
 )
 
 func main() {

@@ -47,7 +47,7 @@ func (r *reviewRepository) Add(ctx context.Context, value *models.Review, userId
 }
 
 func (r *reviewRepository) Get(ctx context.Context, id int) (*models.Review, error) {
-	var review *models.Review
+	review := new(models.Review)
 	conn, err := r.dataHolder.Acquire(context.Background())
 	if err != nil {
 		return review, err

@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"snakealive/m/internal/services/review/models"
 	review_service "snakealive/m/pkg/services/review"
 
@@ -12,7 +13,7 @@ import (
 type ReviewGatewayUseCase interface {
 	Add(ctx context.Context, review *models.Review, userID int) (*models.Review, error)
 	Delete(ctx context.Context, id int, userID int) error
-	GetReviewsListByPlaceId(ctx context.Context, id int, userID int, limit int, skip int) (*[]models.Review, error)
+	GetReviewsListByPlaceId(ctx context.Context, id int, limit int, skip int) (*[]models.Review, error)
 }
 
 type reviewGRPC interface {
@@ -44,6 +45,7 @@ func (u *reviewGatewayUseCase) Add(ctx context.Context, review *models.Review, u
 	})
 
 	if err != nil {
+		fmt.Println(err, addedReview)
 		return nil, err
 	}
 
@@ -64,9 +66,8 @@ func (u *reviewGatewayUseCase) Delete(ctx context.Context, id int, userID int) e
 	return err
 }
 
-func (u *reviewGatewayUseCase) GetReviewsListByPlaceId(ctx context.Context, id int, userID int, limit int, skip int) (*[]models.Review, error) {
+func (u *reviewGatewayUseCase) GetReviewsListByPlaceId(ctx context.Context, id int, limit int, skip int) (*[]models.Review, error) {
 	reviews, err := u.reviewGRPC.ReviewByPlace(ctx, &review_service.ReviewRequest{
-		UserId:  int64(userID),
 		PlaceId: int64(id),
 		Limit:   int64(limit),
 		Skip:    int64(skip),

@@ -62,7 +62,7 @@ func Setup(cfg config.Config) (r *fsthp_router.Router, stopFunc func(), err erro
 		sightUsecase,
 	)
 
-	reviewConn, err := grpc.Dial(cfg.SightServiceEndpoint, grpc.WithInsecure(), grpc.WithBlock())
+	reviewConn, err := grpc.Dial(cfg.ReviewServiceEndpoint, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		return r, stopFunc, err
 	}

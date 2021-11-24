@@ -39,18 +39,17 @@ func (d *reviewGatewayDelivery) ReviewsByPlace(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	userID := ctx.UserValue(cnst.UserIDContextKey).(int)
 	skip, err := strconv.Atoi(string(ctx.QueryArgs().Peek("skip")))
 	if err != nil {
-		skip = cnst.DefaultSkip
+		skip = 0
 	}
 
 	limit, err := strconv.Atoi(string(ctx.QueryArgs().Peek("limit")))
 	if err != nil {
-		limit = 0
+		limit = cnst.DefaultSkip
 	}
 
-	review, err := d.manager.GetReviewsListByPlaceId(ctx, param, userID, limit, skip)
+	review, err := d.manager.GetReviewsListByPlaceId(ctx, param, limit, skip)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
 		return
