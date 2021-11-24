@@ -3,11 +3,12 @@ package delivery
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
+
 	"snakealive/m/internal/gateway/trip/usecase"
 	"snakealive/m/internal/services/trip/models"
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/error_adapter"
-	"strconv"
 
 	"github.com/valyala/fasthttp"
 )
@@ -269,5 +270,5 @@ func (s *tripGatewayDelivery) SightsByTrip(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	ctx.Write(bytes)
+	ctx.Response.SetBody(bytes)
 }

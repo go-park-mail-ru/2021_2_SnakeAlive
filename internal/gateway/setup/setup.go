@@ -54,19 +54,6 @@ func Setup(cfg config.Config) (r *fsthp_router.Router, stopFunc func(), err erro
 		userUsecase,
 	)
 
-	tripConn, err := grpc.Dial(cfg.TripServiceEndpoint, grpc.WithInsecure(), grpc.WithBlock())
-	if err != nil {
-		return r, stopFunc, err
-	}
-	tripGRPC := trip_service.NewTripServiceClient(tripConn)
-	tripGatewayUseCase := tu.NewTripGatewayUseCase(tripGRPC)
-	tripDelivery := td.NewTripGetewayDelivery(
-		error_adapter.NewGrpcToHttpAdapter(
-			grpc_errors.UserGatewayError, grpc_errors.CommonError,
-		),
-		tripGatewayUseCase,
-	)
-
 	sightConn, err := grpc.Dial(cfg.SightServiceEndpoint, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		return r, stopFunc, err
@@ -78,6 +65,19 @@ func Setup(cfg config.Config) (r *fsthp_router.Router, stopFunc func(), err erro
 			grpc_errors.UserGatewayError, grpc_errors.CommonError,
 		),
 		sightUsecase,
+	)
+
+	tripConn, err := grpc.Dial(cfg.TripServiceEndpoint, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		return r, stopFunc, err
+	}
+	tripGRPC := trip_service.NewTripServiceClient(tripConn)
+	tripGatewayUseCase := tu.NewTripGatewayUseCase(tripGRPC, sightGRPC)
+	tripDelivery := td.NewTripGetewayDelivery(
+		error_adapter.NewGrpcToHttpAdapter(
+			grpc_errors.UserGatewayError, grpc_errors.CommonError,
+		),
+		tripGatewayUseCase,
 	)
 
 	reviewConn, err := grpc.Dial(cfg.ReviewServiceEndpoint, grpc.WithInsecure(), grpc.WithBlock())
