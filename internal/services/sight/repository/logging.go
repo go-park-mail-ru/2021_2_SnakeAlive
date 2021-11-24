@@ -71,6 +71,24 @@ func (l *loggingMiddleware) GetSightByID(ctx context.Context, id int) (sight mod
 	return l.next.GetSightByID(ctx, id)
 }
 
+func (l *loggingMiddleware) SearchSights(ctx context.Context, search string, skip, limit int64) (sights []models.Sight, err error) {
+	l.logger.Infow(module,
+		"Action", "GetSightByID",
+		"Request", []interface{}{search, skip, limit},
+	)
+	defer func() {
+		if err != nil {
+			l.logger.Infow(module,
+				"Action", "GetSightByID",
+				"Request", []interface{}{search, skip, limit},
+				"Error", err,
+			)
+		}
+	}()
+
+	return l.next.SearchSights(ctx, search, skip, limit)
+}
+
 func NewLoggingMiddleware(
 	logger *zap.SugaredLogger,
 

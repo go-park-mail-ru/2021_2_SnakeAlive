@@ -13,3 +13,10 @@ type SightMetadata struct {
 	Country string   `json:"country"`
 	Rating  float32  `json:"rating"`
 }
+
+type SightSearch struct {
+	Id   int     `json:"id"`
+	Name string  `json:"name"`
+	Lat  float32 `json:"lat"`
+	Lng  float32 `json:"lng"`
+}

@@ -46,8 +46,23 @@ message GetSightResponse {
   Sight sight = 1;
 }
 
+message SearchSightRequest {
+  string search = 1;
+  int64 skip = 2 [(validate.rules).int64 = {
+    gte: 0,
+  }];
+  int64 limit = 3 [(validate.rules).int64 = {
+    gte: 0,
+  }];
+}
+
+message SearchSightResponse {
+  repeated Sight sights = 1;
+}
+
 service SightService {
   rpc GetSights(GetSightsRequest) returns (GetSightsReponse) {};
   rpc GetSight(GetSightRequest) returns (GetSightResponse) {};
   rpc GetSightsByIDs(GetSightsByIDsRequest) returns (GetSightsByIDsResponse) {};
+  rpc SearchSights(SearchSightRequest) returns (SearchSightResponse) {};
 }
