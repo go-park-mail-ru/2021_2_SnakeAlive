@@ -10,7 +10,7 @@ const (
 	updateUserPass        = "pass=$"
 	updateUserEmail       = "email=$"
 	updateUserDescription = "description=$"
-	updateUserAvater      = "avatar=$"
+	updateUserAvatar      = "avatar=$"
 	updateUserReturning   = "RETURNING name, surname, email, avatar, description"
 	createUserSession     = "INSERT INTO Cookies (user_id, hash) VALUES ($1, $2)"
 	validateUserSession   = "SELECT user_id FROM Cookies WHERE hash = $1"

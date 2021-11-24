@@ -8,7 +8,6 @@ protogen-api-with-validator:
     		--validate_out=lang=go,paths=source_relative:. \
     		$(path)
 
-
 protogen-api-auth-service:
 	make protogen-api-with-validator path=pkg/services/auth/api.proto
 

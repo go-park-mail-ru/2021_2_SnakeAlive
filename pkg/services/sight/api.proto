@@ -13,6 +13,16 @@ message Sight {
   repeated string tags = 5;
   string description = 6;
   repeated string photos = 7;
+  float lat = 8;
+  float lng = 9;
+}
+
+message GetSightsByIDsRequest {
+  repeated int64 ids = 1;
+}
+
+message GetSightsByIDsResponse {
+  repeated Sight sights = 1;
 }
 
 message GetSightsRequest {
@@ -39,4 +49,5 @@ message GetSightResponse {
 service SightService {
   rpc GetSights(GetSightsRequest) returns (GetSightsReponse) {};
   rpc GetSight(GetSightRequest) returns (GetSightResponse) {};
+  rpc GetSightsByIDs(GetSightsByIDsRequest) returns (GetSightsByIDsResponse) {};
 }

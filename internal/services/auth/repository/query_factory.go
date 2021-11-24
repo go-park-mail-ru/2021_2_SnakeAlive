@@ -77,7 +77,7 @@ func (q *queryFactory) CreateUpdateUser(user *models.User) *query.Query {
 	}
 	if user.Image != "" {
 		params = append(params, user.Image)
-		optionals = append(optionals, updateUserAvater+strconv.Itoa(pos))
+		optionals = append(optionals, updateUserAvatar+strconv.Itoa(pos))
 		pos++
 	}
 

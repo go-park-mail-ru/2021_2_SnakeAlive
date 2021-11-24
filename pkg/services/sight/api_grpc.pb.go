@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 type SightServiceClient interface {
 	GetSights(ctx context.Context, in *GetSightsRequest, opts ...grpc.CallOption) (*GetSightsReponse, error)
 	GetSight(ctx context.Context, in *GetSightRequest, opts ...grpc.CallOption) (*GetSightResponse, error)
+	GetSightsByIDs(ctx context.Context, in *GetSightsByIDsRequest, opts ...grpc.CallOption) (*GetSightsByIDsResponse, error)
 }
 
 type sightServiceClient struct {
@@ -48,12 +49,22 @@ func (c *sightServiceClient) GetSight(ctx context.Context, in *GetSightRequest, 
 	return out, nil
 }
 
+func (c *sightServiceClient) GetSightsByIDs(ctx context.Context, in *GetSightsByIDsRequest, opts ...grpc.CallOption) (*GetSightsByIDsResponse, error) {
+	out := new(GetSightsByIDsResponse)
+	err := c.cc.Invoke(ctx, "/services.sight_service.SightService/GetSightsByIDs", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SightServiceServer is the server API for SightService service.
 // All implementations must embed UnimplementedSightServiceServer
 // for forward compatibility
 type SightServiceServer interface {
 	GetSights(context.Context, *GetSightsRequest) (*GetSightsReponse, error)
 	GetSight(context.Context, *GetSightRequest) (*GetSightResponse, error)
+	GetSightsByIDs(context.Context, *GetSightsByIDsRequest) (*GetSightsByIDsResponse, error)
 	mustEmbedUnimplementedSightServiceServer()
 }
 
@@ -66,6 +77,9 @@ func (UnimplementedSightServiceServer) GetSights(context.Context, *GetSightsRequ
 }
 func (UnimplementedSightServiceServer) GetSight(context.Context, *GetSightRequest) (*GetSightResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSight not implemented")
+}
+func (UnimplementedSightServiceServer) GetSightsByIDs(context.Context, *GetSightsByIDsRequest) (*GetSightsByIDsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSightsByIDs not implemented")
 }
 func (UnimplementedSightServiceServer) mustEmbedUnimplementedSightServiceServer() {}
 
@@ -116,6 +130,24 @@ func _SightService_GetSight_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SightService_GetSightsByIDs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSightsByIDsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SightServiceServer).GetSightsByIDs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/services.sight_service.SightService/GetSightsByIDs",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SightServiceServer).GetSightsByIDs(ctx, req.(*GetSightsByIDsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SightService_ServiceDesc is the grpc.ServiceDesc for SightService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -130,6 +162,10 @@ var SightService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetSight",
 			Handler:    _SightService_GetSight_Handler,
+		},
+		{
+			MethodName: "GetSightsByIDs",
+			Handler:    _SightService_GetSightsByIDs_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

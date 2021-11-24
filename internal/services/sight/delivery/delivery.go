@@ -44,6 +44,22 @@ func (s *sightDelivery) GetSight(
 	}, nil
 }
 
+func (s *sightDelivery) GetSightsByIDs(
+	ctx context.Context, request *sight_service.GetSightsByIDsRequest,
+) (*sight_service.GetSightsByIDsResponse, error) {
+	sights, err := s.usecase.GetSightsByIDs(ctx, request.Ids)
+	if err != nil {
+		return &sight_service.GetSightsByIDsResponse{}, s.errorAdapter.AdaptError(err)
+	}
+
+	adapted := &sight_service.GetSightsByIDsResponse{Sights: make([]*sight_service.Sight, len(sights))}
+	for i := range sights {
+		adapted.Sights[i] = s.adaptSight(sights[i])
+	}
+
+	return adapted, nil
+}
+
 func (s *sightDelivery) adaptSight(sight models.Sight) *sight_service.Sight {
 	return &sight_service.Sight{
 		Id:          int64(sight.Id),
@@ -53,6 +69,8 @@ func (s *sightDelivery) adaptSight(sight models.Sight) *sight_service.Sight {
 		Tags:        sight.Tags,
 		Description: sight.Description,
 		Photos:      sight.Photos,
+		Lat:         sight.Lat,
+		Lng:         sight.Lng,
 	}
 }
 

@@ -33,6 +33,8 @@ type Sight struct {
 	Tags        []string `protobuf:"bytes,5,rep,name=tags,proto3" json:"tags,omitempty"`
 	Description string   `protobuf:"bytes,6,opt,name=description,proto3" json:"description,omitempty"`
 	Photos      []string `protobuf:"bytes,7,rep,name=photos,proto3" json:"photos,omitempty"`
+	Lat         float32  `protobuf:"fixed32,8,opt,name=lat,proto3" json:"lat,omitempty"`
+	Lng         float32  `protobuf:"fixed32,9,opt,name=lng,proto3" json:"lng,omitempty"`
 }
 
 func (x *Sight) Reset() {
@@ -116,6 +118,114 @@ func (x *Sight) GetPhotos() []string {
 	return nil
 }
 
+func (x *Sight) GetLat() float32 {
+	if x != nil {
+		return x.Lat
+	}
+	return 0
+}
+
+func (x *Sight) GetLng() float32 {
+	if x != nil {
+		return x.Lng
+	}
+	return 0
+}
+
+type GetSightsByIDsRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Ids []int64 `protobuf:"varint,1,rep,packed,name=ids,proto3" json:"ids,omitempty"`
+}
+
+func (x *GetSightsByIDsRequest) Reset() {
+	*x = GetSightsByIDsRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_services_sight_api_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetSightsByIDsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSightsByIDsRequest) ProtoMessage() {}
+
+func (x *GetSightsByIDsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_services_sight_api_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSightsByIDsRequest.ProtoReflect.Descriptor instead.
+func (*GetSightsByIDsRequest) Descriptor() ([]byte, []int) {
+	return file_pkg_services_sight_api_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *GetSightsByIDsRequest) GetIds() []int64 {
+	if x != nil {
+		return x.Ids
+	}
+	return nil
+}
+
+type GetSightsByIDsResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Sights []*Sight `protobuf:"bytes,1,rep,name=sights,proto3" json:"sights,omitempty"`
+}
+
+func (x *GetSightsByIDsResponse) Reset() {
+	*x = GetSightsByIDsResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_services_sight_api_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetSightsByIDsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSightsByIDsResponse) ProtoMessage() {}
+
+func (x *GetSightsByIDsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_services_sight_api_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSightsByIDsResponse.ProtoReflect.Descriptor instead.
+func (*GetSightsByIDsResponse) Descriptor() ([]byte, []int) {
+	return file_pkg_services_sight_api_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *GetSightsByIDsResponse) GetSights() []*Sight {
+	if x != nil {
+		return x.Sights
+	}
+	return nil
+}
+
 type GetSightsRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -127,7 +237,7 @@ type GetSightsRequest struct {
 func (x *GetSightsRequest) Reset() {
 	*x = GetSightsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pkg_services_sight_api_proto_msgTypes[1]
+		mi := &file_pkg_services_sight_api_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -140,7 +250,7 @@ func (x *GetSightsRequest) String() string {
 func (*GetSightsRequest) ProtoMessage() {}
 
 func (x *GetSightsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_services_sight_api_proto_msgTypes[1]
+	mi := &file_pkg_services_sight_api_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -153,7 +263,7 @@ func (x *GetSightsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSightsRequest.ProtoReflect.Descriptor instead.
 func (*GetSightsRequest) Descriptor() ([]byte, []int) {
-	return file_pkg_services_sight_api_proto_rawDescGZIP(), []int{1}
+	return file_pkg_services_sight_api_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetSightsRequest) GetCountryName() string {
@@ -174,7 +284,7 @@ type GetSightsReponse struct {
 func (x *GetSightsReponse) Reset() {
 	*x = GetSightsReponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pkg_services_sight_api_proto_msgTypes[2]
+		mi := &file_pkg_services_sight_api_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -187,7 +297,7 @@ func (x *GetSightsReponse) String() string {
 func (*GetSightsReponse) ProtoMessage() {}
 
 func (x *GetSightsReponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_services_sight_api_proto_msgTypes[2]
+	mi := &file_pkg_services_sight_api_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -200,7 +310,7 @@ func (x *GetSightsReponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSightsReponse.ProtoReflect.Descriptor instead.
 func (*GetSightsReponse) Descriptor() ([]byte, []int) {
-	return file_pkg_services_sight_api_proto_rawDescGZIP(), []int{2}
+	return file_pkg_services_sight_api_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetSightsReponse) GetSights() []*Sight {
@@ -221,7 +331,7 @@ type GetSightRequest struct {
 func (x *GetSightRequest) Reset() {
 	*x = GetSightRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pkg_services_sight_api_proto_msgTypes[3]
+		mi := &file_pkg_services_sight_api_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -234,7 +344,7 @@ func (x *GetSightRequest) String() string {
 func (*GetSightRequest) ProtoMessage() {}
 
 func (x *GetSightRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_services_sight_api_proto_msgTypes[3]
+	mi := &file_pkg_services_sight_api_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -247,7 +357,7 @@ func (x *GetSightRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSightRequest.ProtoReflect.Descriptor instead.
 func (*GetSightRequest) Descriptor() ([]byte, []int) {
-	return file_pkg_services_sight_api_proto_rawDescGZIP(), []int{3}
+	return file_pkg_services_sight_api_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GetSightRequest) GetId() int64 {
@@ -268,7 +378,7 @@ type GetSightResponse struct {
 func (x *GetSightResponse) Reset() {
 	*x = GetSightResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_pkg_services_sight_api_proto_msgTypes[4]
+		mi := &file_pkg_services_sight_api_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -281,7 +391,7 @@ func (x *GetSightResponse) String() string {
 func (*GetSightResponse) ProtoMessage() {}
 
 func (x *GetSightResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_services_sight_api_proto_msgTypes[4]
+	mi := &file_pkg_services_sight_api_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -294,7 +404,7 @@ func (x *GetSightResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSightResponse.ProtoReflect.Descriptor instead.
 func (*GetSightResponse) Descriptor() ([]byte, []int) {
-	return file_pkg_services_sight_api_proto_rawDescGZIP(), []int{4}
+	return file_pkg_services_sight_api_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetSightResponse) GetSight() *Sight {
@@ -313,7 +423,7 @@ var file_pkg_services_sight_api_proto_rawDesc = []byte{
 	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x1a, 0x2f, 0x74, 0x68, 0x69, 0x72, 0x64, 0x5f, 0x70, 0x61,
 	0x72, 0x74, 0x79, 0x2f, 0x67, 0x6f, 0x2d, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2d, 0x76, 0x61, 0x6c,
 	0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x73, 0x2f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f,
-	0x72, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xab, 0x01, 0x0a, 0x05, 0x53, 0x69, 0x67, 0x68,
+	0x72, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xcf, 0x01, 0x0a, 0x05, 0x53, 0x69, 0x67, 0x68,
 	0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02, 0x69,
 	0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
 	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x72, 0x79,
@@ -324,7 +434,17 @@ var file_pkg_services_sight_api_proto_rawDesc = []byte{
 	0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09,
 	0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x16, 0x0a,
 	0x06, 0x70, 0x68, 0x6f, 0x74, 0x6f, 0x73, 0x18, 0x07, 0x20, 0x03, 0x28, 0x09, 0x52, 0x06, 0x70,
-	0x68, 0x6f, 0x74, 0x6f, 0x73, 0x22, 0x40, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x53, 0x69, 0x67, 0x68,
+	0x68, 0x6f, 0x74, 0x6f, 0x73, 0x12, 0x10, 0x0a, 0x03, 0x6c, 0x61, 0x74, 0x18, 0x08, 0x20, 0x01,
+	0x28, 0x02, 0x52, 0x03, 0x6c, 0x61, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x6c, 0x6e, 0x67, 0x18, 0x09,
+	0x20, 0x01, 0x28, 0x02, 0x52, 0x03, 0x6c, 0x6e, 0x67, 0x22, 0x29, 0x0a, 0x15, 0x47, 0x65, 0x74,
+	0x53, 0x69, 0x67, 0x68, 0x74, 0x73, 0x42, 0x79, 0x49, 0x44, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x69, 0x64, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x03, 0x52,
+	0x03, 0x69, 0x64, 0x73, 0x22, 0x4f, 0x0a, 0x16, 0x47, 0x65, 0x74, 0x53, 0x69, 0x67, 0x68, 0x74,
+	0x73, 0x42, 0x79, 0x49, 0x44, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x35,
+	0x0a, 0x06, 0x73, 0x69, 0x67, 0x68, 0x74, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1d,
+	0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x73, 0x2e, 0x73, 0x69, 0x67, 0x68, 0x74, 0x5f,
+	0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x53, 0x69, 0x67, 0x68, 0x74, 0x52, 0x06, 0x73,
+	0x69, 0x67, 0x68, 0x74, 0x73, 0x22, 0x40, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x53, 0x69, 0x67, 0x68,
 	0x74, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x2c, 0x0a, 0x0b, 0x63, 0x6f, 0x75,
 	0x6e, 0x74, 0x72, 0x79, 0x4e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x0a,
 	0xfa, 0x42, 0x07, 0x72, 0x05, 0x18, 0x80, 0x01, 0x20, 0x01, 0x52, 0x0b, 0x63, 0x6f, 0x75, 0x6e,
@@ -340,7 +460,7 @@ var file_pkg_services_sight_api_proto_rawDesc = []byte{
 	0x73, 0x65, 0x12, 0x33, 0x0a, 0x05, 0x73, 0x69, 0x67, 0x68, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x0b, 0x32, 0x1d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x73, 0x2e, 0x73, 0x69, 0x67,
 	0x68, 0x74, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x53, 0x69, 0x67, 0x68, 0x74,
-	0x52, 0x05, 0x73, 0x69, 0x67, 0x68, 0x74, 0x32, 0xd2, 0x01, 0x0a, 0x0c, 0x53, 0x69, 0x67, 0x68,
+	0x52, 0x05, 0x73, 0x69, 0x67, 0x68, 0x74, 0x32, 0xc5, 0x02, 0x0a, 0x0c, 0x53, 0x69, 0x67, 0x68,
 	0x74, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x61, 0x0a, 0x09, 0x47, 0x65, 0x74, 0x53,
 	0x69, 0x67, 0x68, 0x74, 0x73, 0x12, 0x28, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x73,
 	0x2e, 0x73, 0x69, 0x67, 0x68, 0x74, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x47,
@@ -353,11 +473,18 @@ var file_pkg_services_sight_api_proto_rawDesc = []byte{
 	0x2e, 0x47, 0x65, 0x74, 0x53, 0x69, 0x67, 0x68, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
 	0x1a, 0x28, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x73, 0x2e, 0x73, 0x69, 0x67, 0x68,
 	0x74, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x69, 0x67,
-	0x68, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x2f, 0x5a, 0x2d,
-	0x73, 0x6e, 0x61, 0x6b, 0x65, 0x61, 0x6c, 0x69, 0x76, 0x65, 0x2f, 0x6d, 0x2f, 0x70, 0x6b, 0x67,
-	0x2f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x73, 0x2f, 0x73, 0x69, 0x67, 0x68, 0x74, 0x3b,
-	0x73, 0x69, 0x67, 0x68, 0x74, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x62, 0x06, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x68, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x71, 0x0a, 0x0e,
+	0x47, 0x65, 0x74, 0x53, 0x69, 0x67, 0x68, 0x74, 0x73, 0x42, 0x79, 0x49, 0x44, 0x73, 0x12, 0x2d,
+	0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x73, 0x2e, 0x73, 0x69, 0x67, 0x68, 0x74, 0x5f,
+	0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x69, 0x67, 0x68, 0x74,
+	0x73, 0x42, 0x79, 0x49, 0x44, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2e, 0x2e,
+	0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x73, 0x2e, 0x73, 0x69, 0x67, 0x68, 0x74, 0x5f, 0x73,
+	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x69, 0x67, 0x68, 0x74, 0x73,
+	0x42, 0x79, 0x49, 0x44, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42,
+	0x2f, 0x5a, 0x2d, 0x73, 0x6e, 0x61, 0x6b, 0x65, 0x61, 0x6c, 0x69, 0x76, 0x65, 0x2f, 0x6d, 0x2f,
+	0x70, 0x6b, 0x67, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x73, 0x2f, 0x73, 0x69, 0x67,
+	0x68, 0x74, 0x3b, 0x73, 0x69, 0x67, 0x68, 0x74, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -372,26 +499,31 @@ func file_pkg_services_sight_api_proto_rawDescGZIP() []byte {
 	return file_pkg_services_sight_api_proto_rawDescData
 }
 
-var file_pkg_services_sight_api_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_pkg_services_sight_api_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_pkg_services_sight_api_proto_goTypes = []interface{}{
-	(*Sight)(nil),            // 0: services.sight_service.Sight
-	(*GetSightsRequest)(nil), // 1: services.sight_service.GetSightsRequest
-	(*GetSightsReponse)(nil), // 2: services.sight_service.GetSightsReponse
-	(*GetSightRequest)(nil),  // 3: services.sight_service.GetSightRequest
-	(*GetSightResponse)(nil), // 4: services.sight_service.GetSightResponse
+	(*Sight)(nil),                  // 0: services.sight_service.Sight
+	(*GetSightsByIDsRequest)(nil),  // 1: services.sight_service.GetSightsByIDsRequest
+	(*GetSightsByIDsResponse)(nil), // 2: services.sight_service.GetSightsByIDsResponse
+	(*GetSightsRequest)(nil),       // 3: services.sight_service.GetSightsRequest
+	(*GetSightsReponse)(nil),       // 4: services.sight_service.GetSightsReponse
+	(*GetSightRequest)(nil),        // 5: services.sight_service.GetSightRequest
+	(*GetSightResponse)(nil),       // 6: services.sight_service.GetSightResponse
 }
 var file_pkg_services_sight_api_proto_depIdxs = []int32{
-	0, // 0: services.sight_service.GetSightsReponse.sights:type_name -> services.sight_service.Sight
-	0, // 1: services.sight_service.GetSightResponse.sight:type_name -> services.sight_service.Sight
-	1, // 2: services.sight_service.SightService.GetSights:input_type -> services.sight_service.GetSightsRequest
-	3, // 3: services.sight_service.SightService.GetSight:input_type -> services.sight_service.GetSightRequest
-	2, // 4: services.sight_service.SightService.GetSights:output_type -> services.sight_service.GetSightsReponse
-	4, // 5: services.sight_service.SightService.GetSight:output_type -> services.sight_service.GetSightResponse
-	4, // [4:6] is the sub-list for method output_type
-	2, // [2:4] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	0, // 0: services.sight_service.GetSightsByIDsResponse.sights:type_name -> services.sight_service.Sight
+	0, // 1: services.sight_service.GetSightsReponse.sights:type_name -> services.sight_service.Sight
+	0, // 2: services.sight_service.GetSightResponse.sight:type_name -> services.sight_service.Sight
+	3, // 3: services.sight_service.SightService.GetSights:input_type -> services.sight_service.GetSightsRequest
+	5, // 4: services.sight_service.SightService.GetSight:input_type -> services.sight_service.GetSightRequest
+	1, // 5: services.sight_service.SightService.GetSightsByIDs:input_type -> services.sight_service.GetSightsByIDsRequest
+	4, // 6: services.sight_service.SightService.GetSights:output_type -> services.sight_service.GetSightsReponse
+	6, // 7: services.sight_service.SightService.GetSight:output_type -> services.sight_service.GetSightResponse
+	2, // 8: services.sight_service.SightService.GetSightsByIDs:output_type -> services.sight_service.GetSightsByIDsResponse
+	6, // [6:9] is the sub-list for method output_type
+	3, // [3:6] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_pkg_services_sight_api_proto_init() }
@@ -413,7 +545,7 @@ func file_pkg_services_sight_api_proto_init() {
 			}
 		}
 		file_pkg_services_sight_api_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetSightsRequest); i {
+			switch v := v.(*GetSightsByIDsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -425,7 +557,7 @@ func file_pkg_services_sight_api_proto_init() {
 			}
 		}
 		file_pkg_services_sight_api_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetSightsReponse); i {
+			switch v := v.(*GetSightsByIDsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -437,7 +569,7 @@ func file_pkg_services_sight_api_proto_init() {
 			}
 		}
 		file_pkg_services_sight_api_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetSightRequest); i {
+			switch v := v.(*GetSightsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -449,6 +581,30 @@ func file_pkg_services_sight_api_proto_init() {
 			}
 		}
 		file_pkg_services_sight_api_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetSightsReponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_services_sight_api_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetSightRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_services_sight_api_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*GetSightResponse); i {
 			case 0:
 				return &v.state
@@ -467,7 +623,7 @@ func file_pkg_services_sight_api_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_pkg_services_sight_api_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
