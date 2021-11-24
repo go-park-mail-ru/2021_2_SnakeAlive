@@ -267,16 +267,18 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                  name:
-                    type: string
-                  lng:
-                    type: number
-                  lat:
-                    type: number
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    lng:
+                      type: number
+                    lat:
+                      type: number
         '400':
           description: Bad request params
   /trip:
