@@ -50,6 +50,7 @@ services:
     depends_on:
       - trip_service
       - auth_service
+      - sight_service
     build:
       dockerfile: Dockerfile.gateway
       context: .
