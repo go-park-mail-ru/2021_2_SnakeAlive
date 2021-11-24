@@ -167,6 +167,21 @@ func (mr *MockTripRepositoryMockRecorder) GetTripById(ctx, id interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTripById", reflect.TypeOf((*MockTripRepository)(nil).GetTripById), ctx, id)
 }
 
+// SightsByTrip mocks base method.
+func (m *MockTripRepository) SightsByTrip(ctx context.Context, id int) (*[]int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SightsByTrip", ctx, id)
+	ret0, _ := ret[0].(*[]int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SightsByTrip indicates an expected call of SightsByTrip.
+func (mr *MockTripRepositoryMockRecorder) SightsByTrip(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SightsByTrip", reflect.TypeOf((*MockTripRepository)(nil).SightsByTrip), ctx, id)
+}
+
 // UpdateAlbum mocks base method.
 func (m *MockTripRepository) UpdateAlbum(ctx context.Context, id int, album *models.Album) error {
 	m.ctrl.T.Helper()
