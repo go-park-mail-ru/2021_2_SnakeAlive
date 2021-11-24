@@ -1025,3 +1025,201 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = UploadRequestValidationError{}
+
+// Validate checks the field values on SightsRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *SightsRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SightsRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in SightsRequestMultiError, or
+// nil if none found.
+func (m *SightsRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SightsRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for TripId
+
+	if len(errors) > 0 {
+		return SightsRequestMultiError(errors)
+	}
+	return nil
+}
+
+// SightsRequestMultiError is an error wrapping multiple validation errors
+// returned by SightsRequest.ValidateAll() if the designated constraints
+// aren't met.
+type SightsRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SightsRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SightsRequestMultiError) AllErrors() []error { return m }
+
+// SightsRequestValidationError is the validation error returned by
+// SightsRequest.Validate if the designated constraints aren't met.
+type SightsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SightsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SightsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SightsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SightsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SightsRequestValidationError) ErrorName() string { return "SightsRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SightsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSightsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SightsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SightsRequestValidationError{}
+
+// Validate checks the field values on Sights with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Sights) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Sights with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in SightsMultiError, or nil if none found.
+func (m *Sights) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Sights) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return SightsMultiError(errors)
+	}
+	return nil
+}
+
+// SightsMultiError is an error wrapping multiple validation errors returned by
+// Sights.ValidateAll() if the designated constraints aren't met.
+type SightsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SightsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SightsMultiError) AllErrors() []error { return m }
+
+// SightsValidationError is the validation error returned by Sights.Validate if
+// the designated constraints aren't met.
+type SightsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SightsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SightsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SightsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SightsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SightsValidationError) ErrorName() string { return "SightsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e SightsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSights.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SightsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SightsValidationError{}

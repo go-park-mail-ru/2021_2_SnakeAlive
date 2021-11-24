@@ -22,6 +22,8 @@ type TripGatewayUseCase interface {
 	DeleteAlbum(ctx context.Context, id int, userID int) error
 	UpdateAlbum(ctx context.Context, id int, updatedAlbum *models.Album, userID int) (*models.Album, error)
 	UploadPhoto(ctx context.Context, filename string, userID int, id int) error
+
+	SightsByTrip(ctx context.Context, id int) (*[]int, error)
 }
 
 type tripGRPC interface {
@@ -34,6 +36,7 @@ type tripGRPC interface {
 	UpdateAlbum(ctx context.Context, in *trip_service.ModifyAlbumRequest, opts ...grpc.CallOption) (*trip_service.Album, error)
 	DeleteAlbum(ctx context.Context, in *trip_service.AlbumRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	UploadPhoto(ctx context.Context, in *trip_service.UploadRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	SightsByTrip(ctx context.Context, in *trip_service.SightsRequest, opts ...grpc.CallOption) (*trip_service.Sights, error)
 }
 
 type tripGatewayUseCase struct {
@@ -225,4 +228,20 @@ func (u *tripGatewayUseCase) UploadPhoto(ctx context.Context, filename string, u
 		Filename: filename,
 	})
 	return err
+}
+
+func (u *tripGatewayUseCase) SightsByTrip(ctx context.Context, id int) (*[]int, error) {
+	sights, err := u.tripGRPC.SightsByTrip(ctx, &trip_service.SightsRequest{
+		TripId: int64(id),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var ids []int
+	for _, id := range sights.Ids {
+		ids = append(ids, int(id))
+	}
+
+	return &ids, nil
 }

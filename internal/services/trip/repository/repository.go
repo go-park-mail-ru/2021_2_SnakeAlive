@@ -21,6 +21,8 @@ type TripRepository interface {
 	UpdateAlbum(ctx context.Context, id int, album *models.Album) error
 	GetAlbumAuthor(ctx context.Context, id int) (int, error)
 	AddFilename(ctx context.Context, filename string, id int) error
+
+	SightsByTrip(ctx context.Context, id int) (*[]int, error)
 }
 
 type tripRepository struct {
@@ -291,4 +293,27 @@ func (t *tripRepository) AddFilename(ctx context.Context, filename string, id in
 	)
 
 	return err
+}
+
+func (t *tripRepository) SightsByTrip(ctx context.Context, id int) (*[]int, error) {
+	conn, err := t.dataHolder.Acquire(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Release()
+
+	rows, err := conn.Query(context.Background(),
+		SightsByTripQuery,
+		id)
+	if err != nil {
+		return nil, err
+	}
+
+	var ids []int
+	var sightId int
+	for rows.Next() {
+		rows.Scan(&sightId)
+		ids = append(ids, sightId)
+	}
+	return &ids, nil
 }
