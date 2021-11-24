@@ -101,6 +101,16 @@ CREATE TABLE Countries
     photo       TEXT
 );
 
+CREATE TABLE Albums (
+  id SERIAL NOT NULL PRIMARY KEY,
+  trip_id INT NOT NULL,
+  author INT NOT NULL,
+  title TEXT,
+  description TEXT,
+  photos TEXT[],
+  CONSTRAINT fk_trip FOREIGN KEY(trip_id) REFERENCES trips(id) ON DELETE CASCADE,
+  CONSTRAINT fk_author FOREIGN KEY (author) REFERENCES users(id) ON DELETE CASCADE
+);
 
 INSERT INTO Countries ("name", "description", "photo")
 VALUES ('Россия', 'Россия – крупнейшая страна мира, расположенная в Восточной Европе и Северной Азии и омываемая водами Тихого и Северного Ледовитого океанов.', 'russia.jpeg');
@@ -399,3 +409,6 @@ VALUES (
 INSERT INTO Reviews (id, title, text, rating, user_id, place_id, created_at) VALUES (DEFAULT, 'title', 'text', 10, 1, 1, DEFAULT);
 INSERT INTO Reviews (id, title, text, rating, user_id, place_id, created_at) VALUES (DEFAULT, 'title2', 'text2', 11, 1, 1, DEFAULT);
 INSERT INTO Reviews (id, title, text, rating, user_id, place_id, created_at) VALUES (DEFAULT, 'title3', 'text3', 12, 1, 2, DEFAULT);
+
+
+

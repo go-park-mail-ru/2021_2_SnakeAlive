@@ -17,9 +17,9 @@ COPY ./cmd ./cmd
 COPY ./internal ./internal
 COPY ./pkg ./pkg
 COPY ./third_party ./third_party
+COPY ./vendor ./vendor
 
-COPY go.mod go.mod
-RUN go mod tidy
+RUN ls -a
 
 RUN go build -v \
     -o /out/service \

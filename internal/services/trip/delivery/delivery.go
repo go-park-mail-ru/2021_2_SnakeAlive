@@ -26,12 +26,12 @@ func NewTripDelivery(tripUsecase usecase.TripUseCase, errorAdapter error_adapter
 }
 
 func (s *tripDelivery) GetTrip(ctx context.Context, request *trip_service.TripRequest) (*trip_service.Trip, error) {
-	authorized, err := s.tripUsecase.CheckAuthor(ctx, int(request.UserId), int(request.TripId))
+	authorized, err := s.tripUsecase.CheckTripAuthor(ctx, int(request.UserId), int(request.TripId))
 	if !authorized || err != nil {
 		return &trip_service.Trip{}, errors.DeniedAccess
 	}
 
-	trip, err := s.tripUsecase.GetById(ctx, int(request.TripId))
+	trip, err := s.tripUsecase.GetTripById(ctx, int(request.TripId))
 	if err != nil {
 		return nil, s.errorAdapter.AdaptError(err)
 	}
@@ -49,7 +49,7 @@ func (s *tripDelivery) GetTrip(ctx context.Context, request *trip_service.TripRe
 func (s *tripDelivery) AddTrip(ctx context.Context, request *trip_service.ModifyTripRequest) (*trip_service.Trip, error) {
 	places := PlacesFromProtoDays(request.Trip.Sights)
 
-	id, err := s.tripUsecase.Add(ctx, &models.Trip{
+	id, err := s.tripUsecase.AddTrip(ctx, &models.Trip{
 		Id:          int(request.Trip.Id),
 		Title:       request.Trip.Title,
 		Description: request.Trip.Description,
@@ -60,7 +60,7 @@ func (s *tripDelivery) AddTrip(ctx context.Context, request *trip_service.Modify
 		return nil, s.errorAdapter.AdaptError(err)
 	}
 
-	trip, err := s.tripUsecase.GetById(ctx, id)
+	trip, err := s.tripUsecase.GetTripById(ctx, id)
 	if err != nil {
 		return nil, s.errorAdapter.AdaptError(err)
 	}
@@ -74,15 +74,15 @@ func (s *tripDelivery) AddTrip(ctx context.Context, request *trip_service.Modify
 	}, nil
 }
 
-func (s *tripDelivery) Update(ctx context.Context, request *trip_service.ModifyTripRequest) (*trip_service.Trip, error) {
-	authorized, err := s.tripUsecase.CheckAuthor(ctx, int(request.UserId), int(request.Trip.Id))
+func (s *tripDelivery) UpdateTrip(ctx context.Context, request *trip_service.ModifyTripRequest) (*trip_service.Trip, error) {
+	authorized, err := s.tripUsecase.CheckTripAuthor(ctx, int(request.UserId), int(request.Trip.Id))
 	if !authorized || err != nil {
 		return &trip_service.Trip{}, errors.DeniedAccess
 	}
 
 	places := PlacesFromProtoDays(request.Trip.Sights)
 
-	err = s.tripUsecase.Update(ctx, int(request.Trip.Id), &models.Trip{
+	err = s.tripUsecase.UpdateTrip(ctx, int(request.Trip.Id), &models.Trip{
 		Id:          int(request.Trip.Id),
 		Title:       request.Trip.Title,
 		Description: request.Trip.Description,
@@ -92,7 +92,7 @@ func (s *tripDelivery) Update(ctx context.Context, request *trip_service.ModifyT
 		return nil, s.errorAdapter.AdaptError(err)
 	}
 
-	trip, err := s.tripUsecase.GetById(ctx, int(request.Trip.Id))
+	trip, err := s.tripUsecase.GetTripById(ctx, int(request.Trip.Id))
 	if err != nil {
 		return nil, s.errorAdapter.AdaptError(err)
 	}
@@ -106,13 +106,118 @@ func (s *tripDelivery) Update(ctx context.Context, request *trip_service.ModifyT
 	}, nil
 }
 
-func (s *tripDelivery) Delete(ctx context.Context, request *trip_service.TripRequest) (*empty.Empty, error) {
-	authorized, err := s.tripUsecase.CheckAuthor(ctx, int(request.UserId), int(request.TripId))
+func (s *tripDelivery) DeleteTrip(ctx context.Context, request *trip_service.TripRequest) (*empty.Empty, error) {
+	authorized, err := s.tripUsecase.CheckTripAuthor(ctx, int(request.UserId), int(request.TripId))
 	if !authorized || err != nil {
 		return &empty.Empty{}, errors.DeniedAccess
 	}
 
-	err = s.tripUsecase.Delete(ctx, int(request.TripId))
+	err = s.tripUsecase.DeleteTrip(ctx, int(request.TripId))
+	if err != nil {
+		return nil, s.errorAdapter.AdaptError(err)
+	}
+
+	return &empty.Empty{}, nil
+}
+
+func (s *tripDelivery) GetAlbum(ctx context.Context, request *trip_service.AlbumRequest) (*trip_service.Album, error) {
+	authorized, err := s.tripUsecase.CheckAlbumAuthor(ctx, int(request.UserId), int(request.AlbumId))
+	if !authorized || err != nil {
+		return &trip_service.Album{}, errors.DeniedAccess
+	}
+
+	album, err := s.tripUsecase.GetAlbumById(ctx, int(request.AlbumId))
+	if err != nil {
+		return nil, s.errorAdapter.AdaptError(err)
+	}
+
+	return &trip_service.Album{
+		Id:          int64(album.Id),
+		Title:       album.Title,
+		Author:      int64(album.UserId),
+		Description: album.Description,
+		Photos:      album.Photos,
+	}, nil
+}
+
+func (s *tripDelivery) AddAlbum(ctx context.Context, request *trip_service.ModifyAlbumRequest) (*trip_service.Album, error) {
+	id, err := s.tripUsecase.AddAlbum(ctx, &models.Album{
+		Id:          int(request.Album.Id),
+		TripId:      int(request.Album.TripId),
+		Title:       request.Album.Title,
+		Description: request.Album.Description,
+	}, int(request.UserId))
+
+	if err != nil {
+		return nil, s.errorAdapter.AdaptError(err)
+	}
+
+	album, err := s.tripUsecase.GetAlbumById(ctx, id)
+	if err != nil {
+		return nil, s.errorAdapter.AdaptError(err)
+	}
+
+	return &trip_service.Album{
+		Id:          int64(album.Id),
+		Title:       album.Title,
+		TripId:      int64(album.TripId),
+		Author:      int64(album.UserId),
+		Description: album.Description,
+	}, nil
+}
+
+func (s *tripDelivery) UpdateAlbum(ctx context.Context, request *trip_service.ModifyAlbumRequest) (*trip_service.Album, error) {
+	authorized, err := s.tripUsecase.CheckAlbumAuthor(ctx, int(request.UserId), int(request.Album.Id))
+	if !authorized || err != nil {
+		return &trip_service.Album{}, errors.DeniedAccess
+	}
+
+	err = s.tripUsecase.UpdateAlbum(ctx, int(request.Album.Id), &models.Album{
+		Id:          int(request.Album.Id),
+		Title:       request.Album.Title,
+		TripId:      int(request.Album.TripId),
+		Description: request.Album.Description,
+	})
+	if err != nil {
+		return nil, s.errorAdapter.AdaptError(err)
+	}
+
+	album, err := s.tripUsecase.GetAlbumById(ctx, int(request.Album.Id))
+	if err != nil {
+		return nil, s.errorAdapter.AdaptError(err)
+	}
+
+	return &trip_service.Album{
+		Id:          int64(album.Id),
+		Title:       album.Title,
+		TripId:      int64(album.TripId),
+		Author:      int64(album.UserId),
+		Description: album.Description,
+		Photos:      album.Photos,
+	}, nil
+}
+
+func (s *tripDelivery) UploadPhoto(ctx context.Context, request *trip_service.UploadRequest) (*empty.Empty, error) {
+	authorized, err := s.tripUsecase.CheckAlbumAuthor(ctx, int(request.UserId), int(request.AlbumId))
+	if !authorized || err != nil {
+		return &empty.Empty{}, errors.DeniedAccess
+	}
+
+	err = s.tripUsecase.UploadPhoto(ctx, request.Filename, int(request.AlbumId))
+	if err != nil {
+		return nil, s.errorAdapter.AdaptError(err)
+	}
+
+	return &empty.Empty{}, nil
+}
+
+func (s *tripDelivery) DeleteAlbum(ctx context.Context, request *trip_service.AlbumRequest) (*empty.Empty, error) {
+	authorized, err := s.tripUsecase.CheckAlbumAuthor(ctx, int(request.UserId), int(request.AlbumId))
+	if !authorized || err != nil {
+		return &empty.Empty{}, errors.DeniedAccess
+	}
+
+	err = s.tripUsecase.DeleteAlbum(ctx, int(request.AlbumId))
 	if err != nil {
 		return nil, s.errorAdapter.AdaptError(err)
 	}

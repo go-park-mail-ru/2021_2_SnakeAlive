@@ -21,7 +21,7 @@ COPY ./vendor ./vendor
 
 RUN go build -v \
     -o /out/service \
-    ./cmd/gateway/main.go
+    ./cmd/review_service/main.go
 
 FROM alpine:3.8
 WORKDIR /app

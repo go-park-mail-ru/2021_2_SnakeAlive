@@ -9,3 +9,5 @@ const FormFileKey = "avatar"
 const StaticPath = "./static"
 
 const Format = ".jpg"
+
+const FormFileAlbumKey = "photo"

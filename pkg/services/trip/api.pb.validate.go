@@ -561,3 +561,467 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ModifyTripRequestValidationError{}
+
+// Validate checks the field values on AlbumRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *AlbumRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AlbumRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in AlbumRequestMultiError, or
+// nil if none found.
+func (m *AlbumRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AlbumRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetAlbumId() <= 0 {
+		err := AlbumRequestValidationError{
+			field:  "AlbumId",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if m.GetUserId() <= 0 {
+		err := AlbumRequestValidationError{
+			field:  "UserId",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return AlbumRequestMultiError(errors)
+	}
+	return nil
+}
+
+// AlbumRequestMultiError is an error wrapping multiple validation errors
+// returned by AlbumRequest.ValidateAll() if the designated constraints aren't met.
+type AlbumRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AlbumRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AlbumRequestMultiError) AllErrors() []error { return m }
+
+// AlbumRequestValidationError is the validation error returned by
+// AlbumRequest.Validate if the designated constraints aren't met.
+type AlbumRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AlbumRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AlbumRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AlbumRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AlbumRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AlbumRequestValidationError) ErrorName() string { return "AlbumRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AlbumRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAlbumRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AlbumRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AlbumRequestValidationError{}
+
+// Validate checks the field values on Album with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Album) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Album with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in AlbumMultiError, or nil if none found.
+func (m *Album) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Album) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for TripId
+
+	// no validation rules for Author
+
+	// no validation rules for Title
+
+	// no validation rules for Description
+
+	if len(errors) > 0 {
+		return AlbumMultiError(errors)
+	}
+	return nil
+}
+
+// AlbumMultiError is an error wrapping multiple validation errors returned by
+// Album.ValidateAll() if the designated constraints aren't met.
+type AlbumMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AlbumMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AlbumMultiError) AllErrors() []error { return m }
+
+// AlbumValidationError is the validation error returned by Album.Validate if
+// the designated constraints aren't met.
+type AlbumValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AlbumValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AlbumValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AlbumValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AlbumValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AlbumValidationError) ErrorName() string { return "AlbumValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AlbumValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAlbum.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AlbumValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AlbumValidationError{}
+
+// Validate checks the field values on ModifyAlbumRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ModifyAlbumRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ModifyAlbumRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ModifyAlbumRequestMultiError, or nil if none found.
+func (m *ModifyAlbumRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ModifyAlbumRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if all {
+		switch v := interface{}(m.GetAlbum()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ModifyAlbumRequestValidationError{
+					field:  "Album",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ModifyAlbumRequestValidationError{
+					field:  "Album",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetAlbum()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ModifyAlbumRequestValidationError{
+				field:  "Album",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for UserId
+
+	if len(errors) > 0 {
+		return ModifyAlbumRequestMultiError(errors)
+	}
+	return nil
+}
+
+// ModifyAlbumRequestMultiError is an error wrapping multiple validation errors
+// returned by ModifyAlbumRequest.ValidateAll() if the designated constraints
+// aren't met.
+type ModifyAlbumRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ModifyAlbumRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ModifyAlbumRequestMultiError) AllErrors() []error { return m }
+
+// ModifyAlbumRequestValidationError is the validation error returned by
+// ModifyAlbumRequest.Validate if the designated constraints aren't met.
+type ModifyAlbumRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ModifyAlbumRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ModifyAlbumRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ModifyAlbumRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ModifyAlbumRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ModifyAlbumRequestValidationError) ErrorName() string {
+	return "ModifyAlbumRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ModifyAlbumRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sModifyAlbumRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ModifyAlbumRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ModifyAlbumRequestValidationError{}
+
+// Validate checks the field values on UploadRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *UploadRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UploadRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in UploadRequestMultiError, or
+// nil if none found.
+func (m *UploadRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UploadRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for AlbumId
+
+	// no validation rules for UserId
+
+	// no validation rules for Filename
+
+	if len(errors) > 0 {
+		return UploadRequestMultiError(errors)
+	}
+	return nil
+}
+
+// UploadRequestMultiError is an error wrapping multiple validation errors
+// returned by UploadRequest.ValidateAll() if the designated constraints
+// aren't met.
+type UploadRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UploadRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UploadRequestMultiError) AllErrors() []error { return m }
+
+// UploadRequestValidationError is the validation error returned by
+// UploadRequest.Validate if the designated constraints aren't met.
+type UploadRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UploadRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UploadRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UploadRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UploadRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UploadRequestValidationError) ErrorName() string { return "UploadRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e UploadRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUploadRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UploadRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UploadRequestValidationError{}

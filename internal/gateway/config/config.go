@@ -10,10 +10,11 @@ import (
 )
 
 type Config struct {
-	AuthServiceEndpoint  string `envconfig:"AUTH_ENDPOINT" required:"true"`
-	TripServiceEndpoint  string `envconfig:"TRIP_ENDPOINT" required:"true"`
-	SightServiceEndpoint string `envconfig:"SIGHT_ENDPOINT" required:"true"`
-	HTTPPort             string `envconfig:"HTTP_PORT" required:"true"`
+	AuthServiceEndpoint   string `envconfig:"AUTH_ENDPOINT" required:"true"`
+	TripServiceEndpoint   string `envconfig:"TRIP_ENDPOINT" required:"true"`
+	SightServiceEndpoint  string `envconfig:"SIGHT_ENDPOINT" required:"true"`
+	ReviewServiceEndpoint string `envconfig:"REVIEW_ENDPOINT" required:"true"`
+	HTTPPort              string `envconfig:"HTTP_PORT" required:"true"`
 
 	Ctx    context.Context
 	Cancel func()
