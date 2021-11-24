@@ -19,6 +19,8 @@ COPY ./pkg ./pkg
 COPY ./third_party ./third_party
 COPY ./vendor ./vendor
 
+RUN ls -a
+
 RUN go build -v \
     -o /out/service \
     ./cmd/trip_service/main.go

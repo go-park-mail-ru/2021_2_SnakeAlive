@@ -18,6 +18,7 @@ COPY ./internal ./internal
 COPY ./pkg ./pkg
 COPY ./third_party ./third_party
 COPY ./vendor ./vendor
+COPY ./static ./static
 
 RUN go build -v \
     -o /out/service \

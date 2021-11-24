@@ -67,6 +67,12 @@ message ModifyAlbumRequest {
     int64 user_id = 2;
 }
 
+message UploadRequest {
+    int64 album_id = 2;
+    int64 user_id = 3;
+    string filename = 1;
+}
+
 service TripService {
     rpc GetTrip(TripRequest) returns (Trip) {}
 	rpc AddTrip(ModifyTripRequest) returns (Trip) {}
@@ -77,4 +83,5 @@ service TripService {
     rpc AddAlbum(ModifyAlbumRequest) returns (Album) {}
     rpc UpdateAlbum(ModifyAlbumRequest) returns (Album) {}
     rpc DeleteAlbum(AlbumRequest) returns (google.protobuf.Empty) {}
+    rpc UploadPhoto(UploadRequest) returns (google.protobuf.Empty) {}
 }

@@ -20,6 +20,7 @@ type TripRepository interface {
 	DeleteAlbum(ctx context.Context, id int) error
 	UpdateAlbum(ctx context.Context, id int, album *models.Album) error
 	GetAlbumAuthor(ctx context.Context, id int) (int, error)
+	AddFilename(ctx context.Context, filename string, id int) error
 }
 
 type tripRepository struct {
@@ -263,4 +264,31 @@ func (t *tripRepository) GetAlbumAuthor(ctx context.Context, id int) (int, error
 		return 0, err
 	}
 	return author, err
+}
+
+func (t *tripRepository) AddFilename(ctx context.Context, filename string, id int) error {
+	conn, err := t.dataHolder.Acquire(context.Background())
+	if err != nil {
+		return err
+	}
+	defer conn.Release()
+
+	var photos []string
+	err = conn.QueryRow(context.Background(),
+		GetAlbumPhotosQuery,
+		id,
+	).Scan(&photos)
+
+	if err != nil {
+		return err
+	}
+
+	photos = append(photos, filename)
+	_, err = conn.Exec(context.Background(),
+		AddAlbumPhotosQuery,
+		photos,
+		id,
+	)
+
+	return err
 }

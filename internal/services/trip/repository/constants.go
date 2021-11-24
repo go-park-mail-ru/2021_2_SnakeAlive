@@ -22,4 +22,6 @@ const (
 	UpdateAlbumQuery    = `UPDATE Albums SET "title" = $1, "description" = $2 WHERE id = $3`
 	DeleteAlbumQuery    = `DELETE FROM Albums WHERE id = $1`
 	GetAlbumAuthorQuery = `SELECT author FROM Albums WHERE id = $1`
+	GetAlbumPhotosQuery = `SELECT photos FROM Albums WHERE id = &1`
+	AddAlbumPhotosQuery = `UPDATE Albums SET "photos" = $1 WHERE id = $2`
 )

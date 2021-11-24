@@ -197,6 +197,20 @@ func (s *tripDelivery) UpdateAlbum(ctx context.Context, request *trip_service.Mo
 	}, nil
 }
 
+func (s *tripDelivery) UploadPhoto(ctx context.Context, request *trip_service.UploadRequest) (*empty.Empty, error) {
+	authorized, err := s.tripUsecase.CheckAlbumAuthor(ctx, int(request.UserId), int(request.AlbumId))
+	if !authorized || err != nil {
+		return &empty.Empty{}, errors.DeniedAccess
+	}
+
+	err = s.tripUsecase.UploadPhoto(ctx, request.Filename, int(request.AlbumId))
+	if err != nil {
+		return nil, s.errorAdapter.AdaptError(err)
+	}
+
+	return &empty.Empty{}, nil
+}
+
 func (s *tripDelivery) DeleteAlbum(ctx context.Context, request *trip_service.AlbumRequest) (*empty.Empty, error) {
 	authorized, err := s.tripUsecase.CheckAlbumAuthor(ctx, int(request.UserId), int(request.AlbumId))
 	if !authorized || err != nil {

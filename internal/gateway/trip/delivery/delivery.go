@@ -21,6 +21,7 @@ type TripGatewayDelivery interface {
 	AddAlbum(ctx *fasthttp.RequestCtx)
 	UpdateAlbum(ctx *fasthttp.RequestCtx)
 	DeleteAlbum(ctx *fasthttp.RequestCtx)
+	UploadPhoto(ctx *fasthttp.RequestCtx)
 }
 
 type tripGatewayDelivery struct {
@@ -228,4 +229,26 @@ func (s *tripGatewayDelivery) DeleteAlbum(ctx *fasthttp.RequestCtx) {
 		return
 	}
 	ctx.Write(bytes)
+}
+
+func (s *tripGatewayDelivery) UploadPhoto(ctx *fasthttp.RequestCtx) {
+	param, _ := strconv.Atoi(ctx.UserValue("id").(string))
+	userID := ctx.UserValue(cnst.UserIDContextKey).(int)
+
+	formFile, err := ctx.FormFile(cnst.FormFileAlbumKey)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	filename := strconv.Itoa(param) + "_" + strconv.Itoa(userID) + formFile.Filename
+
+	err = fasthttp.SaveMultipartFile(formFile, filename)
+	if err != nil {
+		fmt.Println(err)
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+	ctx.SetStatusCode(fasthttp.StatusOK)
+
 }
