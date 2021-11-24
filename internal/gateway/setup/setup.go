@@ -2,6 +2,9 @@ package setup
 
 import (
 	"snakealive/m/internal/gateway/config"
+	country_delivery "snakealive/m/internal/gateway/country/delivery"
+	"snakealive/m/internal/gateway/country/repository"
+	"snakealive/m/internal/gateway/country/usecase"
 	review_delivery "snakealive/m/internal/gateway/review/delivery"
 	review_usecase "snakealive/m/internal/gateway/review/usecase"
 	"snakealive/m/internal/gateway/router"
@@ -13,6 +16,7 @@ import (
 	uu "snakealive/m/internal/gateway/user/usecase"
 	"snakealive/m/pkg/error_adapter"
 	"snakealive/m/pkg/grpc_errors"
+	"snakealive/m/pkg/helpers"
 	auth_service "snakealive/m/pkg/services/auth"
 	review_service "snakealive/m/pkg/services/review"
 	sight_service "snakealive/m/pkg/services/sight"
@@ -23,6 +27,20 @@ import (
 )
 
 func Setup(cfg config.Config) (r *fsthp_router.Router, stopFunc func(), err error) {
+	pgxConn, err := helpers.CreatePGXPool(cfg.Ctx, cfg.DBUrl, cfg.Logger)
+	if err != nil {
+		return r, stopFunc, err
+	}
+
+	countryRepo := repository.NewLoggingMiddleware(
+		cfg.Logger.Sugar(),
+		repository.NewCountryStorage(repository.NewQueryFactory(), pgxConn),
+	)
+	countryUsecase := usecase.NewCountryUsecase(countryRepo)
+	countryDelivery := country_delivery.NewCountryDelivery(countryUsecase, error_adapter.NewErrorToHttpAdapter(
+		grpc_errors.PreparedCountryErrors, grpc_errors.CommonError,
+	))
+
 	conn, err := grpc.Dial(cfg.AuthServiceEndpoint, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		return r, stopFunc, err
@@ -81,6 +99,7 @@ func Setup(cfg config.Config) (r *fsthp_router.Router, stopFunc func(), err erro
 		TripGatewayDelivery: tripDelivery,
 		SightDelivery:       sightDelivery,
 		ReviewDelivery:      reviewDelivery,
+		CountryDelivery:     countryDelivery,
 		Logger:              cfg.Logger,
 	})
 
@@ -88,6 +107,7 @@ func Setup(cfg config.Config) (r *fsthp_router.Router, stopFunc func(), err erro
 		conn.Close()
 		tripConn.Close()
 		sightConn.Close()
+		pgxConn.Close()
 	}
 
 	return

@@ -81,6 +81,7 @@ services:
       - GATEWAY_TRIP_ENDPOINT=host.docker.internal:6666
       - GATEWAY_SIGHT_ENDPOINT=host.docker.internal:10124
       - GATEWAY_REVIEW_ENDPOINT=host.docker.internal:9090
+      - GATEWAY_DB_URL=postgres://tripadvisor:12345@host.docker.internal:5432/tripadvisor
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
 

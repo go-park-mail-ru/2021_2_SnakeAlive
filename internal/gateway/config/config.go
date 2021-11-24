@@ -15,6 +15,7 @@ type Config struct {
 	SightServiceEndpoint  string `envconfig:"SIGHT_ENDPOINT" required:"true"`
 	ReviewServiceEndpoint string `envconfig:"REVIEW_ENDPOINT" required:"true"`
 	HTTPPort              string `envconfig:"HTTP_PORT" required:"true"`
+	DBUrl                 string `envconfig:"DB_URL" required:"true"`
 
 	Ctx    context.Context
 	Cancel func()

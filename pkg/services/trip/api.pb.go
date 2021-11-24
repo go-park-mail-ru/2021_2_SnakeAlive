@@ -722,7 +722,7 @@ var file_pkg_services_trip_api_proto_goTypes = []interface{}{
 	(*Album)(nil),              // 5: services.trip_service.Album
 	(*ModifyAlbumRequest)(nil), // 6: services.trip_service.ModifyAlbumRequest
 	(*UploadRequest)(nil),      // 7: services.trip_service.UploadRequest
-	(*empty.Empty)(nil),        // 8: google.protobuf.Empty
+	(*emptypb.Empty)(nil),      // 8: google.protobuf.Empty
 }
 var file_pkg_services_trip_api_proto_depIdxs = []int32{
 	1,  // 0: services.trip_service.Trip.sights:type_name -> services.trip_service.Sight
