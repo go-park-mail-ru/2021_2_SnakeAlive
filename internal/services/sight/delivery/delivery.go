@@ -76,6 +76,22 @@ func (s *sightDelivery) SearchSights(
 	return adapted, nil
 }
 
+func (s *sightDelivery) GetSightsByTag(
+	ctx context.Context, request *sight_service.GetSightsByTagRequest,
+) (*sight_service.GetSightsByTagResponse, error) {
+	sights, err := s.usecase.GetSightByTag(ctx, request.Tag)
+	if err != nil {
+		return &sight_service.GetSightsByTagResponse{}, s.errorAdapter.AdaptError(err)
+	}
+
+	adapted := &sight_service.GetSightsByTagResponse{Sights: make([]*sight_service.Sight, len(sights))}
+	for i := range sights {
+		adapted.Sights[i] = s.adaptSight(sights[i])
+	}
+
+	return adapted, nil
+}
+
 func (s *sightDelivery) adaptSight(sight models.Sight) *sight_service.Sight {
 	return &sight_service.Sight{
 		Id:          int64(sight.Id),

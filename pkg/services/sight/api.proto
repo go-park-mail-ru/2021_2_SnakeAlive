@@ -60,9 +60,21 @@ message SearchSightResponse {
   repeated Sight sights = 1;
 }
 
+message GetSightsByTagRequest {
+  string tag = 1 [(validate.rules).string = {
+    max_len: 128,
+    min_bytes: 1,
+  }];
+}
+
+message GetSightsByTagResponse {
+  repeated Sight sights = 1;
+}
+
 service SightService {
   rpc GetSights(GetSightsRequest) returns (GetSightsReponse) {};
   rpc GetSight(GetSightRequest) returns (GetSightResponse) {};
   rpc GetSightsByIDs(GetSightsByIDsRequest) returns (GetSightsByIDsResponse) {};
   rpc SearchSights(SearchSightRequest) returns (SearchSightResponse) {};
+  rpc GetSightsByTag(GetSightsByTagRequest) returns (GetSightsByTagResponse) {};
 }

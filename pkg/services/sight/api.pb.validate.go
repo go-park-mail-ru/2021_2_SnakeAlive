@@ -1133,3 +1133,261 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SearchSightResponseValidationError{}
+
+// Validate checks the field values on GetSightsByTagRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetSightsByTagRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetSightsByTagRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetSightsByTagRequestMultiError, or nil if none found.
+func (m *GetSightsByTagRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetSightsByTagRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if utf8.RuneCountInString(m.GetTag()) > 128 {
+		err := GetSightsByTagRequestValidationError{
+			field:  "Tag",
+			reason: "value length must be at most 128 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(m.GetTag()) < 1 {
+		err := GetSightsByTagRequestValidationError{
+			field:  "Tag",
+			reason: "value length must be at least 1 bytes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return GetSightsByTagRequestMultiError(errors)
+	}
+	return nil
+}
+
+// GetSightsByTagRequestMultiError is an error wrapping multiple validation
+// errors returned by GetSightsByTagRequest.ValidateAll() if the designated
+// constraints aren't met.
+type GetSightsByTagRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetSightsByTagRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetSightsByTagRequestMultiError) AllErrors() []error { return m }
+
+// GetSightsByTagRequestValidationError is the validation error returned by
+// GetSightsByTagRequest.Validate if the designated constraints aren't met.
+type GetSightsByTagRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetSightsByTagRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetSightsByTagRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetSightsByTagRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetSightsByTagRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetSightsByTagRequestValidationError) ErrorName() string {
+	return "GetSightsByTagRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetSightsByTagRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetSightsByTagRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetSightsByTagRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetSightsByTagRequestValidationError{}
+
+// Validate checks the field values on GetSightsByTagResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetSightsByTagResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetSightsByTagResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetSightsByTagResponseMultiError, or nil if none found.
+func (m *GetSightsByTagResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetSightsByTagResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetSights() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetSightsByTagResponseValidationError{
+						field:  fmt.Sprintf("Sights[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetSightsByTagResponseValidationError{
+						field:  fmt.Sprintf("Sights[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetSightsByTagResponseValidationError{
+					field:  fmt.Sprintf("Sights[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return GetSightsByTagResponseMultiError(errors)
+	}
+	return nil
+}
+
+// GetSightsByTagResponseMultiError is an error wrapping multiple validation
+// errors returned by GetSightsByTagResponse.ValidateAll() if the designated
+// constraints aren't met.
+type GetSightsByTagResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetSightsByTagResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetSightsByTagResponseMultiError) AllErrors() []error { return m }
+
+// GetSightsByTagResponseValidationError is the validation error returned by
+// GetSightsByTagResponse.Validate if the designated constraints aren't met.
+type GetSightsByTagResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetSightsByTagResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetSightsByTagResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetSightsByTagResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetSightsByTagResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetSightsByTagResponseValidationError) ErrorName() string {
+	return "GetSightsByTagResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetSightsByTagResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetSightsByTagResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetSightsByTagResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetSightsByTagResponseValidationError{}

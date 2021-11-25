@@ -10,6 +10,7 @@ type QueryFactory interface {
 	CreateGetSightsByCountry(country string) *query.Query
 	CreateGetSightsByIDs(ids []int64) *query.Query
 	CreateSearchSights(search string, skip, limit int64) *query.Query
+	CreateGetSightsByTag(tag string) *query.Query
 }
 
 type queryFactory struct{}
@@ -43,6 +44,13 @@ func (q *queryFactory) CreateGetSightsByIDs(ids []int64) *query.Query {
 	return &query.Query{
 		Request: GetSightsByIDs,
 		Params:  []interface{}{ids},
+	}
+}
+
+func (q *queryFactory) CreateGetSightsByTag(tag string) *query.Query {
+	return &query.Query{
+		Request: GetSightsByTag,
+		Params:  []interface{}{tag},
 	}
 }
 

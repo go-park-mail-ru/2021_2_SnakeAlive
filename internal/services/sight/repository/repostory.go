@@ -13,6 +13,7 @@ type SightRepository interface {
 	GetSightsByCountry(ctx context.Context, country string) ([]models.Sight, error)
 	GetSightByID(ctx context.Context, id int) (models.Sight, error)
 	GetSightByIDs(ctx context.Context, ids []int64) ([]models.Sight, error)
+	GetSightByTag(ctx context.Context, tag string) ([]models.Sight, error)
 	SearchSights(ctx context.Context, search string, skip, limit int64) ([]models.Sight, error)
 }
 
@@ -65,6 +66,30 @@ func (s *sightRepository) GetSightByID(ctx context.Context, id int) (models.Sigh
 
 func (s *sightRepository) GetSightByIDs(ctx context.Context, ids []int64) ([]models.Sight, error) {
 	request := s.queryFactory.CreateGetSightsByIDs(ids)
+	rows, err := s.conn.Query(ctx, request.Request, request.Params...)
+	if err != nil {
+		return []models.Sight{}, err
+	}
+
+	sights := make([]models.Sight, 0)
+	for rows.Next() {
+		var sight models.Sight
+
+		if err = rows.Scan(
+			&sight.Id, &sight.Name, &sight.Country, &sight.Rating,
+			&sight.Tags, &sight.Description, &sight.Photos, &sight.Lng, &sight.Lat,
+		); err != nil {
+			return []models.Sight{}, err
+		}
+
+		sights = append(sights, sight)
+	}
+
+	return sights, nil
+}
+
+func (s *sightRepository) GetSightByTag(ctx context.Context, tag string) ([]models.Sight, error) {
+	request := s.queryFactory.CreateGetSightsByTag(tag)
 	rows, err := s.conn.Query(ctx, request.Request, request.Params...)
 	if err != nil {
 		return []models.Sight{}, err

@@ -7,83 +7,83 @@ import "third_party/go-proto-validators/validator.proto";
 import "google/protobuf/empty.proto";
 
 message TripRequest {
-    int64 trip_id = 1 [(validate.rules).int64 = {
-        gt: 0,
-    }];
-    int64 user_id = 2 [(validate.rules).int64 = {
-        gt: 0,
-    }];
+  int64 trip_id = 1 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+  int64 user_id = 2 [(validate.rules).int64 = {
+    gt: 0,
+  }];
 }
 
 message Sight {
-    int64 id = 1;
-	string name = 2;
-	string country = 3;
-	float rating = 4;
-	repeated string tags = 5;
-	string description = 6;
-	repeated string photos = 7;
-    int64 day = 8;
+  int64 id = 1;
+  string name = 2;
+  string country = 3;
+  float rating = 4;
+  repeated string tags = 5;
+  string description = 6;
+  repeated string photos = 7;
+  int64 day = 8;
 }
 
 message Trip {
-    int64 id = 1;
-	string title = 2 [(validate.rules).string = {
-        min_len: 1,
-        min_bytes: 1,
-    }];
-	string description = 3;
-	repeated Sight sights = 4;
+  int64 id = 1;
+  string title = 2 [(validate.rules).string = {
+    min_len: 1,
+    min_bytes: 1,
+  }];
+  string description = 3;
+  repeated Sight sights = 4;
 }
 
 message ModifyTripRequest {
-    Trip trip = 1;
-    int64 user_id = 2 [(validate.rules).int64 = {
-        gt: 0,
-    }];
+  Trip trip = 1;
+  int64 user_id = 2 [(validate.rules).int64 = {
+    gt: 0,
+  }];
 }
 
 message AlbumRequest {
-    int64 album_id = 1 [(validate.rules).int64 = {
-        gt: 0,
-    }];
-    int64 user_id = 2 [(validate.rules).int64 = {
-        gt: 0,
-    }];
+  int64 album_id = 1 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+  int64 user_id = 2 [(validate.rules).int64 = {
+    gt: 0,
+  }];
 }
 
 message Album {
-    int64 id = 1;
-    int64 trip_id = 2;
-    int64 author = 7;
-    string title = 3;
-    string description = 4;
-    repeated string names = 5;
-    repeated string photos = 6;
+  int64 id = 1;
+  int64 trip_id = 2;
+  int64 author = 7;
+  string title = 3;
+  string description = 4;
+  repeated string names = 5;
+  repeated string photos = 6;
 }
 
 message ModifyAlbumRequest {
-    Album album = 1;
-    int64 user_id = 2;
+  Album album = 1;
+  int64 user_id = 2;
 }
 
 message SightsRequest {
-    int64 trip_id = 1; 
+  int64 trip_id = 1;
 }
 
 message Sights {
-    repeated int64 ids = 1;
+  repeated int64 ids = 1;
 }
 
 service TripService {
-    rpc GetTrip(TripRequest) returns (Trip) {}
-	rpc AddTrip(ModifyTripRequest) returns (Trip) {}
-	rpc UpdateTrip(ModifyTripRequest) returns (Trip) {}
-	rpc DeleteTrip(TripRequest) returns (google.protobuf.Empty) {}
+  rpc GetTrip(TripRequest) returns (Trip) {}
+  rpc AddTrip(ModifyTripRequest) returns (Trip) {}
+  rpc UpdateTrip(ModifyTripRequest) returns (Trip) {}
+  rpc DeleteTrip(TripRequest) returns (google.protobuf.Empty) {}
 
-    rpc GetAlbum(AlbumRequest) returns (Album) {}
-    rpc AddAlbum(ModifyAlbumRequest) returns (Album) {}
-    rpc UpdateAlbum(ModifyAlbumRequest) returns (Album) {}
-    rpc DeleteAlbum(AlbumRequest) returns (google.protobuf.Empty) {}
-    rpc SightsByTrip(SightsRequest) returns (Sights) {}
+  rpc GetAlbum(AlbumRequest) returns (Album) {}
+  rpc AddAlbum(ModifyAlbumRequest) returns (Album) {}
+  rpc UpdateAlbum(ModifyAlbumRequest) returns (Album) {}
+  rpc DeleteAlbum(AlbumRequest) returns (google.protobuf.Empty) {}
+  rpc SightsByTrip(SightsRequest) returns (Sights) {}
 }

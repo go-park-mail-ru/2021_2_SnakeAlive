@@ -11,7 +11,8 @@ const CountryListURL = "/country/list"
 
 const SightURL = "/sight/{id}"
 const SightsByCountryURL = "/sights/{name}"
-const SightSerach = "/sights/search"
+const SightSearch = "/sights/search"
+const SightTag = "/sights/tag"
 
 const ReviewAddURL = "/review"
 const ReviewURL = "/review/{id}"
