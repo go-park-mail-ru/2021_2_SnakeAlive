@@ -5,4 +5,5 @@ drop table places cascade;
 drop table reviews cascade;
 drop table trips cascade;
 drop table tripsplaces cascade;
+drop table users cascade;
 
