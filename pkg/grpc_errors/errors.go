@@ -26,6 +26,10 @@ var (
 			MSG:  "пользователь не авторизован",
 			Code: http.StatusUnauthorized,
 		},
+		codes.InvalidArgument: {
+			MSG:  "пользователь не авторизован",
+			Code: http.StatusUnauthorized,
+		},
 	}
 	CommonAuthError = error_adapter.HttpError{
 		MSG:  "произошла ошибка обращения во внутренний сервис",
