@@ -150,11 +150,11 @@ VALUES ('Москва-Cити',
         Создатели комплекса стремились не просто выстроить небоскрёбы, а сделать так, чтобы они органично вписались в ансамбль исторических памятников.',
         ARRAY ['Современные здания', 'Виды'],
         ARRAY [
-            'http://194.58.104.204:3000/places/moscow_city_0.jpeg',
-            'http://194.58.104.204:3000/places/moscow_city_1.jpeg',
-            'http://194.58.104.204:3000/places/moscow_city_2.jpeg',
-            'http://194.58.104.204:3000/places/moscow_city_3.jpeg',
-            'http://194.58.104.204:3000/places/moscow_city_4.jpeg']);
+            'https://snakehastrip.hb.bizmrg.com/moscow_city_0.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/moscow_city_1.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/moscow_city_2.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/moscow_city_3.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/moscow_city_4.jpeg']);
 
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Воробьевы горы',
@@ -166,9 +166,9 @@ VALUES ('Воробьевы горы',
         ',
         ARRAY ['Природа', 'Виды'],
         ARRAY [
-            'http://194.58.104.204:3000/places/vorobievi_gory_0.jpeg',
-            'http://194.58.104.204:3000/places/vorobievi_gory_1.jpeg',
-            'http://194.58.104.204:3000/places/vorobievi_gory_2.jpeg']);
+            'https://snakehastrip.hb.bizmrg.com/vorobievi_gory_0.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/vorobievi_gory_1.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/vorobievi_gory_2.jpeg']);
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Дворцово-парковый ансамбль Петергоф',
         'Russia',
@@ -185,7 +185,7 @@ VALUES ('Дворцово-парковый ансамбль Петергоф',
         ',
         ARRAY ['Историческое место', 'Дворец'],
         ARRAY [
-            'http://194.58.104.204:3000/places/petergof_0.jpg']);
+            'https://snakehastrip.hb.bizmrg.com/petergof_0.jpg']);
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Аничков мост',
         'Russia',
@@ -197,12 +197,12 @@ VALUES ('Аничков мост',
         Тогда же родилось известное фривольное прозвище переправы — «Мост восемнадцати яиц». При подсчёте элементов мужского детородного органа учитывался и городовой, пост которого располагался на мосту вплоть до 1917 года.',
         ARRAY ['Архитектура'],
         ARRAY [
-            'http://194.58.104.204:3000/places/anichkov_most_0.jpeg',
-            'http://194.58.104.204:3000/places/anichkov_most_1.jpeg',
-            'http://194.58.104.204:3000/places/anichkov_most_2.jpeg',
-            'http://194.58.104.204:3000/places/anichkov_most_3.jpeg',
-            'http://194.58.104.204:3000/places/anichkov_most_4.jpeg',
-            'http://194.58.104.204:3000/places/anichkov_most_5.jpeg']);
+            'https://snakehastrip.hb.bizmrg.com/anichkov_most_0.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/anichkov_most_1.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/anichkov_most_2.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/anichkov_most_3.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/anichkov_most_4.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/anichkov_most_5.jpeg']);
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Эльбрус',
         'Russia',
@@ -216,10 +216,10 @@ VALUES ('Эльбрус',
         Погода очень неустойчива: ясный безветренный день может мгновенно превратиться в снежное ненастье с сильным ветром.',
         ARRAY ['Природа', 'Виды'],
         ARRAY [
-            'http://194.58.104.204:3000/places/elbrus_0.jpeg',
-            'http://194.58.104.204:3000/places/elbrus_1.jpeg',
-            'http://194.58.104.204:3000/places/elbrus_2.jpeg',
-            'http://194.58.104.204:3000/places/elbrus_3.jpeg']);
+            'https://snakehastrip.hb.bizmrg.com/elbrus_0.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/elbrus_1.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/elbrus_2.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/elbrus_3.jpeg']);
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Озеро Байкал',
         'Russia',
@@ -232,11 +232,11 @@ VALUES ('Озеро Байкал',
         Длина береговой линии сибирского «полумесяца» составляет 2100 км, на нем расположено 27 островов, самый большой из которых – Ольхон. Озеро находится в своеобразной котловине, которую, как было сказано выше, со всех сторон окружают горные хребты и сопки. Это дает основание предполагать, что береговая линия водоема на всем протяжении одинаковая. На самом же деле скалистым и обрывистым является только западное побережье Байкала. Рельеф же восточного более пологий: в некоторых местах горные вершины находятся на отдалении от берега на 10 и больше километров.',
         ARRAY ['Природа', 'Виды'],
         ARRAY [
-            'http://194.58.104.204:3000/places/ozero_baikal_0.jpeg',
-            'http://194.58.104.204:3000/places/ozero_baikal_1.jpeg',
-            'http://194.58.104.204:3000/places/ozero_baikal_2.jpeg',
-            'http://194.58.104.204:3000/places/ozero_baikal_3.jpeg',
-            'http://194.58.104.204:3000/places/ozero_baikal_4.jpeg']);
+            'https://snakehastrip.hb.bizmrg.com/ozero_baikal_0.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/ozero_baikal_1.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/ozero_baikal_2.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/ozero_baikal_3.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/ozero_baikal_4.jpeg']);
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Ростовский кремль',
         'Russia',
@@ -248,10 +248,10 @@ VALUES ('Ростовский кремль',
         ',
         ARRAY ['Историческое место', 'Архитектура'],
         ARRAY [
-            'http://194.58.104.204:3000/places/rostovskiy_kreml_0.jpeg',
-            'http://194.58.104.204:3000/places/rostovskiy_kreml_1.jpeg',
-            'http://194.58.104.204:3000/places/rostovskiy_kreml_2.jpeg',
-            'http://194.58.104.204:3000/places/rostovskiy_kreml_3.jpeg']);
+            'https://snakehastrip.hb.bizmrg.com/rostovskiy_kreml_0.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/rostovskiy_kreml_1.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/rostovskiy_kreml_2.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/rostovskiy_kreml_3.jpeg']);
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Тауэрский мост',
         'UK',
@@ -262,9 +262,9 @@ VALUES ('Тауэрский мост',
         Мост имеет общую длину 244 метра, посередине находятся две башни, каждая высотой 65 метров, между ними имеется пролет в 61 метр, который является разводным элементом. Это позволяет пропускать суда к городским причалам в любое время дня или ночи. Мощная гидравлическая система первоначально была водяной, в движение ее приводили большие паровые машины. Сегодня система полностью заменена на масляную и управляется с помощью компьютера.',
         ARRAY ['Архитектура'],
         ARRAY [
-            'http://194.58.104.204:3000/places/tauerskiy-most_0.jpeg',
-            'http://194.58.104.204:3000/places/tauerskiy-most_1.jpeg',
-            'http://194.58.104.204:3000/places/tauerskiy-most_2.jpeg']);
+            'https://snakehastrip.hb.bizmrg.com/tauerskiy-most_0.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/tauerskiy-most_1.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/tauerskiy-most_2.jpeg']);
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Вестминстерское Аббатство',
         'UK',
@@ -275,9 +275,9 @@ VALUES ('Вестминстерское Аббатство',
         Все, что вам нужно знать об этом месте:  “Большую часть посетителей сюда привлекают надгробия.”',
         ARRAY ['Церковь', 'Святое место'],
         ARRAY [
-            'http://194.58.104.204:3000/places/vestminsterskoe-abbatstvo_0.jpeg',
-            'http://194.58.104.204:3000/places/vestminsterskoe-abbatstvo_1.jpeg',
-            'http://194.58.104.204:3000/places/vestminsterskoe-abbatstvo_2.jpeg']);
+            'https://snakehastrip.hb.bizmrg.com/vestminsterskoe-abbatstvo_0.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/vestminsterskoe-abbatstvo_1.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/vestminsterskoe-abbatstvo_2.jpeg']);
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Букингемский дворец',
         'UK',
@@ -287,11 +287,11 @@ VALUES ('Букингемский дворец',
         'Букингемский дворец – резиденция британских монархов в Лондоне. Сегодня там живет и работает Елизавета II. Во дворце кипит жизнь: проходят приемы и мероприятия государственного значения. Покой королевской семьи охраняют гвардейцы – их ярко-красные наряды видны издалека.',
         ARRAY ['Дворец', 'Резиденция'],
         ARRAY [
-            'http://194.58.104.204:3000/places/bukingemskiy-dvorets_0.jpeg',
-            'http://194.58.104.204:3000/places/bukingemskiy-dvorets_1.jpeg',
-            'http://194.58.104.204:3000/places/bukingemskiy-dvorets_2.jpeg',
-            'http://194.58.104.204:3000/places/bukingemskiy-dvorets_3.jpeg',
-            'http://194.58.104.204:3000/places/bukingemskiy-dvorets_4.jpeg']);
+            'https://snakehastrip.hb.bizmrg.com/bukingemskiy-dvorets_0.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/bukingemskiy-dvorets_1.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/bukingemskiy-dvorets_2.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/bukingemskiy-dvorets_3.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/bukingemskiy-dvorets_4.jpeg']);
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Остров Мэн',
         'UK',
@@ -302,9 +302,9 @@ VALUES ('Остров Мэн',
         В XIX веке туризм стал самой важной отраслью экономики острова. Массовый туризм начался в 1830-х годах, в связи с организацией регулярного пароходного сообщения между островом (прежде всего — Дугласом) и Ливерпулем. Количество туристов, посещавших остров, росло на протяжении всего XIX века и начала XX века. Например, если в 1870-х годах каждый год остров посещало сто тысяч туристов, то в 1913 году остров посетило 553 000 туристов. После этого в связи с началом Первой мировой войны количество туристов снизилось, и пик 1913 года был побит только в 1948 году, но после этого года количество туристов начало снижаться. Связано это с постепенным ростом благосостояния населения и развитием авиации, следствием чего стал рост популярности курортов Южной Европы и более экзотичных мест.',
         ARRAY ['Природа', 'Виды'],
         ARRAY [
-            'http://194.58.104.204:3000/places/ostrov-men_0.jpeg',
-            'http://194.58.104.204:3000/places/ostrov-men_1.jpeg',
-            'http://194.58.104.204:3000/places/ostrov-men_2.jpeg']);
+            'https://snakehastrip.hb.bizmrg.com/ostrov-men_0.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/ostrov-men_1.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/ostrov-men_2.jpeg']);
 
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Старый Собор',
@@ -316,7 +316,7 @@ VALUES ('Старый Собор',
         Местом установки была выбрана западная сторона площади Республики. Храм выполнен в неоклассическом стиле. В качестве фундамента послужила основа снесенной ранее церкви Сантьяго. Своим величественным видом, красотой и размерами собор просто притягивает внимание не только местного населения, но и посещающих страну туристов. ',
         ARRAY ['Архитектура'],
         ARRAY [
-            'http://194.58.104.204:3000/places/old_sobor_0.jpeg']);
+            'https://snakehastrip.hb.bizmrg.com/old_sobor_0.jpeg']);
 
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Вулкан Момбачо',
@@ -328,12 +328,12 @@ VALUES ('Вулкан Момбачо',
         Несмотря на то, что Момбачо относится к действующим вулканам, последний раз его активность наблюдалась в 1570 году. Почти круглый год вершина покрыта плотными облаками, что дает 100% влажность. Вулкан Момбачо похож на вечнозеленую гору посреди сухих тропиков. У его подножья раскинулся буйный лес с огромными цветами. Если Вы решили посетить парк на своей машине, то помните, на его территорию пускают только полноприводные автомобили 4х4, а все из-за того, что дорога на вулкан очень крутая и обычная машина туда просто не доедет. ',
         ARRAY ['Природа', 'Виды'],
         ARRAY [
-            'http://194.58.104.204:3000/places/vulkan-mombacho_0.jpeg',
-            'http://194.58.104.204:3000/places/vulkan-mombacho_1.jpeg',
-            'http://194.58.104.204:3000/places/vulkan-mombacho_2.jpeg',
-            'http://194.58.104.204:3000/places/vulkan-mombacho_3.jpeg',
-            'http://194.58.104.204:3000/places/vulkan-mombacho_4.jpeg',
-            'http://194.58.104.204:3000/places/vulkan-mombacho_5.jpeg']);
+            'https://snakehastrip.hb.bizmrg.com/vulkan-mombacho_0.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/vulkan-mombacho_1.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/vulkan-mombacho_2.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/vulkan-mombacho_3.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/vulkan-mombacho_4.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/vulkan-mombacho_5.jpeg']);
 
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Архипелаг Солентинаме',
@@ -347,10 +347,10 @@ VALUES ('Архипелаг Солентинаме',
         Власти Никарагуа присвоили островам Солентинаме статус национального природного памятника Никарагуа. ',
         ARRAY ['Природа', 'Виды'],
         ARRAY [
-            'http://194.58.104.204:3000/places/arkhipelag-solentiname_0.jpeg',
-            'http://194.58.104.204:3000/places/arkhipelag-solentiname_1.jpeg',
-            'http://194.58.104.204:3000/places/arkhipelag-solentiname_2.jpeg',
-            'http://194.58.104.204:3000/places/varkhipelag-solentiname_3.jpeg']);
+            'https://snakehastrip.hb.bizmrg.com/arkhipelag-solentiname_0.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/arkhipelag-solentiname_1.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/arkhipelag-solentiname_2.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/varkhipelag-solentiname_3.jpeg']);
 
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Хамберстоун',
@@ -365,10 +365,10 @@ VALUES ('Хамберстоун',
         Чилийский город стал призраком, который пережил невероятный взлет, а теперь должен был навсегда быть похороненным в песках. Однако в конце 60-х годов, когда правительство страны искало любые способы борьбы с экономическим спадом, Хамберстоун был объявлен национальной достопримечательностью, а наполовину засыпанные песком дома и улицы — музеем под открытым небом. Целый отряд рабочих был отправлен для приведения города в порядок: вновь налажено освещение, проведена дорога, а на открытках появляются виды пустынного чуда. ',
         ARRAY ['Город', 'Заброшенное'],
         ARRAY [
-            'http://194.58.104.204:3000/places/khamberstoun_0.jpeg',
-            'http://194.58.104.204:3000/places/khamberstoun_1.jpeg',
-            'http://194.58.104.204:3000/places/khamberstoun_2.jpeg',
-            'http://194.58.104.204:3000/places/khamberstoun_3.jpeg']);
+            'https://snakehastrip.hb.bizmrg.com/khamberstoun_0.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/khamberstoun_1.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/khamberstoun_2.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/khamberstoun_3.jpeg']);
 
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Остров Пасхи',
@@ -380,9 +380,9 @@ VALUES ('Остров Пасхи',
         Остров Пасхи, или Рапа Нуи — остров в Тихом океане на территории Чили, известный благодаря гигантским каменным статуям ',
         ARRAY ['Мистическое место', 'Заброшенное'],
         ARRAY [
-            'http://194.58.104.204:3000/places/ostrov-paskhi_0.jpeg',
-            'http://194.58.104.204:3000/places/ostrov-paskhi_1.jpeg',
-            'http://194.58.104.204:3000/places/kostrov-paskhi_2.jpeg']);
+            'https://snakehastrip.hb.bizmrg.com/ostrov-paskhi_0.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/ostrov-paskhi_1.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/kostrov-paskhi_2.jpeg']);
 
 INSERT INTO Reviews (id, title, text, rating, user_id, place_id, created_at)
 VALUES (DEFAULT, 'title', 'text', 10, 1, 1, DEFAULT);
