@@ -82,6 +82,11 @@ services:
       - GATEWAY_SIGHT_ENDPOINT=host.docker.internal:10124
       - GATEWAY_REVIEW_ENDPOINT=host.docker.internal:9090
       - GATEWAY_DB_URL=postgres://tripadvisor:12345@host.docker.internal:5432/tripadvisor
+      - GATEWAY_S3_BUCKET=snakehastrip
+      - GATEWAY_S3_ENDPOINT=http://hb.bizmrg.com
+      - GATEWAY_S3_PUBLIC_ENDPOINT=https://snakehastrip.hb.bizmrg.com/
+      - GATEWAY_S3_SECRET_KEY=7qdqBBT9xeKDV3iAdKco4jqEhmjpMqiyk3bLL9PcU2S7
+      - GATEWAY_S3_SECRET_ID=rcLyfa3DhATRNmeterCZLk
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
 

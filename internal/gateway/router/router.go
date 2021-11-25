@@ -2,6 +2,7 @@ package router
 
 import (
 	country_delivery "snakealive/m/internal/gateway/country/delivery"
+	media_delivery "snakealive/m/internal/gateway/media/delivery"
 	review_delivery "snakealive/m/internal/gateway/review/delivery"
 	sight_delivery "snakealive/m/internal/gateway/sight/delivery"
 	td "snakealive/m/internal/gateway/trip/delivery"
@@ -24,6 +25,7 @@ type RouterConfig struct {
 	SightDelivery       sight_delivery.SightDelivery
 	ReviewDelivery      review_delivery.ReviewGatewayDelivery
 	CountryDelivery     country_delivery.CountryDelivery
+	MediaDelivery       media_delivery.MediaDelivery
 
 	Logger *zap.Logger
 }
@@ -63,6 +65,8 @@ func SetupRouter(cfg RouterConfig) (r *router.Router) {
 	r.GET(cnst.CountryNameURL, lgrMw(cfg.CountryDelivery.GetCountryByName))
 	r.GET(cnst.CountryIdURL, lgrMw(cfg.CountryDelivery.GetCountryByID))
 	r.GET(cnst.CountryListURL, lgrMw(cfg.CountryDelivery.ListCountries))
+
+	r.POST(cnst.UploadURL, lgrMw(authMw(cfg.MediaDelivery.UploadFile)))
 
 	return
 }

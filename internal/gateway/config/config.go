@@ -16,6 +16,11 @@ type Config struct {
 	ReviewServiceEndpoint string `envconfig:"REVIEW_ENDPOINT" required:"true"`
 	HTTPPort              string `envconfig:"HTTP_PORT" required:"true"`
 	DBUrl                 string `envconfig:"DB_URL" required:"true"`
+	DefaultBucket         string `envconfig:"S3_BUCKET" required:"true"`
+	S3Endpoint            string `envconfig:"S3_ENDPOINT" required:"true"`
+	S3PublicEndpoint      string `envconfig:"S3_PUBLIC_ENDPOINT" required:"true"`
+	SecretKey             string `envconfig:"S3_SECRET_KEY" required:"true"`
+	ID                    string `envconfig:"S3_SECRET_ID" required:"true"`
 
 	Ctx    context.Context
 	Cancel func()

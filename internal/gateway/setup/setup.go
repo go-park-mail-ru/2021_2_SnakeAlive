@@ -1,10 +1,17 @@
 package setup
 
 import (
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/twinj/uuid"
 	"snakealive/m/internal/gateway/config"
 	country_delivery "snakealive/m/internal/gateway/country/delivery"
 	"snakealive/m/internal/gateway/country/repository"
 	"snakealive/m/internal/gateway/country/usecase"
+	media_delivery "snakealive/m/internal/gateway/media/delivery"
+	media_usecase "snakealive/m/internal/gateway/media/usecase"
 	review_delivery "snakealive/m/internal/gateway/review/delivery"
 	review_usecase "snakealive/m/internal/gateway/review/usecase"
 	"snakealive/m/internal/gateway/router"
@@ -16,6 +23,7 @@ import (
 	uu "snakealive/m/internal/gateway/user/usecase"
 	"snakealive/m/pkg/error_adapter"
 	"snakealive/m/pkg/grpc_errors"
+	"snakealive/m/pkg/hasher"
 	"snakealive/m/pkg/helpers"
 	auth_service "snakealive/m/pkg/services/auth"
 	review_service "snakealive/m/pkg/services/review"
@@ -93,6 +101,27 @@ func Setup(cfg config.Config) (r *fsthp_router.Router, stopFunc func(), err erro
 		reviewUsecase,
 	)
 
+	s3Client := s3.New(
+		session.Must(session.NewSession()),
+		aws.NewConfig().WithEndpoint(cfg.S3Endpoint),
+		aws.NewConfig().WithRegion("ru-msk"),
+		aws.NewConfig().WithCredentials(
+			credentials.NewStaticCredentials(
+				cfg.ID,
+				cfg.SecretKey,
+				"",
+			),
+		),
+	)
+	mediaUsecase := media_usecase.NewMediaUsecase(
+		uuid.NewV4(), s3Client, hasher.NewHasher(5),
+		cfg.DefaultBucket, cfg.S3PublicEndpoint,
+	)
+	mediaDelivery := media_delivery.NewMediaDelivery(mediaUsecase,
+		error_adapter.NewErrorToHttpAdapter(
+			grpc_errors.PreparedCountryErrors, grpc_errors.CommonError,
+		))
+
 	r = router.SetupRouter(router.RouterConfig{
 		AuthGRPC:            userGRPC,
 		UserDelivery:        userDelivery,
@@ -100,6 +129,7 @@ func Setup(cfg config.Config) (r *fsthp_router.Router, stopFunc func(), err erro
 		SightDelivery:       sightDelivery,
 		ReviewDelivery:      reviewDelivery,
 		CountryDelivery:     countryDelivery,
+		MediaDelivery:       mediaDelivery,
 		Logger:              cfg.Logger,
 	})
 
