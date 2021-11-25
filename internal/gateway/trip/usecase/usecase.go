@@ -20,8 +20,6 @@ type TripGatewayUseCase interface {
 	GetAlbumById(ctx context.Context, id int, userID int) (*models.Album, error)
 	DeleteAlbum(ctx context.Context, id int, userID int) error
 	UpdateAlbum(ctx context.Context, id int, updatedAlbum *models.Album, userID int) (*models.Album, error)
-	UploadPhoto(ctx context.Context, filename string, userID int, id int) error
-
 	SightsByTrip(ctx context.Context, id int) ([]models.TripSight, error)
 }
 
@@ -209,15 +207,6 @@ func (u *tripGatewayUseCase) UpdateAlbum(ctx context.Context, id int, updatedAlb
 		Description: responce.Description,
 		Photos:      responce.Photos,
 	}, nil
-}
-
-func (u *tripGatewayUseCase) UploadPhoto(ctx context.Context, filename string, userID int, id int) error {
-	_, err := u.tripGRPC.UploadPhoto(ctx, &trip_service.UploadRequest{
-		AlbumId:  int64(id),
-		UserId:   int64(userID),
-		Filename: filename,
-	})
-	return err
 }
 
 func (u *tripGatewayUseCase) SightsByTrip(ctx context.Context, id int) ([]models.TripSight, error) {

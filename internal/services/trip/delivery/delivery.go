@@ -2,7 +2,6 @@ package delivery
 
 import (
 	"context"
-	"snakealive/m/internal/domain"
 	"snakealive/m/internal/services/trip/models"
 	"snakealive/m/internal/services/trip/usecase"
 	"snakealive/m/pkg/error_adapter"
@@ -197,20 +196,6 @@ func (s *tripDelivery) UpdateAlbum(ctx context.Context, request *trip_service.Mo
 	}, nil
 }
 
-func (s *tripDelivery) UploadPhoto(ctx context.Context, request *trip_service.UploadRequest) (*empty.Empty, error) {
-	authorized, err := s.tripUsecase.CheckAlbumAuthor(ctx, int(request.UserId), int(request.AlbumId))
-	if !authorized || err != nil {
-		return &empty.Empty{}, errors.DeniedAccess
-	}
-
-	err = s.tripUsecase.UploadPhoto(ctx, request.Filename, int(request.AlbumId))
-	if err != nil {
-		return nil, s.errorAdapter.AdaptError(err)
-	}
-
-	return &empty.Empty{}, nil
-}
-
 func (s *tripDelivery) DeleteAlbum(ctx context.Context, request *trip_service.AlbumRequest) (*empty.Empty, error) {
 	authorized, err := s.tripUsecase.CheckAlbumAuthor(ctx, int(request.UserId), int(request.AlbumId))
 	if !authorized || err != nil {
@@ -241,7 +226,7 @@ func (s *tripDelivery) SightsByTrip(ctx context.Context, request *trip_service.S
 	}, nil
 }
 
-func ProtoDaysFromPlaces(places []domain.Place) []*trip_service.Sight {
+func ProtoDaysFromPlaces(places []models.Place) []*trip_service.Sight {
 	var protoDays []*trip_service.Sight
 	for _, sight := range places {
 		protoSight := trip_service.Sight{
@@ -259,10 +244,10 @@ func ProtoDaysFromPlaces(places []domain.Place) []*trip_service.Sight {
 	return protoDays
 }
 
-func PlacesFromProtoDays(sights []*trip_service.Sight) []domain.Place {
-	var places []domain.Place
+func PlacesFromProtoDays(sights []*trip_service.Sight) []models.Place {
+	var places []models.Place
 	for _, sight := range sights {
-		placesSight := domain.Place{
+		placesSight := models.Place{
 			Id:          int(sight.Id),
 			Name:        sight.Name,
 			Country:     sight.Country,

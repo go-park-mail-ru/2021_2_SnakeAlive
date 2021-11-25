@@ -44,7 +44,7 @@ func NewMediaUsecase(
 		gen:           gen,
 		client:        client,
 		defaultBucket: defaultBucket,
-		fileEndpoint: fileEndpoint,
-		hasher: hasher,
+		fileEndpoint:  fileEndpoint,
+		hasher:        hasher,
 	}
 }

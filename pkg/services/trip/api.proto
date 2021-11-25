@@ -67,12 +67,6 @@ message ModifyAlbumRequest {
     int64 user_id = 2;
 }
 
-message UploadRequest {
-    int64 album_id = 2;
-    int64 user_id = 3;
-    string filename = 1;
-}
-
 message SightsRequest {
     int64 trip_id = 1; 
 }
@@ -92,6 +86,4 @@ service TripService {
     rpc UpdateAlbum(ModifyAlbumRequest) returns (Album) {}
     rpc DeleteAlbum(AlbumRequest) returns (google.protobuf.Empty) {}
     rpc SightsByTrip(SightsRequest) returns (Sights) {}
-
-    rpc UploadPhoto(UploadRequest) returns (google.protobuf.Empty) {}
 }

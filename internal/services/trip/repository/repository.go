@@ -2,28 +2,10 @@ package repository
 
 import (
 	"context"
-	"snakealive/m/internal/domain"
 	"snakealive/m/internal/services/trip/models"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 )
-
-type TripRepository interface {
-	AddTrip(ctx context.Context, value *models.Trip, userID int) (int, error)
-	GetTripById(ctx context.Context, id int) (value *models.Trip, err error)
-	DeleteTrip(ctx context.Context, id int) error
-	UpdateTrip(ctx context.Context, id int, value *models.Trip) error
-	GetTripAuthor(ctx context.Context, id int) (int, error)
-
-	AddAlbum(ctx context.Context, album *models.Album, userID int) (int, error)
-	GetAlbumById(ctx context.Context, id int) (*models.Album, error)
-	DeleteAlbum(ctx context.Context, id int) error
-	UpdateAlbum(ctx context.Context, id int, album *models.Album) error
-	GetAlbumAuthor(ctx context.Context, id int) (int, error)
-	AddFilename(ctx context.Context, filename string, id int) error
-
-	SightsByTrip(ctx context.Context, id int) (*[]int, error)
-}
 
 type tripRepository struct {
 	dataHolder *pgxpool.Pool
@@ -81,7 +63,7 @@ func (t *tripRepository) GetTripById(ctx context.Context, id int) (*models.Trip,
 		return &trip, err
 	}
 
-	var place domain.Place
+	var place models.Place
 	for rows.Next() {
 		rows.Scan(&place.Id, &place.Name, &place.Tags, &place.Description, &place.Rating, &place.Country, &place.Photos, &place.Day)
 		trip.Sights = append(trip.Sights, place)
@@ -143,7 +125,7 @@ func (t *tripRepository) deletePlaces(ctx context.Context, tripId int) error {
 	return err
 }
 
-func (t *tripRepository) addPlaces(ctx context.Context, value []domain.Place, tripId int) error {
+func (t *tripRepository) addPlaces(ctx context.Context, value []models.Place, tripId int) error {
 	conn, err := t.dataHolder.Acquire(context.Background())
 	if err != nil {
 		return err
@@ -266,33 +248,6 @@ func (t *tripRepository) GetAlbumAuthor(ctx context.Context, id int) (int, error
 		return 0, err
 	}
 	return author, err
-}
-
-func (t *tripRepository) AddFilename(ctx context.Context, filename string, id int) error {
-	conn, err := t.dataHolder.Acquire(context.Background())
-	if err != nil {
-		return err
-	}
-	defer conn.Release()
-
-	var photos []string
-	err = conn.QueryRow(context.Background(),
-		GetAlbumPhotosQuery,
-		id,
-	).Scan(&photos)
-
-	if err != nil {
-		return err
-	}
-
-	photos = append(photos, filename)
-	_, err = conn.Exec(context.Background(),
-		AddAlbumPhotosQuery,
-		photos,
-		id,
-	)
-
-	return err
 }
 
 func (t *tripRepository) SightsByTrip(ctx context.Context, id int) (*[]int, error) {
