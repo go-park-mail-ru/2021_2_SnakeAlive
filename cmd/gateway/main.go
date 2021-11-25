@@ -2,53 +2,17 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/valyala/fasthttp"
 	"snakealive/m/internal/gateway/config"
 	"snakealive/m/internal/gateway/setup"
 )
 
 func main() {
-	client := s3.New(
-		session.Must(session.NewSession()),
-		aws.NewConfig().WithEndpoint("http://hb.bizmrg.com"),
-		aws.NewConfig().WithRegion("ru-msk"),
-		aws.NewConfig().WithCredentials(
-			credentials.NewStaticCredentials(
-				"rcLyfa3DhATRNmeterCZLk",
-				"7qdqBBT9xeKDV3iAdKco4jqEhmjpMqiyk3bLL9PcU2S7",
-				"",
-			),
-		),
-		//aws.NewConfig().WithDisableSSL(true),
-		//aws.NewConfig().WithS3ForcePathStyle(true),
-	)
-
-	//fmt.Println(client.CreateBucket(&s3.CreateBucketInput{
-	//	ACL:    aws.String("public-read-write"),
-	//	Bucket: aws.String("tpvk"),
-	//}))
-	fmt.Println(client.PutObject(&s3.PutObjectInput{
-		Body:                 bytes.NewReader([]byte("123123456789")),
-		Key:                  aws.String("123"),
-		Bucket:               aws.String("snakehastrip"),
-		ACL:                  aws.String("public-read-write"),
-		ServerSideEncryption: aws.String("AES256"),
-	}))
-	//fmt.Println(client.GetObject(&s3.GetObjectInput{
-	//	Key:    aws.String("123"),
-	//	Bucket: aws.String("tpvk"),
-	//}))
-
 	var cfg config.Config
 	if err := cfg.Setup(); err != nil {
 		log.Fatal("failed to setup cfg: ", err)
