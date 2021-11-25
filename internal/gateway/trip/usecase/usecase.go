@@ -130,6 +130,7 @@ func (u *tripGatewayUseCase) AddAlbum(ctx context.Context, album *models.Album, 
 		Title:       album.Title,
 		TripId:      int64(album.TripId),
 		Description: album.Description,
+		Photos:      album.Photos,
 	}
 
 	responce, err := u.tripGRPC.AddAlbum(ctx,
@@ -187,6 +188,7 @@ func (u *tripGatewayUseCase) UpdateAlbum(ctx context.Context, id int, updatedAlb
 		Id:          int64(id),
 		Title:       updatedAlbum.Title,
 		Description: updatedAlbum.Description,
+		Photos:      updatedAlbum.Photos,
 	}
 
 	responce, err := u.tripGRPC.UpdateAlbum(ctx,

@@ -14,12 +14,12 @@ const (
 	AddPlacesForTripQuery    = `INSERT INTO TripsPlaces ("trip_id", "place_id", "day", "order") VALUES ($1, $2, $3, $4)`
 	GetTripAuthorQuery       = `SELECT user_id FROM Trips WHERE id = $1`
 
-	AddAlbumQuery = `INSERT INTO Albums ("title", "description", "trip_id", "author") VALUES ($1, $2, $3, $4) 
+	AddAlbumQuery = `INSERT INTO Albums ("title", "description", "trip_id", "author", "photos") VALUES ($1, $2, $3, $4) 
 								RETURNING id`
 	GetAlbumQuery = `SELECT a.id, a.title, a.description, a.trip_id, a.author, a.photos
 								FROM Albums AS a
 								WHERE a.id = $1`
-	UpdateAlbumQuery    = `UPDATE Albums SET "title" = $1, "description" = $2 WHERE id = $3`
+	UpdateAlbumQuery    = `UPDATE Albums SET "title" = $1, "description" = $2, "photos" = $3 WHERE id = $$`
 	DeleteAlbumQuery    = `DELETE FROM Albums WHERE id = $1`
 	GetAlbumAuthorQuery = `SELECT author FROM Albums WHERE id = $1`
 	GetAlbumPhotosQuery = `SELECT photos FROM Albums WHERE id = &1`

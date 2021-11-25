@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+
 	"snakealive/m/internal/services/trip/models"
 	"snakealive/m/internal/services/trip/repository"
 

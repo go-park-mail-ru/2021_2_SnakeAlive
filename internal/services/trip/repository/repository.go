@@ -2,10 +2,27 @@ package repository
 
 import (
 	"context"
+
 	"snakealive/m/internal/services/trip/models"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 )
+
+type TripRepository interface {
+	AddTrip(ctx context.Context, value *models.Trip, userID int) (int, error)
+	GetTripById(ctx context.Context, id int) (value *models.Trip, err error)
+	DeleteTrip(ctx context.Context, id int) error
+	UpdateTrip(ctx context.Context, id int, value *models.Trip) error
+	GetTripAuthor(ctx context.Context, id int) (int, error)
+
+	AddAlbum(ctx context.Context, album *models.Album, userID int) (int, error)
+	GetAlbumById(ctx context.Context, id int) (*models.Album, error)
+	DeleteAlbum(ctx context.Context, id int) error
+	UpdateAlbum(ctx context.Context, id int, album *models.Album) error
+	GetAlbumAuthor(ctx context.Context, id int) (int, error)
+
+	SightsByTrip(ctx context.Context, id int) (*[]int, error)
+}
 
 type tripRepository struct {
 	dataHolder *pgxpool.Pool
@@ -178,6 +195,7 @@ func (t *tripRepository) AddAlbum(ctx context.Context, album *models.Album, user
 		album.Description,
 		album.TripId,
 		userID,
+		album.Photos,
 	).Scan(&albumId)
 
 	return albumId, err
@@ -225,6 +243,7 @@ func (t *tripRepository) UpdateAlbum(ctx context.Context, id int, album *models.
 		UpdateAlbumQuery,
 		album.Title,
 		album.Description,
+		album.Photos,
 		id,
 	)
 

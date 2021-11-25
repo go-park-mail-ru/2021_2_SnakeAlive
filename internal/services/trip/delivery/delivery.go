@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"context"
+
 	"snakealive/m/internal/services/trip/models"
 	"snakealive/m/internal/services/trip/usecase"
 	"snakealive/m/pkg/error_adapter"
@@ -145,6 +146,7 @@ func (s *tripDelivery) AddAlbum(ctx context.Context, request *trip_service.Modif
 		TripId:      int(request.Album.TripId),
 		Title:       request.Album.Title,
 		Description: request.Album.Description,
+		Photos:      request.Album.Photos,
 	}, int(request.UserId))
 
 	if err != nil {
@@ -176,6 +178,7 @@ func (s *tripDelivery) UpdateAlbum(ctx context.Context, request *trip_service.Mo
 		Title:       request.Album.Title,
 		TripId:      int(request.Album.TripId),
 		Description: request.Album.Description,
+		Photos:      request.Album.Photos,
 	})
 	if err != nil {
 		return nil, s.errorAdapter.AdaptError(err)
