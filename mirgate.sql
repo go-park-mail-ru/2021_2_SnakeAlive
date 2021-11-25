@@ -17,7 +17,7 @@ CREATE TABLE Users
     surname     TEXT        NOT NULL,
     email       TEXT        NOT NULL UNIQUE,
     password    TEXT        NOT NULL,
-    avatar      TEXT                 DEFAULT 'default.jpg',
+    avatar      TEXT                 DEFAULT 'https://snakehastrip.hb.bizmrg.com/default.jpg',
     description TEXT                 DEFAULT '',
     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -132,13 +132,13 @@ VALUES ('UK',
         'uk.jpeg');
 
 INSERT INTO Users ("name", "surname", "password", "email", "description", "avatar")
-VALUES ('Алексадра', 'Волынец', 'AAAcGFzc3dvcmQ=', 'alex@mail.ru', '', 'test.jpeg');
+VALUES ('Алексадра', 'Волынец', 'AAAcGFzc3dvcmQ=', 'alex@mail.ru', '', 'https://snakehastrip.hb.bizmrg.com/test.jpeg');
 INSERT INTO Users ("name", "surname", "password", "email", "description", "avatar")
-VALUES ('Никита', 'Черных', 'AAAZnJvbnRlbmQxMjM=', 'nikita@mail.ru', '', 'test.jpeg');
+VALUES ('Никита', 'Черных', 'AAAZnJvbnRlbmQxMjM=', 'nikita@mail.ru', '', 'https://snakehastrip.hb.bizmrg.com/test.jpeg');
 INSERT INTO Users ("name", "surname", "password", "email", "description", "avatar")
-VALUES ('Ксения', 'Самойлова', 'AAAMTIzNDU2Nzg=', 'ksenia@mail.ru', '', 'test.jpeg');
+VALUES ('Ксения', 'Самойлова', 'AAAMTIzNDU2Nzg=', 'ksenia@mail.ru', '', 'https://snakehastrip.hb.bizmrg.com/test.jpeg');
 INSERT INTO Users ("name", "surname", "password", "email", "description", "avatar")
-VALUES ('Андрей', 'Кравцов', 'AAAMDAwMTExMDAw', 'andrew@mail.ru', '', 'test.jpeg');
+VALUES ('Андрей', 'Кравцов', 'AAAMDAwMTExMDAw', 'andrew@mail.ru', '', 'https://snakehastrip.hb.bizmrg.com/test.jpeg');
 
 INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
 VALUES ('Москва-Cити',
