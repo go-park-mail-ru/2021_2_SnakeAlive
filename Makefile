@@ -23,7 +23,8 @@ protogen-api-review-service:
 protogen-all-services:
 	make protogen-api-auth-service && \
 	make protogen-api-trip-service && \
-	make protogen-api-sight-service
+	make protogen-api-sight-service && \
+	make protogen-api-review-service
 
 prepare-auth_service-env:
 	export USER_DB_URL="postgres://tripadvisor:12345@localhost:5432/tripadvisor" && \
