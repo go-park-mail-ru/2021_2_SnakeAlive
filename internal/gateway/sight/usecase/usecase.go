@@ -93,6 +93,8 @@ func (t *sightUseCase) adaptSightMeta(sight *sight_service.Sight) models.SightMe
 		Photos:  sight.Photos,
 		Country: sight.Country,
 		Rating:  sight.Rating,
+		Lat:     sight.Lat,
+		Lng:     sight.Lng,
 	}
 }
 
