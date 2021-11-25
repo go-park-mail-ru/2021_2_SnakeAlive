@@ -33,8 +33,9 @@ func (s *sightRepository) GetSightsByCountry(ctx context.Context, country string
 		var sight models.Sight
 
 		if err = rows.Scan(
-			&sight.Id, &sight.Name, &sight.Country, &sight.Rating,
-			&sight.Tags, &sight.Description, &sight.Photos, &sight.Lng, &sight.Lat,
+			&sight.Id, &sight.Name, &sight.Tags, &sight.Photos,
+			&sight.Country, &sight.Rating,
+			&sight.Lng, &sight.Lat,
 		); err != nil {
 			return []models.Sight{}, err
 		}
