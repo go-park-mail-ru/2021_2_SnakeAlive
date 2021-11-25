@@ -12,8 +12,8 @@ type SightMetadata struct {
 	Photos  []string `json:"photos"`
 	Country string   `json:"country"`
 	Rating  float32  `json:"rating"`
-	Lat  float32  `json:"lat"`
-	Lng  float32  `json:"lng"`
+	Lat     float32  `json:"lat"`
+	Lng     float32  `json:"lng"`
 }
 
 type SightSearch struct {

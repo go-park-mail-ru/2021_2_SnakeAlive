@@ -3,6 +3,7 @@ package delivery
 import (
 	"encoding/json"
 	"net/http"
+	"path/filepath"
 
 	"github.com/valyala/fasthttp"
 	"snakealive/m/internal/gateway/media/usecase"
@@ -33,7 +34,7 @@ func (m *mediaDelivery) UploadFile(ctx *fasthttp.RequestCtx) {
 	}
 	defer file.Close()
 
-	filename, err := m.manager.UploadFile(ctx, file)
+	filename, err := m.manager.UploadFile(ctx, file, filepath.Ext(form.Filename))
 	if err != nil {
 		ctx.SetStatusCode(http.StatusTeapot)
 		return

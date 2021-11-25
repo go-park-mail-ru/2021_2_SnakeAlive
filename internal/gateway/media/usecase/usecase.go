@@ -11,7 +11,7 @@ import (
 )
 
 type MediaUsecase interface {
-	UploadFile(ctx context.Context, file io.ReadSeeker) (filename string, err error)
+	UploadFile(ctx context.Context, file io.ReadSeeker, ext string) (filename string, err error)
 }
 
 type mediaUsecase struct {
@@ -22,19 +22,18 @@ type mediaUsecase struct {
 	client        *s3.S3
 }
 
-func (m *mediaUsecase) UploadFile(ctx context.Context, file io.ReadSeeker) (filename string, err error) {
+func (m *mediaUsecase) UploadFile(ctx context.Context, file io.ReadSeeker, ext string) (filename string, err error) {
 	filename = m.hasher.EncodeString(m.gen.String())
-	if _, err = m.client.PutObject(&s3.PutObjectInput{
-		Body:                 file,
-		Key:                  aws.String(filename),
-		Bucket:               aws.String(m.defaultBucket),
-		ACL:                  aws.String("public-read-write"),
-		ServerSideEncryption: aws.String("AES256"),
+	if _, err = m.client.PutObjectWithContext(ctx, &s3.PutObjectInput{
+		Body:   file,
+		Key:    aws.String(filename + ext),
+		Bucket: aws.String(m.defaultBucket),
+		ACL:    aws.String("public-read-write"),
 	}); err != nil {
 		return filename, err
 	}
 
-	return m.fileEndpoint + filename, err
+	return m.fileEndpoint + filename + ext, err
 }
 
 func NewMediaUsecase(
