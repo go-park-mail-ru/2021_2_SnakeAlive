@@ -14,7 +14,7 @@ const (
 	AddPlacesForTripQuery    = `INSERT INTO TripsPlaces ("trip_id", "place_id", "day", "order") VALUES ($1, $2, $3, $4)`
 	GetTripAuthorQuery       = `SELECT user_id FROM Trips WHERE id = $1`
 
-	AddAlbumQuery = `INSERT INTO Albums ("title", "description", "trip_id", "author", "photos") VALUES ($1, $2, $3, $4) 
+	AddAlbumQuery = `INSERT INTO Albums ("title", "description", "trip_id", "author", "photos") VALUES ($1, $2, $3, $4, $5) 
 								RETURNING id`
 	GetAlbumQuery = `SELECT a.id, a.title, a.description, a.trip_id, a.author, a.photos
 								FROM Albums AS a
