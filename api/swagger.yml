@@ -130,6 +130,8 @@ paths:
               properties:
                 name:
                   type: string
+                avatar:
+                  type: string
                 surname:
                   type: string
                 email:
