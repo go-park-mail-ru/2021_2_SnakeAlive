@@ -134,6 +134,7 @@ func (s *tripDelivery) GetAlbum(ctx context.Context, request *trip_service.Album
 	return &trip_service.Album{
 		Id:          int64(album.Id),
 		Title:       album.Title,
+		TripId:      int64(album.TripId),
 		Author:      int64(album.UserId),
 		Description: album.Description,
 		Photos:      album.Photos,

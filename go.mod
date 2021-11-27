@@ -11,9 +11,8 @@ require github.com/jackc/pgx/v4 v4.13.0
 require github.com/stretchr/testify v1.7.0
 
 require (
-	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/aws/aws-sdk-go v1.42.12
-	github.com/envoyproxy/protoc-gen-validate v0.6.2
+	github.com/envoyproxy/protoc-gen-validate v0.1.0
 	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
@@ -26,7 +25,10 @@ require (
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	github.com/twinj/uuid v1.0.0
 	go.uber.org/zap v1.13.0
-	google.golang.org/genproto v0.0.0-20210903162649-d08c68adba83 // indirect
+	golang.org/x/mod v0.5.0 // indirect
+	golang.org/x/net v0.0.0-20210813160813-60bc85c4be6d // indirect
+	golang.org/x/sys v0.0.0-20210816183151-1e6c022a8912 // indirect
+	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/grpc v1.40.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0
 	google.golang.org/protobuf v1.27.1
