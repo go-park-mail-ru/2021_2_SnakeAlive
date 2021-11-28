@@ -72,7 +72,6 @@ func (s *sightDelivery) SearchSights(
 	for i := range sights {
 		adapted.Sights[i] = s.adaptSight(sights[i])
 	}
-
 	return adapted, nil
 }
 

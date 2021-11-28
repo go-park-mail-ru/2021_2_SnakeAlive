@@ -17,9 +17,10 @@ type SightMetadata struct {
 }
 
 type SightSearch struct {
-	Id   int      `json:"id"`
-	Name string   `json:"name"`
-	Tags []string `json:"tags"`
-	Lat  float32  `json:"lat"`
-	Lng  float32  `json:"lng"`
+	Id     int      `json:"id"`
+	Name   string   `json:"name"`
+	Tags   []string `json:"tags"`
+	Lat    float32  `json:"lat"`
+	Lng    float32  `json:"lng"`
+	Photos []string `json:"photos"`
 }
