@@ -14,6 +14,7 @@ type TripRepository interface {
 	DeleteTrip(ctx context.Context, id int) error
 	UpdateTrip(ctx context.Context, id int, value *models.Trip) error
 	GetTripAuthor(ctx context.Context, id int) (int, error)
+	GetTripsByUser(ctx context.Context, id int) (*[]models.Trip, error)
 
 	AddAlbum(ctx context.Context, album *models.Album, userID int) (int, error)
 	GetAlbumById(ctx context.Context, id int) (*models.Album, error)
@@ -41,12 +42,19 @@ func (t *tripRepository) AddTrip(ctx context.Context, value *models.Trip, userID
 	}
 	defer conn.Release()
 
+	var origin int
+	if len(value.Sights) < 1 {
+		origin = 0
+	} else {
+		origin = value.Sights[0].Id
+	}
+
 	err = conn.QueryRow(context.Background(),
 		AddTripQuery,
 		value.Title,
 		value.Description,
 		userID,
-		value.Sights[0].Id,
+		origin,
 	).Scan(&tripId)
 	if err != nil {
 		return tripId, err
@@ -178,6 +186,29 @@ func (t *tripRepository) GetTripAuthor(ctx context.Context, id int) (int, error)
 		return 0, err
 	}
 	return author, err
+}
+
+func (t *tripRepository) GetTripsByUser(ctx context.Context, id int) (*[]models.Trip, error) {
+	conn, err := t.dataHolder.Acquire(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Release()
+
+	rows, err := conn.Query(context.Background(),
+		TripsByUserQuery,
+		id)
+	if err != nil {
+		return nil, err
+	}
+
+	trips := make([]models.Trip, 0)
+	var trip models.Trip
+	for rows.Next() {
+		rows.Scan(&trip.Id, &trip.Title, &trip.Description)
+		trips = append(trips, trip)
+	}
+	return &trips, nil
 }
 
 func (t *tripRepository) AddAlbum(ctx context.Context, album *models.Album, userID int) (int, error) {

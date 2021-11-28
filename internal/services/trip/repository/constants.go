@@ -26,4 +26,5 @@ const (
 	AddAlbumPhotosQuery = `UPDATE Albums SET "photos" = $1 WHERE id = $2`
 
 	SightsByTripQuery = `SELECT place_id FROM TripsPlaces AS tp WHERE trip_id = $1 ORDER BY day, tp.order`
+	TripsByUserQuery  = `SELECT id, title, description FROM Trips WHERE user_id = $1`
 )

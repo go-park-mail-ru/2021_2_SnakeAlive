@@ -30,3 +30,4 @@ const AlbumAddURL = "/album"
 const UploadAlbumPhotoURL = "/album/upload/{id}"
 
 const SightsByTripURL = "/trip/sights/{id}"
+const TripsByUserURL = "/trip/user"

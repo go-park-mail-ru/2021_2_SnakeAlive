@@ -75,11 +75,20 @@ message Sights {
   repeated int64 ids = 1;
 }
 
+message TripByUserRequest {
+  int64 user_id = 1;
+}
+
+message Trips {
+  repeated Trip trips = 1;
+}
+
 service TripService {
   rpc GetTrip(TripRequest) returns (Trip) {}
   rpc AddTrip(ModifyTripRequest) returns (Trip) {}
   rpc UpdateTrip(ModifyTripRequest) returns (Trip) {}
   rpc DeleteTrip(TripRequest) returns (google.protobuf.Empty) {}
+  rpc GetTripsByUser(TripByUserRequest) returns (Trips) {}
 
   rpc GetAlbum(AlbumRequest) returns (Album) {}
   rpc AddAlbum(ModifyAlbumRequest) returns (Album) {}

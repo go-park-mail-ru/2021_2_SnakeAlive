@@ -15,6 +15,7 @@ type TripGatewayUseCase interface {
 	GetTripById(ctx context.Context, id int, userID int) (*models.Trip, error)
 	DeleteTrip(ctx context.Context, id int, userID int) error
 	UpdateTrip(ctx context.Context, id int, updatedTrip *models.Trip, userID int) (*models.Trip, error)
+	GetTripsByUser(ctx context.Context, id int) (*[]models.Trip, error)
 
 	AddAlbum(ctx context.Context, album *models.Album, userID int) (*models.Album, error)
 	GetAlbumById(ctx context.Context, id int, userID int) (*models.Album, error)
@@ -234,4 +235,21 @@ func (u *tripGatewayUseCase) SightsByTrip(ctx context.Context, id int) ([]models
 	}
 
 	return adapted, nil
+}
+
+func (u *tripGatewayUseCase) GetTripsByUser(ctx context.Context, id int) (*[]models.Trip, error) {
+	protoTrips, err := u.tripGRPC.GetTripsByUser(ctx, &trip_service.TripByUserRequest{UserId: int64(id)})
+	if err != nil {
+		return nil, err
+	}
+
+	var trips []models.Trip
+	for _, trip := range protoTrips.Trips {
+		trips = append(trips, models.Trip{
+			Id:          int(trip.Id),
+			Title:       trip.Title,
+			Description: trip.Description,
+		})
+	}
+	return &trips, nil
 }

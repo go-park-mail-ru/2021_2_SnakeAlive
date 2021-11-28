@@ -22,6 +22,7 @@ type TripGatewayDelivery interface {
 	UpdateAlbum(ctx *fasthttp.RequestCtx)
 	DeleteAlbum(ctx *fasthttp.RequestCtx)
 	SightsByTrip(ctx *fasthttp.RequestCtx)
+	TripsByUser(ctx *fasthttp.RequestCtx)
 }
 
 type tripGatewayDelivery struct {
@@ -240,6 +241,25 @@ func (s *tripGatewayDelivery) SightsByTrip(ctx *fasthttp.RequestCtx) {
 	}
 
 	bytes, err := json.Marshal(ids)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	ctx.SetStatusCode(fasthttp.StatusOK)
+	ctx.Response.SetBody(bytes)
+}
+
+func (s *tripGatewayDelivery) TripsByUser(ctx *fasthttp.RequestCtx) {
+	userID := ctx.UserValue(cnst.UserIDContextKey).(int)
+
+	trips, err := s.manager.GetTripsByUser(ctx, userID)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	bytes, err := json.Marshal(trips)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return

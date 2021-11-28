@@ -1118,3 +1118,237 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SightsValidationError{}
+
+// Validate checks the field values on TripByUserRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *TripByUserRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TripByUserRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// TripByUserRequestMultiError, or nil if none found.
+func (m *TripByUserRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TripByUserRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for UserId
+
+	if len(errors) > 0 {
+		return TripByUserRequestMultiError(errors)
+	}
+	return nil
+}
+
+// TripByUserRequestMultiError is an error wrapping multiple validation errors
+// returned by TripByUserRequest.ValidateAll() if the designated constraints
+// aren't met.
+type TripByUserRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TripByUserRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TripByUserRequestMultiError) AllErrors() []error { return m }
+
+// TripByUserRequestValidationError is the validation error returned by
+// TripByUserRequest.Validate if the designated constraints aren't met.
+type TripByUserRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TripByUserRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TripByUserRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TripByUserRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TripByUserRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TripByUserRequestValidationError) ErrorName() string {
+	return "TripByUserRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TripByUserRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTripByUserRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TripByUserRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TripByUserRequestValidationError{}
+
+// Validate checks the field values on Trips with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Trips) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Trips with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in TripsMultiError, or nil if none found.
+func (m *Trips) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Trips) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetTrips() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, TripsValidationError{
+						field:  fmt.Sprintf("Trips[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, TripsValidationError{
+						field:  fmt.Sprintf("Trips[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TripsValidationError{
+					field:  fmt.Sprintf("Trips[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return TripsMultiError(errors)
+	}
+	return nil
+}
+
+// TripsMultiError is an error wrapping multiple validation errors returned by
+// Trips.ValidateAll() if the designated constraints aren't met.
+type TripsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TripsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TripsMultiError) AllErrors() []error { return m }
+
+// TripsValidationError is the validation error returned by Trips.Validate if
+// the designated constraints aren't met.
+type TripsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TripsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TripsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TripsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TripsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TripsValidationError) ErrorName() string { return "TripsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e TripsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTrips.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TripsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TripsValidationError{}
