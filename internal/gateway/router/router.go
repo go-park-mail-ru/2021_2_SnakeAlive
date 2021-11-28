@@ -43,6 +43,7 @@ func SetupRouter(cfg RouterConfig) (r *router.Router) {
 	r.GET(cnst.ProfileURL, lgrMw(authMw(cfg.UserDelivery.GetProfile)))
 	r.PATCH(cnst.ProfileURL, lgrMw(authMw(cfg.UserDelivery.UpdateProfile)))
 	r.POST(cnst.RegisterURL, lgrMw(cfg.UserDelivery.Register))
+	r.GET(cnst.UserInfoURL, lgrMw(cfg.UserDelivery.GetUserInfo))
 
 	r.GET(cnst.TripURL, lgrMw(authMw(cfg.TripGatewayDelivery.Trip)))
 	r.POST(cnst.TripPostURL, lgrMw(authMw(cfg.TripGatewayDelivery.AddTrip)))

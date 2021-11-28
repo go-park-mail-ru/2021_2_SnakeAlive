@@ -3,19 +3,22 @@ package delivery
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
-	"github.com/valyala/fasthttp"
 	"snakealive/m/internal/gateway/user/usecase"
 	"snakealive/m/internal/models"
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/error_adapter"
+
+	"github.com/valyala/fasthttp"
 )
 
 type UserDelivery interface {
 	Login(ctx *fasthttp.RequestCtx)
 	Logout(ctx *fasthttp.RequestCtx)
 	Register(ctx *fasthttp.RequestCtx)
+	GetUserInfo(ctx *fasthttp.RequestCtx)
 
 	GetProfile(ctx *fasthttp.RequestCtx)
 	UpdateProfile(ctx *fasthttp.RequestCtx)
@@ -129,6 +132,21 @@ func (u *userDelivery) UpdateProfile(ctx *fasthttp.RequestCtx) {
 	}
 
 	b, _ := json.Marshal(response)
+	ctx.SetStatusCode(http.StatusOK)
+	ctx.SetBody(b)
+}
+
+func (u *userDelivery) GetUserInfo(ctx *fasthttp.RequestCtx) {
+	param, _ := strconv.Atoi(ctx.UserValue("id").(string))
+	responce, err := u.manager.GetUserInfo(ctx, param)
+	if err != nil {
+		httpError := u.errorAdapter.AdaptError(err)
+		ctx.SetStatusCode(httpError.Code)
+		ctx.SetBody([]byte(httpError.MSG))
+		return
+	}
+
+	b, _ := json.Marshal(responce)
 	ctx.SetStatusCode(http.StatusOK)
 	ctx.SetBody(b)
 }

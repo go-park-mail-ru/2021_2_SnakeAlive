@@ -4,6 +4,7 @@ const LoginURL = "/login"
 const RegisterURL = "/register"
 const ProfileURL = "/profile"
 const LogoutURL = "/logout"
+const UserInfoURL = "/user/{id}"
 
 const CountryNameURL = "/country/{name}"
 const CountryIdURL = "/country/id/{id}"

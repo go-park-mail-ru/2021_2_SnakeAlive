@@ -15,4 +15,5 @@ const (
 	createUserSession     = "INSERT INTO Cookies (user_id, hash) VALUES ($1, $2)"
 	validateUserSession   = "SELECT user_id FROM Cookies WHERE hash = $1"
 	removeUserSession     = "DELETE FROM Cookies WHERE hash = $1"
+	GetUserInfoQuery      = "SELECT id, name, surname, avatar FROM Users WHERE id = $1"
 )

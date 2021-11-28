@@ -3,8 +3,9 @@ package repository
 import (
 	"context"
 
-	"go.uber.org/zap"
 	"snakealive/m/internal/services/auth/models"
+
+	"go.uber.org/zap"
 )
 
 const (
@@ -142,4 +143,22 @@ func (l *loggingMiddleware) RemoveUserSession(ctx context.Context, hash string) 
 	}()
 
 	return l.next.RemoveUserSession(ctx, hash)
+}
+
+func (l *loggingMiddleware) GetUserInfo(ctx context.Context, id int) (u *models.User, err error) {
+	l.logger.Infow(module,
+		"Action", "GetUserByEmail",
+		"Request", id,
+	)
+	defer func() {
+		if err != nil {
+			l.logger.Infow(module,
+				"Action", "GetUserInfo",
+				"Request", id,
+				"Error", err,
+			)
+		}
+	}()
+
+	return l.next.GetUserInfo(ctx, id)
 }

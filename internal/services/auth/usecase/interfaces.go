@@ -14,6 +14,7 @@ type authRepository interface {
 	CreateUserSession(ctx context.Context, userID int64, hash string) error
 	ValidateUserSession(ctx context.Context, hash string) (int64, error)
 	RemoveUserSession(ctx context.Context, hash string) error
+	GetUserInfo(ctx context.Context, id int) (*models.User, error)
 }
 
 type hasher interface {

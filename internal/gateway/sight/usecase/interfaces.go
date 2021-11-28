@@ -3,8 +3,9 @@ package usecase
 import (
 	"context"
 
-	"google.golang.org/grpc"
 	sight_service "snakealive/m/pkg/services/sight"
+
+	"google.golang.org/grpc"
 )
 
 type sightGRPC interface {

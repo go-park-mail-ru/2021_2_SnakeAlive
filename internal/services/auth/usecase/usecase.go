@@ -3,9 +3,10 @@ package usecase
 import (
 	"context"
 
-	"github.com/twinj/uuid"
 	"snakealive/m/internal/services/auth/models"
 	"snakealive/m/pkg/errors"
+
+	"github.com/twinj/uuid"
 )
 
 type AuthUseCase interface {
@@ -16,6 +17,7 @@ type AuthUseCase interface {
 	RegisterUser(ctx context.Context, user *models.User) (models.Session, error)
 	GetUser(ctx context.Context, ID int64) (*models.User, error)
 	UpdateUser(ctx context.Context, user *models.User) (*models.User, error)
+	GetUserInfo(ctx context.Context, id int) (*models.User, error)
 }
 
 type authUseCase struct {
@@ -82,6 +84,10 @@ func (a *authUseCase) UpdateUser(ctx context.Context, user *models.User) (*model
 	}
 
 	return a.repo.UpdateUser(ctx, user)
+}
+
+func (a *authUseCase) GetUserInfo(ctx context.Context, id int) (*models.User, error) {
+	return a.repo.GetUserInfo(ctx, id)
 }
 
 func NewAuthUseCase(
