@@ -23,6 +23,7 @@ type TripRepository interface {
 	GetAlbumAuthor(ctx context.Context, id int) (int, error)
 
 	SightsByTrip(ctx context.Context, id int) (*[]int, error)
+	AlbumsByUser(ctx context.Context, id int) (*[]models.Album, error)
 }
 
 type tripRepository struct {
@@ -321,4 +322,27 @@ func (t *tripRepository) SightsByTrip(ctx context.Context, id int) (*[]int, erro
 		ids = append(ids, sightId)
 	}
 	return &ids, nil
+}
+
+func (t *tripRepository) AlbumsByUser(ctx context.Context, id int) (*[]models.Album, error) {
+	conn, err := t.dataHolder.Acquire(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Release()
+
+	rows, err := conn.Query(context.Background(),
+		AlbumsByUserQuery,
+		id)
+	if err != nil {
+		return nil, err
+	}
+
+	var albums []models.Album
+	var album models.Album
+	for rows.Next() {
+		rows.Scan(&album.Id, &album.Title, &album.Description, &album.TripId, &album.UserId, &album.Photos)
+		albums = append(albums, album)
+	}
+	return &albums, nil
 }

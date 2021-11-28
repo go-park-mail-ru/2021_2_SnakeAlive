@@ -29,6 +29,7 @@ const StaticServerURL = "http://194.58.104.204:3000"
 const AlbumURL = "/album/{id}"
 const AlbumAddURL = "/album"
 const UploadAlbumPhotoURL = "/album/upload/{id}"
+const AlbumsByUserURL = "/album/user"
 
 const SightsByTripURL = "/trip/sights/{id}"
 const TripsByUserURL = "/trip/user"

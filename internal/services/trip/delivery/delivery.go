@@ -214,7 +214,7 @@ func (s *tripDelivery) DeleteAlbum(ctx context.Context, request *trip_service.Al
 	return &empty.Empty{}, nil
 }
 
-func (s *tripDelivery) GetTripsByUser(ctx context.Context, request *trip_service.TripByUserRequest) (*trip_service.Trips, error) {
+func (s *tripDelivery) GetTripsByUser(ctx context.Context, request *trip_service.ByUserRequest) (*trip_service.Trips, error) {
 	trips, err := s.tripUsecase.TripsByUser(ctx, int(request.UserId))
 	if err != nil {
 		return nil, s.errorAdapter.AdaptError(err)
@@ -245,6 +245,27 @@ func (s *tripDelivery) SightsByTrip(ctx context.Context, request *trip_service.S
 	return &trip_service.Sights{
 		Ids: ids,
 	}, nil
+}
+
+func (s *tripDelivery) GetAlbumsByUser(ctx context.Context, request *trip_service.ByUserRequest) (*trip_service.Albums, error) {
+	responce, err := s.tripUsecase.AlbumsByUser(ctx, int(request.UserId))
+	if err != nil {
+		return nil, s.errorAdapter.AdaptError(err)
+	}
+
+	var protoAlbums trip_service.Albums
+	for _, album := range *responce {
+		protoAlbums.Albums = append(protoAlbums.Albums, &trip_service.Album{
+			Id:          int64(album.Id),
+			Title:       album.Title,
+			TripId:      int64(album.TripId),
+			Author:      int64(album.UserId),
+			Description: album.Description,
+			Photos:      album.Photos,
+		})
+	}
+	return &protoAlbums, nil
+
 }
 
 func ProtoDaysFromPlaces(places []models.Place) []*trip_service.Sight {

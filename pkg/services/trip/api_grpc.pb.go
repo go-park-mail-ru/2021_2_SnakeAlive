@@ -23,12 +23,13 @@ type TripServiceClient interface {
 	AddTrip(ctx context.Context, in *ModifyTripRequest, opts ...grpc.CallOption) (*Trip, error)
 	UpdateTrip(ctx context.Context, in *ModifyTripRequest, opts ...grpc.CallOption) (*Trip, error)
 	DeleteTrip(ctx context.Context, in *TripRequest, opts ...grpc.CallOption) (*empty.Empty, error)
-	GetTripsByUser(ctx context.Context, in *TripByUserRequest, opts ...grpc.CallOption) (*Trips, error)
+	GetTripsByUser(ctx context.Context, in *ByUserRequest, opts ...grpc.CallOption) (*Trips, error)
 	GetAlbum(ctx context.Context, in *AlbumRequest, opts ...grpc.CallOption) (*Album, error)
 	AddAlbum(ctx context.Context, in *ModifyAlbumRequest, opts ...grpc.CallOption) (*Album, error)
 	UpdateAlbum(ctx context.Context, in *ModifyAlbumRequest, opts ...grpc.CallOption) (*Album, error)
 	DeleteAlbum(ctx context.Context, in *AlbumRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	SightsByTrip(ctx context.Context, in *SightsRequest, opts ...grpc.CallOption) (*Sights, error)
+	GetAlbumsByUser(ctx context.Context, in *ByUserRequest, opts ...grpc.CallOption) (*Albums, error)
 }
 
 type tripServiceClient struct {
@@ -75,7 +76,7 @@ func (c *tripServiceClient) DeleteTrip(ctx context.Context, in *TripRequest, opt
 	return out, nil
 }
 
-func (c *tripServiceClient) GetTripsByUser(ctx context.Context, in *TripByUserRequest, opts ...grpc.CallOption) (*Trips, error) {
+func (c *tripServiceClient) GetTripsByUser(ctx context.Context, in *ByUserRequest, opts ...grpc.CallOption) (*Trips, error) {
 	out := new(Trips)
 	err := c.cc.Invoke(ctx, "/services.trip_service.TripService/GetTripsByUser", in, out, opts...)
 	if err != nil {
@@ -129,6 +130,15 @@ func (c *tripServiceClient) SightsByTrip(ctx context.Context, in *SightsRequest,
 	return out, nil
 }
 
+func (c *tripServiceClient) GetAlbumsByUser(ctx context.Context, in *ByUserRequest, opts ...grpc.CallOption) (*Albums, error) {
+	out := new(Albums)
+	err := c.cc.Invoke(ctx, "/services.trip_service.TripService/GetAlbumsByUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TripServiceServer is the server API for TripService service.
 // All implementations must embed UnimplementedTripServiceServer
 // for forward compatibility
@@ -137,12 +147,13 @@ type TripServiceServer interface {
 	AddTrip(context.Context, *ModifyTripRequest) (*Trip, error)
 	UpdateTrip(context.Context, *ModifyTripRequest) (*Trip, error)
 	DeleteTrip(context.Context, *TripRequest) (*empty.Empty, error)
-	GetTripsByUser(context.Context, *TripByUserRequest) (*Trips, error)
+	GetTripsByUser(context.Context, *ByUserRequest) (*Trips, error)
 	GetAlbum(context.Context, *AlbumRequest) (*Album, error)
 	AddAlbum(context.Context, *ModifyAlbumRequest) (*Album, error)
 	UpdateAlbum(context.Context, *ModifyAlbumRequest) (*Album, error)
 	DeleteAlbum(context.Context, *AlbumRequest) (*empty.Empty, error)
 	SightsByTrip(context.Context, *SightsRequest) (*Sights, error)
+	GetAlbumsByUser(context.Context, *ByUserRequest) (*Albums, error)
 	mustEmbedUnimplementedTripServiceServer()
 }
 
@@ -162,7 +173,7 @@ func (UnimplementedTripServiceServer) UpdateTrip(context.Context, *ModifyTripReq
 func (UnimplementedTripServiceServer) DeleteTrip(context.Context, *TripRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteTrip not implemented")
 }
-func (UnimplementedTripServiceServer) GetTripsByUser(context.Context, *TripByUserRequest) (*Trips, error) {
+func (UnimplementedTripServiceServer) GetTripsByUser(context.Context, *ByUserRequest) (*Trips, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTripsByUser not implemented")
 }
 func (UnimplementedTripServiceServer) GetAlbum(context.Context, *AlbumRequest) (*Album, error) {
@@ -179,6 +190,9 @@ func (UnimplementedTripServiceServer) DeleteAlbum(context.Context, *AlbumRequest
 }
 func (UnimplementedTripServiceServer) SightsByTrip(context.Context, *SightsRequest) (*Sights, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SightsByTrip not implemented")
+}
+func (UnimplementedTripServiceServer) GetAlbumsByUser(context.Context, *ByUserRequest) (*Albums, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAlbumsByUser not implemented")
 }
 func (UnimplementedTripServiceServer) mustEmbedUnimplementedTripServiceServer() {}
 
@@ -266,7 +280,7 @@ func _TripService_DeleteTrip_Handler(srv interface{}, ctx context.Context, dec f
 }
 
 func _TripService_GetTripsByUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TripByUserRequest)
+	in := new(ByUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -278,7 +292,7 @@ func _TripService_GetTripsByUser_Handler(srv interface{}, ctx context.Context, d
 		FullMethod: "/services.trip_service.TripService/GetTripsByUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TripServiceServer).GetTripsByUser(ctx, req.(*TripByUserRequest))
+		return srv.(TripServiceServer).GetTripsByUser(ctx, req.(*ByUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -373,6 +387,24 @@ func _TripService_SightsByTrip_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TripService_GetAlbumsByUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ByUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TripServiceServer).GetAlbumsByUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/services.trip_service.TripService/GetAlbumsByUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TripServiceServer).GetAlbumsByUser(ctx, req.(*ByUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TripService_ServiceDesc is the grpc.ServiceDesc for TripService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -419,6 +451,10 @@ var TripService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SightsByTrip",
 			Handler:    _TripService_SightsByTrip_Handler,
+		},
+		{
+			MethodName: "GetAlbumsByUser",
+			Handler:    _TripService_GetAlbumsByUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

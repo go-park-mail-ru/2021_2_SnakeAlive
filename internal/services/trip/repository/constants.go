@@ -27,4 +27,5 @@ const (
 
 	SightsByTripQuery = `SELECT place_id FROM TripsPlaces AS tp WHERE trip_id = $1 ORDER BY day, tp.order`
 	TripsByUserQuery  = `SELECT id, title, description FROM Trips WHERE user_id = $1`
+	AlbumsByUserQuery = `SELECT id, title, description, trip_id, author, photos FROM Albums WHERE author = $1`
 )

@@ -1119,22 +1119,22 @@ var _ interface {
 	ErrorName() string
 } = SightsValidationError{}
 
-// Validate checks the field values on TripByUserRequest with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// first error encountered is returned, or nil if there are no violations.
-func (m *TripByUserRequest) Validate() error {
+// Validate checks the field values on ByUserRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ByUserRequest) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on TripByUserRequest with the rules
-// defined in the proto definition for this message. If any rules are
-// violated, the result is a list of violation errors wrapped in
-// TripByUserRequestMultiError, or nil if none found.
-func (m *TripByUserRequest) ValidateAll() error {
+// ValidateAll checks the field values on ByUserRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ByUserRequestMultiError, or
+// nil if none found.
+func (m *ByUserRequest) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *TripByUserRequest) validate(all bool) error {
+func (m *ByUserRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -1144,18 +1144,18 @@ func (m *TripByUserRequest) validate(all bool) error {
 	// no validation rules for UserId
 
 	if len(errors) > 0 {
-		return TripByUserRequestMultiError(errors)
+		return ByUserRequestMultiError(errors)
 	}
 	return nil
 }
 
-// TripByUserRequestMultiError is an error wrapping multiple validation errors
-// returned by TripByUserRequest.ValidateAll() if the designated constraints
+// ByUserRequestMultiError is an error wrapping multiple validation errors
+// returned by ByUserRequest.ValidateAll() if the designated constraints
 // aren't met.
-type TripByUserRequestMultiError []error
+type ByUserRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m TripByUserRequestMultiError) Error() string {
+func (m ByUserRequestMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -1164,11 +1164,11 @@ func (m TripByUserRequestMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m TripByUserRequestMultiError) AllErrors() []error { return m }
+func (m ByUserRequestMultiError) AllErrors() []error { return m }
 
-// TripByUserRequestValidationError is the validation error returned by
-// TripByUserRequest.Validate if the designated constraints aren't met.
-type TripByUserRequestValidationError struct {
+// ByUserRequestValidationError is the validation error returned by
+// ByUserRequest.Validate if the designated constraints aren't met.
+type ByUserRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1176,24 +1176,22 @@ type TripByUserRequestValidationError struct {
 }
 
 // Field function returns field value.
-func (e TripByUserRequestValidationError) Field() string { return e.field }
+func (e ByUserRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e TripByUserRequestValidationError) Reason() string { return e.reason }
+func (e ByUserRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e TripByUserRequestValidationError) Cause() error { return e.cause }
+func (e ByUserRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e TripByUserRequestValidationError) Key() bool { return e.key }
+func (e ByUserRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e TripByUserRequestValidationError) ErrorName() string {
-	return "TripByUserRequestValidationError"
-}
+func (e ByUserRequestValidationError) ErrorName() string { return "ByUserRequestValidationError" }
 
 // Error satisfies the builtin error interface
-func (e TripByUserRequestValidationError) Error() string {
+func (e ByUserRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1205,14 +1203,14 @@ func (e TripByUserRequestValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sTripByUserRequest.%s: %s%s",
+		"invalid %sByUserRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = TripByUserRequestValidationError{}
+var _ error = ByUserRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -1220,7 +1218,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = TripByUserRequestValidationError{}
+} = ByUserRequestValidationError{}
 
 // Validate checks the field values on Trips with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
@@ -1352,3 +1350,134 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = TripsValidationError{}
+
+// Validate checks the field values on Albums with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *Albums) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Albums with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in AlbumsMultiError, or nil if none found.
+func (m *Albums) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Albums) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetAlbums() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, AlbumsValidationError{
+						field:  fmt.Sprintf("Albums[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, AlbumsValidationError{
+						field:  fmt.Sprintf("Albums[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return AlbumsValidationError{
+					field:  fmt.Sprintf("Albums[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return AlbumsMultiError(errors)
+	}
+	return nil
+}
+
+// AlbumsMultiError is an error wrapping multiple validation errors returned by
+// Albums.ValidateAll() if the designated constraints aren't met.
+type AlbumsMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AlbumsMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AlbumsMultiError) AllErrors() []error { return m }
+
+// AlbumsValidationError is the validation error returned by Albums.Validate if
+// the designated constraints aren't met.
+type AlbumsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AlbumsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AlbumsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AlbumsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AlbumsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AlbumsValidationError) ErrorName() string { return "AlbumsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AlbumsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAlbums.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AlbumsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AlbumsValidationError{}

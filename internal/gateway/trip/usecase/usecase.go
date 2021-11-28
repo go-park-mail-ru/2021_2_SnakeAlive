@@ -21,7 +21,8 @@ type TripGatewayUseCase interface {
 	GetAlbumById(ctx context.Context, id int, userID int) (*models.Album, error)
 	DeleteAlbum(ctx context.Context, id int, userID int) error
 	UpdateAlbum(ctx context.Context, id int, updatedAlbum *models.Album, userID int) (*models.Album, error)
-	SightsByTrip(ctx context.Context, id int) ([]models.TripSight, error)
+	SightsByTrip(ctx context.Context, id int) (*[]models.TripSight, error)
+	GetAlbumsByUser(ctx context.Context, id int) (*[]models.Album, error)
 }
 
 type tripGatewayUseCase struct {
@@ -212,7 +213,7 @@ func (u *tripGatewayUseCase) UpdateAlbum(ctx context.Context, id int, updatedAlb
 	}, nil
 }
 
-func (u *tripGatewayUseCase) SightsByTrip(ctx context.Context, id int) ([]models.TripSight, error) {
+func (u *tripGatewayUseCase) SightsByTrip(ctx context.Context, id int) (*[]models.TripSight, error) {
 	ids, err := u.tripGRPC.SightsByTrip(ctx, &trip_service.SightsRequest{
 		TripId: int64(id),
 	})
@@ -234,11 +235,11 @@ func (u *tripGatewayUseCase) SightsByTrip(ctx context.Context, id int) ([]models
 		}
 	}
 
-	return adapted, nil
+	return &adapted, nil
 }
 
 func (u *tripGatewayUseCase) GetTripsByUser(ctx context.Context, id int) (*[]models.Trip, error) {
-	protoTrips, err := u.tripGRPC.GetTripsByUser(ctx, &trip_service.TripByUserRequest{UserId: int64(id)})
+	protoTrips, err := u.tripGRPC.GetTripsByUser(ctx, &trip_service.ByUserRequest{UserId: int64(id)})
 	if err != nil {
 		return nil, err
 	}
@@ -252,4 +253,24 @@ func (u *tripGatewayUseCase) GetTripsByUser(ctx context.Context, id int) (*[]mod
 		})
 	}
 	return &trips, nil
+}
+
+func (u *tripGatewayUseCase) GetAlbumsByUser(ctx context.Context, id int) (*[]models.Album, error) {
+	protoAlbums, err := u.tripGRPC.GetAlbumsByUser(ctx, &trip_service.ByUserRequest{UserId: int64(id)})
+	if err != nil {
+		return nil, err
+	}
+
+	var albums []models.Album
+	for _, album := range protoAlbums.Albums {
+		albums = append(albums, models.Album{
+			Id:          int(album.Id),
+			Title:       album.Title,
+			TripId:      int(album.TripId),
+			UserId:      int(album.Author),
+			Description: album.Description,
+			Photos:      album.Photos,
+		})
+	}
+	return &albums, nil
 }

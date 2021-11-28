@@ -28,6 +28,7 @@ type TripUseCase interface {
 
 	SightsByTrip(ctx context.Context, id int) (*[]int, error)
 	TripsByUser(ctx context.Context, id int) (*[]models.Trip, error)
+	AlbumsByUser(ctx context.Context, id int) (*[]models.Album, error)
 }
 
 type tripUseCase struct {
@@ -109,4 +110,8 @@ func (u tripUseCase) SanitizeAlbum(ctx context.Context, album *models.Album) *mo
 	album.Title = sanitizer.Sanitize(album.Title)
 	album.Description = sanitizer.Sanitize(album.Description)
 	return album
+}
+
+func (u tripUseCase) AlbumsByUser(ctx context.Context, id int) (*[]models.Album, error) {
+	return u.tripRepository.AlbumsByUser(ctx, id)
 }
