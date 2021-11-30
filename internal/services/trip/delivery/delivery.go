@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"context"
+	"fmt"
 
 	"snakealive/m/internal/services/trip/models"
 	"snakealive/m/internal/services/trip/usecase"
@@ -32,17 +33,20 @@ func (s *tripDelivery) GetTrip(ctx context.Context, request *trip_service.TripRe
 	}
 
 	trip, err := s.tripUsecase.GetTripById(ctx, int(request.TripId))
+	fmt.Println(trip)
 	if err != nil {
 		return nil, s.errorAdapter.AdaptError(err)
 	}
 
 	protoDays := ProtoDaysFromPlaces(trip.Sights)
+	protoAlbums := ProtoAlbumsFromAlbums(trip.Albums)
 
 	return &trip_service.Trip{
 		Id:          int64(trip.Id),
 		Title:       trip.Title,
 		Description: trip.Description,
 		Sights:      protoDays,
+		Albums:      protoAlbums,
 	}, nil
 }
 
@@ -66,11 +70,14 @@ func (s *tripDelivery) AddTrip(ctx context.Context, request *trip_service.Modify
 	}
 
 	days := ProtoDaysFromPlaces(trip.Sights)
+	protoAlbums := ProtoAlbumsFromAlbums(trip.Albums)
+
 	return &trip_service.Trip{
 		Id:          int64(trip.Id),
 		Title:       trip.Title,
 		Description: trip.Description,
 		Sights:      days,
+		Albums:      protoAlbums,
 	}, nil
 }
 
@@ -98,11 +105,14 @@ func (s *tripDelivery) UpdateTrip(ctx context.Context, request *trip_service.Mod
 	}
 
 	days := ProtoDaysFromPlaces(trip.Sights)
+	protoAlbums := ProtoAlbumsFromAlbums(trip.Albums)
+
 	return &trip_service.Trip{
 		Id:          int64(trip.Id),
 		Title:       trip.Title,
 		Description: trip.Description,
 		Sights:      days,
+		Albums:      protoAlbums,
 	}, nil
 }
 
@@ -222,10 +232,15 @@ func (s *tripDelivery) GetTripsByUser(ctx context.Context, request *trip_service
 
 	var protoTrips trip_service.Trips
 	for _, trip := range *trips {
+		protoAlbums := ProtoAlbumsFromAlbums(trip.Albums)
+		protoSights := ProtoDaysFromPlaces(trip.Sights)
+
 		protoTrips.Trips = append(protoTrips.Trips, &trip_service.Trip{
 			Id:          int64(trip.Id),
 			Title:       trip.Title,
 			Description: trip.Description,
+			Sights:      protoSights,
+			Albums:      protoAlbums,
 		})
 	}
 	return &protoTrips, nil
@@ -302,4 +317,32 @@ func PlacesFromProtoDays(sights []*trip_service.Sight) []models.Place {
 		places = append(places, placesSight)
 	}
 	return places
+}
+
+func ProtoAlbumsFromAlbums(albums []models.Album) []*trip_service.Album {
+	var protoAlbums []*trip_service.Album
+	for _, album := range albums {
+		protoAlbum := trip_service.Album{
+			Id:          int64(album.Id),
+			Title:       album.Title,
+			Description: album.Description,
+			Photos:      album.Photos,
+		}
+		protoAlbums = append(protoAlbums, &protoAlbum)
+	}
+	return protoAlbums
+}
+
+func AlbumsFromProtoAlbums(protoAlbums []*trip_service.Album) []models.Album {
+	var albums []models.Album
+	for _, album := range protoAlbums {
+		modelAlbum := models.Album{
+			Id:          int(album.Id),
+			Title:       album.Title,
+			Description: album.Description,
+			Photos:      album.Photos,
+		}
+		albums = append(albums, modelAlbum)
+	}
+	return albums
 }

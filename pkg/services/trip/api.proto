@@ -34,6 +34,7 @@ message Trip {
   }];
   string description = 3;
   repeated Sight sights = 4;
+  repeated Album albums = 5;
 }
 
 message ModifyTripRequest {
@@ -58,7 +59,6 @@ message Album {
   int64 author = 7;
   string title = 3;
   string description = 4;
-  repeated string names = 5;
   repeated string photos = 6;
 }
 

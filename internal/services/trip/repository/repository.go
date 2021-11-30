@@ -95,6 +95,19 @@ func (t *tripRepository) GetTripById(ctx context.Context, id int) (*models.Trip,
 		trip.Sights = append(trip.Sights, place)
 	}
 
+	rows, err = conn.Query(context.Background(),
+		GetAlbumsByTripQuery,
+		id)
+	if err != nil {
+		return &trip, err
+	}
+
+	var album models.Album
+	for rows.Next() {
+		rows.Scan(&album.Id, &album.Title, &album.Description, &album.Photos)
+		trip.Albums = append(trip.Albums, album)
+	}
+
 	return &trip, err
 }
 
@@ -208,6 +221,34 @@ func (t *tripRepository) GetTripsByUser(ctx context.Context, id int) (*[]models.
 	for rows.Next() {
 		rows.Scan(&trip.Id, &trip.Title, &trip.Description)
 		trips = append(trips, trip)
+	}
+
+	for i := range trips {
+		rows, err := conn.Query(context.Background(),
+			GetPlaceForTripQuery,
+			trips[i].Id)
+		if err != nil {
+			return &trips, err
+		}
+
+		var place models.Place
+		for rows.Next() {
+			rows.Scan(&place.Id, &place.Name, &place.Tags, &place.Description, &place.Rating, &place.Country, &place.Photos, &place.Day)
+			trips[i].Sights = append(trips[i].Sights, place)
+		}
+
+		rows, err = conn.Query(context.Background(),
+			GetAlbumsByTripQuery,
+			trips[i].Id)
+		if err != nil {
+			return &trips, err
+		}
+
+		var album models.Album
+		for rows.Next() {
+			rows.Scan(&album.Id, &album.Title, &album.Description, &album.Photos)
+			trips[i].Albums = append(trips[i].Albums, album)
+		}
 	}
 	return &trips, nil
 }

@@ -16,6 +16,7 @@ type Trip struct {
 	Title       string  `json:"title"`
 	Description string  `json:"description"`
 	Sights      []Place `json:"sights"`
+	Albums      []Album `json:"albums"`
 }
 
 type TripSight struct {

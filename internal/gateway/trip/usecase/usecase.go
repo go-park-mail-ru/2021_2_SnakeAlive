@@ -57,12 +57,14 @@ func (u *tripGatewayUseCase) AddTrip(ctx context.Context, value *models.Trip, us
 	}
 
 	places := td.PlacesFromProtoDays(responce.Sights)
+	albums := td.AlbumsFromProtoAlbums(responce.Albums)
 
 	return &models.Trip{
 		Id:          int(responce.Id),
 		Title:       responce.Title,
 		Description: responce.Description,
 		Sights:      places,
+		Albums:      albums,
 	}, nil
 }
 
@@ -80,12 +82,14 @@ func (u *tripGatewayUseCase) GetTripById(ctx context.Context, tripId int, userID
 	}
 
 	places := td.PlacesFromProtoDays(responce.Sights)
+	albums := td.AlbumsFromProtoAlbums(responce.Albums)
 
 	return &models.Trip{
 		Id:          int(responce.Id),
 		Title:       responce.Title,
 		Description: responce.Description,
 		Sights:      places,
+		Albums:      albums,
 	}, nil
 }
 
@@ -117,12 +121,14 @@ func (u *tripGatewayUseCase) UpdateTrip(ctx context.Context, id int, updatedTrip
 	}
 
 	places := td.PlacesFromProtoDays(responce.Sights)
+	albums := td.AlbumsFromProtoAlbums(responce.Albums)
 
 	return &models.Trip{
 		Id:          int(responce.Id),
 		Title:       responce.Title,
 		Description: responce.Description,
 		Sights:      places,
+		Albums:      albums,
 	}, nil
 }
 
@@ -246,10 +252,14 @@ func (u *tripGatewayUseCase) GetTripsByUser(ctx context.Context, id int) (*[]mod
 
 	var trips []models.Trip
 	for _, trip := range protoTrips.Trips {
+		places := td.PlacesFromProtoDays(trip.Sights)
+		albums := td.AlbumsFromProtoAlbums(trip.Albums)
 		trips = append(trips, models.Trip{
 			Id:          int(trip.Id),
 			Title:       trip.Title,
 			Description: trip.Description,
+			Albums:      albums,
+			Sights:      places,
 		})
 	}
 	return &trips, nil
