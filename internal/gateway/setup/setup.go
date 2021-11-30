@@ -5,7 +5,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/twinj/uuid"
 	"snakealive/m/internal/gateway/config"
 	country_delivery "snakealive/m/internal/gateway/country/delivery"
 	"snakealive/m/internal/gateway/country/repository"
@@ -114,7 +113,7 @@ func Setup(cfg config.Config) (r *fsthp_router.Router, stopFunc func(), err erro
 		),
 	)
 	mediaUsecase := media_usecase.NewMediaUsecase(
-		uuid.NewV4(), s3Client, hasher.NewHasher(5),
+		s3Client, hasher.NewHasher(5),
 		cfg.DefaultBucket, cfg.S3PublicEndpoint,
 	)
 	mediaDelivery := media_delivery.NewMediaDelivery(mediaUsecase,

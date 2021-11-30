@@ -15,7 +15,6 @@ type MediaUsecase interface {
 }
 
 type mediaUsecase struct {
-	gen           uuid.UUID
 	hasher        hasher.Hasher
 	defaultBucket string
 	fileEndpoint  string
@@ -23,7 +22,8 @@ type mediaUsecase struct {
 }
 
 func (m *mediaUsecase) UploadFile(ctx context.Context, file io.ReadSeeker, ext string) (filename string, err error) {
-	filename = m.hasher.EncodeString(m.gen.String())
+	uuidGen := uuid.NewV4()
+	filename = m.hasher.EncodeString(uuidGen.String())
 	if _, err = m.client.PutObjectWithContext(ctx, &s3.PutObjectInput{
 		Body:   file,
 		Key:    aws.String(filename + ext),
@@ -37,10 +37,9 @@ func (m *mediaUsecase) UploadFile(ctx context.Context, file io.ReadSeeker, ext s
 }
 
 func NewMediaUsecase(
-	gen uuid.UUID, client *s3.S3, hasher hasher.Hasher,
+	client *s3.S3, hasher hasher.Hasher,
 	defaultBucket, fileEndpoint string) MediaUsecase {
 	return &mediaUsecase{
-		gen:           gen,
 		client:        client,
 		defaultBucket: defaultBucket,
 		fileEndpoint:  fileEndpoint,
