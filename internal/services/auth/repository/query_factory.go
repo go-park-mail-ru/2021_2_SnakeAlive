@@ -82,8 +82,10 @@ func (q *queryFactory) CreateUpdateUser(user *models.User) *query.Query {
 	}
 
 	return &query.Query{
-		Request: updateUserRequest + strings.Join(optionals, ",") + " " + updateUserReturning,
-		Params:  params,
+		Request: updateUserRequest +
+			strings.Join(optionals, ",") + " " +
+			updateUserReturning + " " + whereStatement,
+		Params: params,
 	}
 }
 
