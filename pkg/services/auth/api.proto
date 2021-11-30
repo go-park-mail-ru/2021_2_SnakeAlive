@@ -84,6 +84,19 @@ message ValidateSessionResponse {
   int64 user_id = 1;
 }
 
+message UserInfo {
+  int64 user_id = 1;
+  string name = 3 [(validate.rules).string = {
+    max_len: 128,
+    min_bytes: 1,
+  }];;
+  string surname = 4 [(validate.rules).string = {
+    max_len: 128,
+    min_bytes: 1,
+  }];;
+  string image = 2;
+}
+
 service AuthService {
   rpc ValidateSession (Session) returns (ValidateSessionResponse) {}
   rpc LogoutUser(Session) returns (google.protobuf.Empty) {}
@@ -92,4 +105,5 @@ service AuthService {
   rpc RegisterUser(RegisterRequest) returns (LoginResponse) {}
   rpc GetUser(GetUserRequest) returns (GetUserResponse) {}
   rpc UpdateUser(UpdateUserRequest) returns (GetUserResponse) {}
+  rpc GetUserInfo(GetUserRequest) returns (UserInfo) {}
 }

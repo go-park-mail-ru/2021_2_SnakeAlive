@@ -3,11 +3,12 @@ package delivery
 import (
 	"context"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"snakealive/m/internal/services/auth/models"
 	"snakealive/m/internal/services/auth/usecase"
 	"snakealive/m/pkg/error_adapter"
 	auth_service "snakealive/m/pkg/services/auth"
+
+	"github.com/golang/protobuf/ptypes/empty"
 )
 
 type authDelivery struct {
@@ -96,6 +97,20 @@ func (a *authDelivery) UpdateUser(ctx context.Context, request *auth_service.Upd
 		Email:       response.Email,
 		Image:       response.Image,
 		Description: response.Description,
+	}, nil
+}
+
+func (a *authDelivery) GetUserInfo(ctx context.Context, request *auth_service.GetUserRequest) (*auth_service.UserInfo, error) {
+	responce, err := a.authUsecase.GetUserInfo(ctx, int(request.Id))
+	if err != nil {
+		return &auth_service.UserInfo{}, a.errorAdapter.AdaptError(err)
+	}
+
+	return &auth_service.UserInfo{
+		UserId:  responce.ID,
+		Name:    responce.Name,
+		Surname: responce.Surname,
+		Image:   responce.Image,
 	}, nil
 }
 

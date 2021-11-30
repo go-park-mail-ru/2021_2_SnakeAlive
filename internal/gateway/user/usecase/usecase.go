@@ -11,6 +11,7 @@ type UserUsecase interface {
 	Login(ctx context.Context, request *models.LoginUserRequest) (*models.Session, error)
 	Register(ctx context.Context, request *models.RegisterUserRequest) (*models.Session, error)
 	Logout(ctx context.Context, cookie string) error
+	GetUserInfo(ctx context.Context, id int) (*models.Profile, error)
 
 	Profile(ctx context.Context, userID int) (*models.Profile, error)
 	UpdateProfile(ctx context.Context, userID int, request *models.UpdateProfileRequest) (*models.Profile, error)
@@ -101,6 +102,20 @@ func (u *userUsecase) UpdateProfile(ctx context.Context, userID int, request *mo
 		Avatar:      response.Image,
 		Email:       response.Email,
 		Description: response.Description,
+	}, nil
+}
+
+func (u *userUsecase) GetUserInfo(ctx context.Context, id int) (*models.Profile, error) {
+	responce, err := u.authGRPC.GetUserInfo(ctx, &auth_service.GetUserRequest{Id: int64(id)})
+	if err != nil {
+		return nil, err
+	}
+
+	return &models.Profile{
+		Id:      int(responce.UserId),
+		Name:    responce.Name,
+		Surname: responce.Surname,
+		Avatar:  responce.Image,
 	}, nil
 }
 

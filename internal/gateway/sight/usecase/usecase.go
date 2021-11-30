@@ -31,11 +31,12 @@ func (t *sightUseCase) SearchSights(ctx context.Context, search string, skip, li
 	adapted := make([]models.SightSearch, len(response.Sights))
 	for i, sight := range response.Sights {
 		adapted[i] = models.SightSearch{
-			Id:   int(sight.Id),
-			Name: sight.Name,
-			Tags: sight.Tags,
-			Lat:  sight.Lat,
-			Lng:  sight.Lng,
+			Id:     int(sight.Id),
+			Name:   sight.Name,
+			Tags:   sight.Tags,
+			Photos: sight.Photos,
+			Lat:    sight.Lat,
+			Lng:    sight.Lng,
 		}
 	}
 

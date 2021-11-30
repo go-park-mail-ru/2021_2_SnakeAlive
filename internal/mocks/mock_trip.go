@@ -50,20 +50,6 @@ func (mr *MockTripRepositoryMockRecorder) AddAlbum(ctx, album, userID interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddAlbum", reflect.TypeOf((*MockTripRepository)(nil).AddAlbum), ctx, album, userID)
 }
 
-// AddFilename mocks base method.
-func (m *MockTripRepository) AddFilename(ctx context.Context, filename string, id int) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddFilename", ctx, filename, id)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// AddFilename indicates an expected call of AddFilename.
-func (mr *MockTripRepositoryMockRecorder) AddFilename(ctx, filename, id interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddFilename", reflect.TypeOf((*MockTripRepository)(nil).AddFilename), ctx, filename, id)
-}
-
 // AddTrip mocks base method.
 func (m *MockTripRepository) AddTrip(ctx context.Context, value *models.Trip, userID int) (int, error) {
 	m.ctrl.T.Helper()
@@ -165,6 +151,21 @@ func (m *MockTripRepository) GetTripById(ctx context.Context, id int) (*models.T
 func (mr *MockTripRepositoryMockRecorder) GetTripById(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTripById", reflect.TypeOf((*MockTripRepository)(nil).GetTripById), ctx, id)
+}
+
+// GetTripsByUser mocks base method.
+func (m *MockTripRepository) GetTripsByUser(ctx context.Context, id int) (*[]models.Trip, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTripsByUser", ctx, id)
+	ret0, _ := ret[0].(*[]models.Trip)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTripsByUser indicates an expected call of GetTripsByUser.
+func (mr *MockTripRepositoryMockRecorder) GetTripsByUser(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTripsByUser", reflect.TypeOf((*MockTripRepository)(nil).GetTripsByUser), ctx, id)
 }
 
 // SightsByTrip mocks base method.

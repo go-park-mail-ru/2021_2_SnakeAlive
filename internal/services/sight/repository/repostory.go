@@ -3,10 +3,11 @@ package repository
 import (
 	"context"
 
-	"github.com/jackc/pgx/v4"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"snakealive/m/internal/services/sight/models"
 	"snakealive/m/pkg/errors"
+
+	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type SightRepository interface {

@@ -14,6 +14,7 @@ type TripRepository interface {
 	DeleteTrip(ctx context.Context, id int) error
 	UpdateTrip(ctx context.Context, id int, value *models.Trip) error
 	GetTripAuthor(ctx context.Context, id int) (int, error)
+	GetTripsByUser(ctx context.Context, id int) (*[]models.Trip, error)
 
 	AddAlbum(ctx context.Context, album *models.Album, userID int) (int, error)
 	GetAlbumById(ctx context.Context, id int) (*models.Album, error)
@@ -22,6 +23,7 @@ type TripRepository interface {
 	GetAlbumAuthor(ctx context.Context, id int) (int, error)
 
 	SightsByTrip(ctx context.Context, id int) (*[]int, error)
+	AlbumsByUser(ctx context.Context, id int) (*[]models.Album, error)
 }
 
 type tripRepository struct {
@@ -41,12 +43,19 @@ func (t *tripRepository) AddTrip(ctx context.Context, value *models.Trip, userID
 	}
 	defer conn.Release()
 
+	var origin int
+	if len(value.Sights) < 1 {
+		origin = 0
+	} else {
+		origin = value.Sights[0].Id
+	}
+
 	err = conn.QueryRow(context.Background(),
 		AddTripQuery,
 		value.Title,
 		value.Description,
 		userID,
-		value.Sights[0].Id,
+		origin,
 	).Scan(&tripId)
 	if err != nil {
 		return tripId, err
@@ -84,6 +93,19 @@ func (t *tripRepository) GetTripById(ctx context.Context, id int) (*models.Trip,
 	for rows.Next() {
 		rows.Scan(&place.Id, &place.Name, &place.Tags, &place.Description, &place.Rating, &place.Country, &place.Photos, &place.Day)
 		trip.Sights = append(trip.Sights, place)
+	}
+
+	rows, err = conn.Query(context.Background(),
+		GetAlbumsByTripQuery,
+		id)
+	if err != nil {
+		return &trip, err
+	}
+
+	var album models.Album
+	for rows.Next() {
+		rows.Scan(&album.Id, &album.Title, &album.Description, &album.Photos)
+		trip.Albums = append(trip.Albums, album)
 	}
 
 	return &trip, err
@@ -178,6 +200,57 @@ func (t *tripRepository) GetTripAuthor(ctx context.Context, id int) (int, error)
 		return 0, err
 	}
 	return author, err
+}
+
+func (t *tripRepository) GetTripsByUser(ctx context.Context, id int) (*[]models.Trip, error) {
+	conn, err := t.dataHolder.Acquire(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Release()
+
+	rows, err := conn.Query(context.Background(),
+		TripsByUserQuery,
+		id)
+	if err != nil {
+		return nil, err
+	}
+
+	trips := make([]models.Trip, 0)
+	var trip models.Trip
+	for rows.Next() {
+		rows.Scan(&trip.Id, &trip.Title, &trip.Description)
+		trips = append(trips, trip)
+	}
+
+	for i := range trips {
+		rows, err := conn.Query(context.Background(),
+			GetPlaceForTripQuery,
+			trips[i].Id)
+		if err != nil {
+			return &trips, err
+		}
+
+		var place models.Place
+		for rows.Next() {
+			rows.Scan(&place.Id, &place.Name, &place.Tags, &place.Description, &place.Rating, &place.Country, &place.Photos, &place.Day)
+			trips[i].Sights = append(trips[i].Sights, place)
+		}
+
+		rows, err = conn.Query(context.Background(),
+			GetAlbumsByTripQuery,
+			trips[i].Id)
+		if err != nil {
+			return &trips, err
+		}
+
+		var album models.Album
+		for rows.Next() {
+			rows.Scan(&album.Id, &album.Title, &album.Description, &album.Photos)
+			trips[i].Albums = append(trips[i].Albums, album)
+		}
+	}
+	return &trips, nil
 }
 
 func (t *tripRepository) AddAlbum(ctx context.Context, album *models.Album, userID int) (int, error) {
@@ -290,4 +363,27 @@ func (t *tripRepository) SightsByTrip(ctx context.Context, id int) (*[]int, erro
 		ids = append(ids, sightId)
 	}
 	return &ids, nil
+}
+
+func (t *tripRepository) AlbumsByUser(ctx context.Context, id int) (*[]models.Album, error) {
+	conn, err := t.dataHolder.Acquire(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Release()
+
+	rows, err := conn.Query(context.Background(),
+		AlbumsByUserQuery,
+		id)
+	if err != nil {
+		return nil, err
+	}
+
+	var albums []models.Album
+	var album models.Album
+	for rows.Next() {
+		rows.Scan(&album.Id, &album.Title, &album.Description, &album.TripId, &album.UserId, &album.Photos)
+		albums = append(albums, album)
+	}
+	return &albums, nil
 }

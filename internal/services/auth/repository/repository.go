@@ -3,10 +3,11 @@ package repository
 import (
 	"context"
 
-	"github.com/jackc/pgx/v4"
-	pgxpool "github.com/jackc/pgx/v4/pgxpool"
 	"snakealive/m/internal/services/auth/models"
 	"snakealive/m/pkg/errors"
+
+	"github.com/jackc/pgx/v4"
+	pgxpool "github.com/jackc/pgx/v4/pgxpool"
 )
 
 type AuthRepository interface {
@@ -17,6 +18,7 @@ type AuthRepository interface {
 	CreateUserSession(ctx context.Context, userID int64, hash string) error
 	ValidateUserSession(ctx context.Context, hash string) (int64, error)
 	RemoveUserSession(ctx context.Context, hash string) error
+	GetUserInfo(ctx context.Context, id int) (*models.User, error)
 }
 
 type authRepository struct {
@@ -114,6 +116,25 @@ func (a *authRepository) RemoveUserSession(ctx context.Context, hash string) err
 	}
 
 	return nil
+}
+
+func (a *authRepository) GetUserInfo(ctx context.Context, id int) (*models.User, error) {
+	conn, err := a.conn.Acquire(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Release()
+
+	var user models.User
+	err = conn.QueryRow(context.Background(),
+		GetUserInfoQuery,
+		id,
+	).Scan(&user.ID, &user.Name, &user.Surname, &user.Image)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
 
 func NewAuthRepository(

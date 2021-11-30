@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"context"
+	"fmt"
 
 	"snakealive/m/internal/services/trip/models"
 	"snakealive/m/internal/services/trip/usecase"
@@ -32,17 +33,20 @@ func (s *tripDelivery) GetTrip(ctx context.Context, request *trip_service.TripRe
 	}
 
 	trip, err := s.tripUsecase.GetTripById(ctx, int(request.TripId))
+	fmt.Println(trip)
 	if err != nil {
 		return nil, s.errorAdapter.AdaptError(err)
 	}
 
 	protoDays := ProtoDaysFromPlaces(trip.Sights)
+	protoAlbums := ProtoAlbumsFromAlbums(trip.Albums)
 
 	return &trip_service.Trip{
 		Id:          int64(trip.Id),
 		Title:       trip.Title,
 		Description: trip.Description,
 		Sights:      protoDays,
+		Albums:      protoAlbums,
 	}, nil
 }
 
@@ -66,11 +70,14 @@ func (s *tripDelivery) AddTrip(ctx context.Context, request *trip_service.Modify
 	}
 
 	days := ProtoDaysFromPlaces(trip.Sights)
+	protoAlbums := ProtoAlbumsFromAlbums(trip.Albums)
+
 	return &trip_service.Trip{
 		Id:          int64(trip.Id),
 		Title:       trip.Title,
 		Description: trip.Description,
 		Sights:      days,
+		Albums:      protoAlbums,
 	}, nil
 }
 
@@ -98,11 +105,14 @@ func (s *tripDelivery) UpdateTrip(ctx context.Context, request *trip_service.Mod
 	}
 
 	days := ProtoDaysFromPlaces(trip.Sights)
+	protoAlbums := ProtoAlbumsFromAlbums(trip.Albums)
+
 	return &trip_service.Trip{
 		Id:          int64(trip.Id),
 		Title:       trip.Title,
 		Description: trip.Description,
 		Sights:      days,
+		Albums:      protoAlbums,
 	}, nil
 }
 
@@ -134,6 +144,7 @@ func (s *tripDelivery) GetAlbum(ctx context.Context, request *trip_service.Album
 	return &trip_service.Album{
 		Id:          int64(album.Id),
 		Title:       album.Title,
+		TripId:      int64(album.TripId),
 		Author:      int64(album.UserId),
 		Description: album.Description,
 		Photos:      album.Photos,
@@ -213,6 +224,28 @@ func (s *tripDelivery) DeleteAlbum(ctx context.Context, request *trip_service.Al
 	return &empty.Empty{}, nil
 }
 
+func (s *tripDelivery) GetTripsByUser(ctx context.Context, request *trip_service.ByUserRequest) (*trip_service.Trips, error) {
+	trips, err := s.tripUsecase.TripsByUser(ctx, int(request.UserId))
+	if err != nil {
+		return nil, s.errorAdapter.AdaptError(err)
+	}
+
+	var protoTrips trip_service.Trips
+	for _, trip := range *trips {
+		protoAlbums := ProtoAlbumsFromAlbums(trip.Albums)
+		protoSights := ProtoDaysFromPlaces(trip.Sights)
+
+		protoTrips.Trips = append(protoTrips.Trips, &trip_service.Trip{
+			Id:          int64(trip.Id),
+			Title:       trip.Title,
+			Description: trip.Description,
+			Sights:      protoSights,
+			Albums:      protoAlbums,
+		})
+	}
+	return &protoTrips, nil
+}
+
 func (s *tripDelivery) SightsByTrip(ctx context.Context, request *trip_service.SightsRequest) (*trip_service.Sights, error) {
 	sights, err := s.tripUsecase.SightsByTrip(ctx, int(request.TripId))
 	if err != nil {
@@ -227,6 +260,27 @@ func (s *tripDelivery) SightsByTrip(ctx context.Context, request *trip_service.S
 	return &trip_service.Sights{
 		Ids: ids,
 	}, nil
+}
+
+func (s *tripDelivery) GetAlbumsByUser(ctx context.Context, request *trip_service.ByUserRequest) (*trip_service.Albums, error) {
+	responce, err := s.tripUsecase.AlbumsByUser(ctx, int(request.UserId))
+	if err != nil {
+		return nil, s.errorAdapter.AdaptError(err)
+	}
+
+	var protoAlbums trip_service.Albums
+	for _, album := range *responce {
+		protoAlbums.Albums = append(protoAlbums.Albums, &trip_service.Album{
+			Id:          int64(album.Id),
+			Title:       album.Title,
+			TripId:      int64(album.TripId),
+			Author:      int64(album.UserId),
+			Description: album.Description,
+			Photos:      album.Photos,
+		})
+	}
+	return &protoAlbums, nil
+
 }
 
 func ProtoDaysFromPlaces(places []models.Place) []*trip_service.Sight {
@@ -263,4 +317,32 @@ func PlacesFromProtoDays(sights []*trip_service.Sight) []models.Place {
 		places = append(places, placesSight)
 	}
 	return places
+}
+
+func ProtoAlbumsFromAlbums(albums []models.Album) []*trip_service.Album {
+	var protoAlbums []*trip_service.Album
+	for _, album := range albums {
+		protoAlbum := trip_service.Album{
+			Id:          int64(album.Id),
+			Title:       album.Title,
+			Description: album.Description,
+			Photos:      album.Photos,
+		}
+		protoAlbums = append(protoAlbums, &protoAlbum)
+	}
+	return protoAlbums
+}
+
+func AlbumsFromProtoAlbums(protoAlbums []*trip_service.Album) []models.Album {
+	var albums []models.Album
+	for _, album := range protoAlbums {
+		modelAlbum := models.Album{
+			Id:          int(album.Id),
+			Title:       album.Title,
+			Description: album.Description,
+			Photos:      album.Photos,
+		}
+		albums = append(albums, modelAlbum)
+	}
+	return albums
 }

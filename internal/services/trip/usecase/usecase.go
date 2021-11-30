@@ -27,6 +27,8 @@ type TripUseCase interface {
 	SanitizeAlbum(ctx context.Context, album *models.Album) *models.Album
 
 	SightsByTrip(ctx context.Context, id int) (*[]int, error)
+	TripsByUser(ctx context.Context, id int) (*[]models.Trip, error)
+	AlbumsByUser(ctx context.Context, id int) (*[]models.Album, error)
 }
 
 type tripUseCase struct {
@@ -98,10 +100,18 @@ func (u tripUseCase) SightsByTrip(ctx context.Context, id int) (*[]int, error) {
 	return u.tripRepository.SightsByTrip(ctx, id)
 }
 
+func (u tripUseCase) TripsByUser(ctx context.Context, id int) (*[]models.Trip, error) {
+	return u.tripRepository.GetTripsByUser(ctx, id)
+}
+
 func (u tripUseCase) SanitizeAlbum(ctx context.Context, album *models.Album) *models.Album {
 	sanitizer := bluemonday.UGCPolicy()
 
 	album.Title = sanitizer.Sanitize(album.Title)
 	album.Description = sanitizer.Sanitize(album.Description)
 	return album
+}
+
+func (u tripUseCase) AlbumsByUser(ctx context.Context, id int) (*[]models.Album, error) {
+	return u.tripRepository.AlbumsByUser(ctx, id)
 }
