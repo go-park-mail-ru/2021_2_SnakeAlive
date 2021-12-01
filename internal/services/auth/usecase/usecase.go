@@ -5,8 +5,9 @@ import (
 
 	"snakealive/m/internal/services/auth/models"
 	"snakealive/m/pkg/errors"
+	"snakealive/m/pkg/generator"
 
-	"github.com/twinj/uuid"
+	"github.com/gofrs/uuid"
 )
 
 type AuthUseCase interface {
@@ -23,7 +24,7 @@ type AuthUseCase interface {
 type authUseCase struct {
 	hashGenerator hasher
 	repo          authRepository
-	uuidGen       uuid.UUID
+	uuidGen       generator.UUIDGenerator
 }
 
 func (a *authUseCase) LoginUser(ctx context.Context, user *models.User) (models.Session, error) {
@@ -37,7 +38,7 @@ func (a *authUseCase) LoginUser(ctx context.Context, user *models.User) (models.
 		return models.Session{}, errors.WrongUserPassword
 	}
 
-	cookie := a.uuidGen.String()
+	cookie := a.uuidGen.GenerateString()
 	if err = a.repo.CreateUserSession(ctx, repoUser.ID, cookie); err != nil {
 		return models.Session{}, err
 	}
@@ -63,7 +64,7 @@ func (a *authUseCase) RegisterUser(ctx context.Context, user *models.User) (mode
 		return models.Session{}, err
 	}
 
-	cookie := a.uuidGen.String()
+	cookie := a.uuidGen.GenerateString()
 	if err = a.repo.CreateUserSession(ctx, user.ID, cookie); err != nil {
 		return models.Session{}, err
 	}
@@ -97,6 +98,6 @@ func NewAuthUseCase(
 	return &authUseCase{
 		hashGenerator: hashGenerator,
 		repo:          repo,
-		uuidGen:       uuid.NewV4(),
+		uuidGen:       generator.NewUUIDGenerator(uuid.NewGen()),
 	}
 }

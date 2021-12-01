@@ -13,6 +13,7 @@ require github.com/stretchr/testify v1.7.0
 require (
 	github.com/aws/aws-sdk-go v1.42.12
 	github.com/envoyproxy/protoc-gen-validate v0.1.0
+	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
@@ -21,9 +22,7 @@ require (
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.16
 	github.com/mwitkow/go-proto-validators v0.3.2
-	github.com/myesui/uuid v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
-	github.com/twinj/uuid v1.0.0
 	go.uber.org/zap v1.13.0
 	golang.org/x/mod v0.5.0 // indirect
 	golang.org/x/net v0.0.0-20210813160813-60bc85c4be6d // indirect
@@ -33,6 +32,5 @@ require (
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.1.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
-	gopkg.in/stretchr/testify.v1 v1.2.2 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )

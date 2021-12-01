@@ -6,7 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/twinj/uuid"
+	"github.com/gofrs/uuid"
+	"snakealive/m/pkg/generator"
 	"snakealive/m/pkg/hasher"
 )
 
@@ -19,11 +20,11 @@ type mediaUsecase struct {
 	defaultBucket string
 	fileEndpoint  string
 	client        *s3.S3
+	gen           generator.UUIDGenerator
 }
 
 func (m *mediaUsecase) UploadFile(ctx context.Context, file io.ReadSeeker, ext string) (filename string, err error) {
-	uuidGen := uuid.NewV4()
-	filename = m.hasher.EncodeString(uuidGen.String())
+	filename = m.hasher.EncodeString(m.gen.GenerateString())
 	if _, err = m.client.PutObjectWithContext(ctx, &s3.PutObjectInput{
 		Body:   file,
 		Key:    aws.String(filename + ext),
@@ -40,9 +41,10 @@ func NewMediaUsecase(
 	client *s3.S3, hasher hasher.Hasher,
 	defaultBucket, fileEndpoint string) MediaUsecase {
 	return &mediaUsecase{
-		client:        client,
+		hasher:        hasher,
 		defaultBucket: defaultBucket,
 		fileEndpoint:  fileEndpoint,
-		hasher:        hasher,
+		client:        client,
+		gen:           generator.NewUUIDGenerator(uuid.NewGen()),
 	}
 }

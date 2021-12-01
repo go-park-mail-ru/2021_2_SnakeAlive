@@ -4,7 +4,8 @@ import (
 	"encoding/base64"
 	"errors"
 
-	"github.com/twinj/uuid"
+	"github.com/gofrs/uuid"
+	"snakealive/m/pkg/generator"
 )
 
 type Hasher interface {
@@ -14,11 +15,11 @@ type Hasher interface {
 
 type hasher struct {
 	prefixLen int
-	gen       uuid.UUID
+	gen       generator.UUIDGenerator
 }
 
 func (h *hasher) EncodeString(value string) string {
-	str := h.gen.String()
+	str := h.gen.GenerateString()
 	return str[:h.prefixLen] + base64.StdEncoding.EncodeToString([]byte(value))
 }
 
@@ -34,6 +35,6 @@ func (h *hasher) DecodeString(value string) (string, error) {
 func NewHasher(prefixLen int) Hasher {
 	return &hasher{
 		prefixLen: prefixLen,
-		gen:       uuid.NewV4(),
+		gen:       generator.NewUUIDGenerator(uuid.NewGen()),
 	}
 }
