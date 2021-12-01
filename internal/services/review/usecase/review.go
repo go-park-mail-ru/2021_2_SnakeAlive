@@ -44,7 +44,7 @@ func (u reviewUseCase) GetReviewsListByPlaceId(ctx context.Context, id int, limi
 
 func (u reviewUseCase) CheckAuthor(ctx context.Context, userID int, id int) bool {
 	author := u.reviewRepository.GetReviewAuthor(ctx, id)
-	return author == id
+	return author == userID
 }
 
 func (u reviewUseCase) SanitizeReview(ctx context.Context, review *models.Review) *models.Review {
