@@ -24,6 +24,7 @@ type TripGatewayDelivery interface {
 	SightsByTrip(ctx *fasthttp.RequestCtx)
 	TripsByUser(ctx *fasthttp.RequestCtx)
 	AlbumsByUser(ctx *fasthttp.RequestCtx)
+	AddTripUser(ctx *fasthttp.RequestCtx)
 }
 
 type tripGatewayDelivery struct {
@@ -287,4 +288,29 @@ func (s *tripGatewayDelivery) AlbumsByUser(ctx *fasthttp.RequestCtx) {
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	ctx.Response.SetBody(bytes)
+}
+
+func (s *tripGatewayDelivery) AddTripUser(ctx *fasthttp.RequestCtx) {
+	param, _ := strconv.Atoi(ctx.UserValue("id").(string))
+	author := ctx.UserValue(cnst.UserIDContextKey).(int)
+
+	user := new(models.TripUser)
+	if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	err := s.manager.AddTripUser(ctx, author, param, user.Email)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+	ctx.SetStatusCode(fasthttp.StatusOK)
+
+	response := map[string]int{"status": fasthttp.StatusOK}
+	bytes, err := json.Marshal(response)
+	if err != nil {
+		return
+	}
+	ctx.Write(bytes)
 }

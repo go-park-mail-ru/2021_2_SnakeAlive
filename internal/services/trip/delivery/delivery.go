@@ -41,12 +41,18 @@ func (s *tripDelivery) GetTrip(ctx context.Context, request *trip_service.TripRe
 	protoDays := ProtoDaysFromPlaces(trip.Sights)
 	protoAlbums := ProtoAlbumsFromAlbums(trip.Albums)
 
+	users := make([]int64, 0)
+	for _, id := range trip.Users {
+		users = append(users, int64(id))
+	}
+
 	return &trip_service.Trip{
 		Id:          int64(trip.Id),
 		Title:       trip.Title,
 		Description: trip.Description,
 		Sights:      protoDays,
 		Albums:      protoAlbums,
+		Users:       users,
 	}, nil
 }
 
@@ -72,12 +78,18 @@ func (s *tripDelivery) AddTrip(ctx context.Context, request *trip_service.Modify
 	days := ProtoDaysFromPlaces(trip.Sights)
 	protoAlbums := ProtoAlbumsFromAlbums(trip.Albums)
 
+	users := make([]int64, 0)
+	for _, id := range trip.Users {
+		users = append(users, int64(id))
+	}
+
 	return &trip_service.Trip{
 		Id:          int64(trip.Id),
 		Title:       trip.Title,
 		Description: trip.Description,
 		Sights:      days,
 		Albums:      protoAlbums,
+		Users:       users,
 	}, nil
 }
 
@@ -107,12 +119,18 @@ func (s *tripDelivery) UpdateTrip(ctx context.Context, request *trip_service.Mod
 	days := ProtoDaysFromPlaces(trip.Sights)
 	protoAlbums := ProtoAlbumsFromAlbums(trip.Albums)
 
+	users := make([]int64, 0)
+	for _, id := range trip.Users {
+		users = append(users, int64(id))
+	}
+
 	return &trip_service.Trip{
 		Id:          int64(trip.Id),
 		Title:       trip.Title,
 		Description: trip.Description,
 		Sights:      days,
 		Albums:      protoAlbums,
+		Users:       users,
 	}, nil
 }
 
@@ -235,12 +253,18 @@ func (s *tripDelivery) GetTripsByUser(ctx context.Context, request *trip_service
 		protoAlbums := ProtoAlbumsFromAlbums(trip.Albums)
 		protoSights := ProtoDaysFromPlaces(trip.Sights)
 
+		users := make([]int64, 0)
+		for _, id := range trip.Users {
+			users = append(users, int64(id))
+		}
+
 		protoTrips.Trips = append(protoTrips.Trips, &trip_service.Trip{
 			Id:          int64(trip.Id),
 			Title:       trip.Title,
 			Description: trip.Description,
 			Sights:      protoSights,
 			Albums:      protoAlbums,
+			Users:       users,
 		})
 	}
 	return &protoTrips, nil
@@ -281,6 +305,20 @@ func (s *tripDelivery) GetAlbumsByUser(ctx context.Context, request *trip_servic
 	}
 	return &protoAlbums, nil
 
+}
+
+func (s *tripDelivery) AddTripUser(ctx context.Context, request *trip_service.AddTripUserRequest) (*empty.Empty, error) {
+	authorized, err := s.tripUsecase.CheckTripAuthor(ctx, int(request.Author), int(request.TripId))
+	if !authorized || err != nil {
+		return &empty.Empty{}, errors.DeniedAccess
+	}
+
+	err = s.tripUsecase.AddTripUser(ctx, int(request.TripId), int(request.UserId))
+	if err != nil {
+		return &empty.Empty{}, s.errorAdapter.AdaptError(err)
+	}
+
+	return &empty.Empty{}, nil
 }
 
 func ProtoDaysFromPlaces(places []models.Place) []*trip_service.Sight {

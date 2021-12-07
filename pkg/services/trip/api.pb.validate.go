@@ -1515,3 +1515,137 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AlbumsValidationError{}
+
+// Validate checks the field values on AddTripUserRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *AddTripUserRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddTripUserRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddTripUserRequestMultiError, or nil if none found.
+func (m *AddTripUserRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddTripUserRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetTripId() <= 0 {
+		err := AddTripUserRequestValidationError{
+			field:  "TripId",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if m.GetUserId() <= 0 {
+		err := AddTripUserRequestValidationError{
+			field:  "UserId",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if m.GetAuthor() <= 0 {
+		err := AddTripUserRequestValidationError{
+			field:  "Author",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return AddTripUserRequestMultiError(errors)
+	}
+	return nil
+}
+
+// AddTripUserRequestMultiError is an error wrapping multiple validation errors
+// returned by AddTripUserRequest.ValidateAll() if the designated constraints
+// aren't met.
+type AddTripUserRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddTripUserRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddTripUserRequestMultiError) AllErrors() []error { return m }
+
+// AddTripUserRequestValidationError is the validation error returned by
+// AddTripUserRequest.Validate if the designated constraints aren't met.
+type AddTripUserRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddTripUserRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddTripUserRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddTripUserRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddTripUserRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddTripUserRequestValidationError) ErrorName() string {
+	return "AddTripUserRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AddTripUserRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddTripUserRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddTripUserRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddTripUserRequestValidationError{}

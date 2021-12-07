@@ -56,6 +56,7 @@ func SetupRouter(cfg RouterConfig) (r *router.Router) {
 	r.GET(cnst.SightsByTripURL, lgrMw(cfg.TripGatewayDelivery.SightsByTrip))
 	r.GET(cnst.TripsByUserURL, lgrMw(authMw(cfg.TripGatewayDelivery.TripsByUser)))
 	r.GET(cnst.AlbumsByUserURL, lgrMw(authMw(cfg.TripGatewayDelivery.AlbumsByUser)))
+	r.POST(cnst.AddTripUserURL, lgrMw(authMw(cfg.TripGatewayDelivery.AddTripUser)))
 
 	r.GET(cnst.SightsByCountryURL, lgrMw(cfg.SightDelivery.GetSightByCountry))
 	r.GET(cnst.SightURL, lgrMw(cfg.SightDelivery.GetSightByID))

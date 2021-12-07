@@ -6,6 +6,7 @@ import (
 	td "snakealive/m/internal/services/trip/delivery"
 	"snakealive/m/internal/services/trip/models"
 	"snakealive/m/pkg/errors"
+	auth_service "snakealive/m/pkg/services/auth"
 	sight_service "snakealive/m/pkg/services/sight"
 	trip_service "snakealive/m/pkg/services/trip"
 )
@@ -23,17 +24,21 @@ type TripGatewayUseCase interface {
 	UpdateAlbum(ctx context.Context, id int, updatedAlbum *models.Album, userID int) (*models.Album, error)
 	SightsByTrip(ctx context.Context, id int) (*[]models.TripSight, error)
 	GetAlbumsByUser(ctx context.Context, id int) (*[]models.Album, error)
+
+	AddTripUser(ctx context.Context, author int, tripId int, email string) error
 }
 
 type tripGatewayUseCase struct {
 	tripGRPC  tripGRPC
 	sightGRPC sightGRPC
+	authGRPC  authGRPC
 }
 
-func NewTripGatewayUseCase(grpc tripGRPC, sightGRPC sightGRPC) TripGatewayUseCase {
+func NewTripGatewayUseCase(grpc tripGRPC, sightGRPC sightGRPC, authGRPC authGRPC) TripGatewayUseCase {
 	return &tripGatewayUseCase{
 		tripGRPC:  grpc,
 		sightGRPC: sightGRPC,
+		authGRPC:  authGRPC,
 	}
 }
 
@@ -59,12 +64,18 @@ func (u *tripGatewayUseCase) AddTrip(ctx context.Context, value *models.Trip, us
 	places := td.PlacesFromProtoDays(responce.Sights)
 	albums := td.AlbumsFromProtoAlbums(responce.Albums)
 
+	users := make([]int, 0)
+	for _, id := range responce.Users {
+		users = append(users, int(id))
+	}
+
 	return &models.Trip{
 		Id:          int(responce.Id),
 		Title:       responce.Title,
 		Description: responce.Description,
 		Sights:      places,
 		Albums:      albums,
+		Users:       users,
 	}, nil
 }
 
@@ -84,12 +95,18 @@ func (u *tripGatewayUseCase) GetTripById(ctx context.Context, tripId int, userID
 	places := td.PlacesFromProtoDays(responce.Sights)
 	albums := td.AlbumsFromProtoAlbums(responce.Albums)
 
+	users := make([]int, 0)
+	for _, id := range responce.Users {
+		users = append(users, int(id))
+	}
+
 	return &models.Trip{
 		Id:          int(responce.Id),
 		Title:       responce.Title,
 		Description: responce.Description,
 		Sights:      places,
 		Albums:      albums,
+		Users:       users,
 	}, nil
 }
 
@@ -123,12 +140,18 @@ func (u *tripGatewayUseCase) UpdateTrip(ctx context.Context, id int, updatedTrip
 	places := td.PlacesFromProtoDays(responce.Sights)
 	albums := td.AlbumsFromProtoAlbums(responce.Albums)
 
+	users := make([]int, 0)
+	for _, id := range responce.Users {
+		users = append(users, int(id))
+	}
+
 	return &models.Trip{
 		Id:          int(responce.Id),
 		Title:       responce.Title,
 		Description: responce.Description,
 		Sights:      places,
 		Albums:      albums,
+		Users:       users,
 	}, nil
 }
 
@@ -254,12 +277,19 @@ func (u *tripGatewayUseCase) GetTripsByUser(ctx context.Context, id int) (*[]mod
 	for _, trip := range protoTrips.Trips {
 		places := td.PlacesFromProtoDays(trip.Sights)
 		albums := td.AlbumsFromProtoAlbums(trip.Albums)
+
+		users := make([]int, 0)
+		for _, id := range trip.Users {
+			users = append(users, int(id))
+		}
+
 		trips = append(trips, models.Trip{
 			Id:          int(trip.Id),
 			Title:       trip.Title,
 			Description: trip.Description,
 			Albums:      albums,
 			Sights:      places,
+			Users:       users,
 		})
 	}
 	return &trips, nil
@@ -283,4 +313,18 @@ func (u *tripGatewayUseCase) GetAlbumsByUser(ctx context.Context, id int) (*[]mo
 		})
 	}
 	return &albums, nil
+}
+
+func (u *tripGatewayUseCase) AddTripUser(ctx context.Context, author int, tripId int, email string) error {
+	user, err := u.authGRPC.GetUserByEmail(ctx, &auth_service.UserEmailRequest{Email: email})
+	if err != nil {
+		return err
+	}
+
+	_, err = u.tripGRPC.AddTripUser(ctx, &trip_service.AddTripUserRequest{
+		TripId: int64(tripId),
+		UserId: int64(user.Id),
+		Author: int64(author),
+	})
+	return err
 }
