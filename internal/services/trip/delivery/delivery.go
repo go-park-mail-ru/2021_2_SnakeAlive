@@ -2,7 +2,6 @@ package delivery
 
 import (
 	"context"
-	"fmt"
 
 	"snakealive/m/internal/services/trip/models"
 	"snakealive/m/internal/services/trip/usecase"
@@ -33,7 +32,7 @@ func (s *tripDelivery) GetTrip(ctx context.Context, request *trip_service.TripRe
 	}
 
 	trip, err := s.tripUsecase.GetTripById(ctx, int(request.TripId))
-	fmt.Println(trip)
+
 	if err != nil {
 		return nil, s.errorAdapter.AdaptError(err)
 	}
@@ -319,6 +318,55 @@ func (s *tripDelivery) AddTripUser(ctx context.Context, request *trip_service.Ad
 	}
 
 	return &empty.Empty{}, nil
+}
+
+func (s *tripDelivery) ShareLink(ctx context.Context, request *trip_service.ShareRequest) (*trip_service.Link, error) {
+	authorized, err := s.tripUsecase.CheckTripAuthor(ctx, int(request.UserId), int(request.TripId))
+	if !authorized || err != nil {
+		return nil, errors.DeniedAccess
+	}
+
+	link := s.tripUsecase.ShareLink(ctx, int(request.TripId))
+
+	return &trip_service.Link{Link: link}, nil
+}
+
+func (s *tripDelivery) AddUserByLink(ctx context.Context, request *trip_service.AddByShareRequest) (*trip_service.Trip, error) {
+	authorized, err := s.tripUsecase.CheckTripAuthor(ctx, int(request.UserId), int(request.TripId))
+	if authorized || err != nil {
+		return nil, errors.DeniedAccess
+	}
+
+	if !s.tripUsecase.CheckLink(ctx, request.Uuid, int(request.TripId)) {
+		return nil, errors.DeniedAccess
+	}
+
+	err = s.tripUsecase.AddTripUser(ctx, int(request.TripId), int(request.UserId))
+	if err != nil {
+		return nil, err
+	}
+
+	trip, err := s.tripUsecase.GetTripById(ctx, int(request.TripId))
+	if err != nil {
+		return nil, err
+	}
+
+	protoDays := ProtoDaysFromPlaces(trip.Sights)
+	protoAlbums := ProtoAlbumsFromAlbums(trip.Albums)
+
+	users := make([]int64, 0)
+	for _, id := range trip.Users {
+		users = append(users, int64(id))
+	}
+
+	return &trip_service.Trip{
+		Id:          int64(trip.Id),
+		Title:       trip.Title,
+		Description: trip.Description,
+		Sights:      protoDays,
+		Albums:      protoAlbums,
+		Users:       users,
+	}, nil
 }
 
 func ProtoDaysFromPlaces(places []models.Place) []*trip_service.Sight {

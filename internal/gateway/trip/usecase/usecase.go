@@ -26,6 +26,9 @@ type TripGatewayUseCase interface {
 	GetAlbumsByUser(ctx context.Context, id int) (*[]models.Album, error)
 
 	AddTripUser(ctx context.Context, author int, tripId int, email string) error
+
+	ShareLink(ctx context.Context, author int, tripId int) (string, error)
+	AddUserByLink(ctx context.Context, author int, tripId int, uuid string) (*models.Trip, error)
 }
 
 type tripGatewayUseCase struct {
@@ -327,4 +330,47 @@ func (u *tripGatewayUseCase) AddTripUser(ctx context.Context, author int, tripId
 		Author: int64(author),
 	})
 	return err
+}
+
+func (u *tripGatewayUseCase) ShareLink(ctx context.Context, author int, tripId int) (string, error) {
+	link, err := u.tripGRPC.ShareLink(ctx, &trip_service.ShareRequest{
+		TripId: int64(tripId),
+		UserId: int64(author),
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return link.Link, nil
+}
+
+func (u *tripGatewayUseCase) AddUserByLink(ctx context.Context, author int, tripId int, uuid string) (*models.Trip, error) {
+
+	responce, err := u.tripGRPC.AddUserByLink(ctx,
+		&trip_service.AddByShareRequest{
+			TripId: int64(tripId),
+			UserId: int64(author),
+			Uuid:   uuid,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	places := td.PlacesFromProtoDays(responce.Sights)
+	albums := td.AlbumsFromProtoAlbums(responce.Albums)
+
+	users := make([]int, 0)
+	for _, id := range responce.Users {
+		users = append(users, int(id))
+	}
+
+	return &models.Trip{
+		Id:          int(responce.Id),
+		Title:       responce.Title,
+		Description: responce.Description,
+		Sights:      places,
+		Albums:      albums,
+		Users:       users,
+	}, nil
 }

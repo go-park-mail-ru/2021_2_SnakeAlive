@@ -1649,3 +1649,347 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AddTripUserRequestValidationError{}
+
+// Validate checks the field values on ShareRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ShareRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ShareRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ShareRequestMultiError, or
+// nil if none found.
+func (m *ShareRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ShareRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetTripId() <= 0 {
+		err := ShareRequestValidationError{
+			field:  "TripId",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if m.GetUserId() <= 0 {
+		err := ShareRequestValidationError{
+			field:  "UserId",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return ShareRequestMultiError(errors)
+	}
+	return nil
+}
+
+// ShareRequestMultiError is an error wrapping multiple validation errors
+// returned by ShareRequest.ValidateAll() if the designated constraints aren't met.
+type ShareRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ShareRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ShareRequestMultiError) AllErrors() []error { return m }
+
+// ShareRequestValidationError is the validation error returned by
+// ShareRequest.Validate if the designated constraints aren't met.
+type ShareRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ShareRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ShareRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ShareRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ShareRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ShareRequestValidationError) ErrorName() string { return "ShareRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ShareRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sShareRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ShareRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ShareRequestValidationError{}
+
+// Validate checks the field values on AddByShareRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *AddByShareRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on AddByShareRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// AddByShareRequestMultiError, or nil if none found.
+func (m *AddByShareRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *AddByShareRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if m.GetTripId() <= 0 {
+		err := AddByShareRequestValidationError{
+			field:  "TripId",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if m.GetUserId() <= 0 {
+		err := AddByShareRequestValidationError{
+			field:  "UserId",
+			reason: "value must be greater than 0",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	// no validation rules for Uuid
+
+	if len(errors) > 0 {
+		return AddByShareRequestMultiError(errors)
+	}
+	return nil
+}
+
+// AddByShareRequestMultiError is an error wrapping multiple validation errors
+// returned by AddByShareRequest.ValidateAll() if the designated constraints
+// aren't met.
+type AddByShareRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m AddByShareRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m AddByShareRequestMultiError) AllErrors() []error { return m }
+
+// AddByShareRequestValidationError is the validation error returned by
+// AddByShareRequest.Validate if the designated constraints aren't met.
+type AddByShareRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddByShareRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddByShareRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddByShareRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddByShareRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddByShareRequestValidationError) ErrorName() string {
+	return "AddByShareRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AddByShareRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddByShareRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddByShareRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddByShareRequestValidationError{}
+
+// Validate checks the field values on Link with the rules defined in the proto
+// definition for this message. If any rules are violated, the first error
+// encountered is returned, or nil if there are no violations.
+func (m *Link) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on Link with the rules defined in the
+// proto definition for this message. If any rules are violated, the result is
+// a list of violation errors wrapped in LinkMultiError, or nil if none found.
+func (m *Link) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Link) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Link
+
+	if len(errors) > 0 {
+		return LinkMultiError(errors)
+	}
+	return nil
+}
+
+// LinkMultiError is an error wrapping multiple validation errors returned by
+// Link.ValidateAll() if the designated constraints aren't met.
+type LinkMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m LinkMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m LinkMultiError) AllErrors() []error { return m }
+
+// LinkValidationError is the validation error returned by Link.Validate if the
+// designated constraints aren't met.
+type LinkValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e LinkValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e LinkValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e LinkValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e LinkValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e LinkValidationError) ErrorName() string { return "LinkValidationError" }
+
+// Error satisfies the builtin error interface
+func (e LinkValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sLink.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = LinkValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = LinkValidationError{}

@@ -99,6 +99,30 @@ message AddTripUserRequest {
   }];
 }
 
+message ShareRequest {
+  int64 trip_id = 1 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+  int64 user_id = 2 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+}
+
+message AddByShareRequest {
+  int64 trip_id = 1 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+  int64 user_id = 2 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+
+  string uuid = 3;
+}
+
+message Link {
+  string link = 1;
+}
+
 service TripService {
   rpc GetTrip(TripRequest) returns (Trip) {}
   rpc AddTrip(ModifyTripRequest) returns (Trip) {}
@@ -113,4 +137,7 @@ service TripService {
   rpc SightsByTrip(SightsRequest) returns (Sights) {}
   rpc GetAlbumsByUser(ByUserRequest) returns (Albums) {}
   rpc AddTripUser(AddTripUserRequest) returns (google.protobuf.Empty) {}
+
+  rpc ShareLink(ShareRequest) returns (Link) {}
+  rpc AddUserByLink(AddByShareRequest) returns (Trip) {}
 }

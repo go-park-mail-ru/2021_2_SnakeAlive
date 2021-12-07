@@ -2,10 +2,14 @@ package usecase
 
 import (
 	"context"
+	"fmt"
+	"strconv"
 
 	"snakealive/m/internal/services/trip/models"
 	"snakealive/m/internal/services/trip/repository"
+	cnst "snakealive/m/pkg/constants"
 
+	"github.com/google/uuid"
 	"github.com/microcosm-cc/bluemonday"
 )
 
@@ -31,6 +35,9 @@ type TripUseCase interface {
 	AlbumsByUser(ctx context.Context, id int) (*[]models.Album, error)
 
 	AddTripUser(ctx context.Context, tripId int, userId int) error
+
+	ShareLink(ctx context.Context, id int) string
+	CheckLink(ctx context.Context, uuid string, id int) bool
 }
 
 type tripUseCase struct {
@@ -125,4 +132,17 @@ func (u tripUseCase) AlbumsByUser(ctx context.Context, id int) (*[]models.Album,
 
 func (u tripUseCase) AddTripUser(ctx context.Context, tripId int, userId int) error {
 	return u.tripRepository.AddTripUser(ctx, tripId, userId)
+}
+
+func (u tripUseCase) ShareLink(ctx context.Context, tripId int) string {
+
+	idStr := strconv.Itoa(tripId)
+	uuidLink := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(idStr)))
+	u.tripRepository.AddLinkToCache(ctx, uuidLink, tripId)
+
+	return cnst.ShareTrip + uuidLink + "/" + idStr
+}
+
+func (u tripUseCase) CheckLink(ctx context.Context, uuid string, id int) bool {
+	return u.tripRepository.CheckLink(ctx, uuid, id)
 }

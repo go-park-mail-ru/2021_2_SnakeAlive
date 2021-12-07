@@ -26,6 +26,9 @@ type TripRepository interface {
 	AlbumsByUser(ctx context.Context, id int) (*[]models.Album, error)
 
 	AddTripUser(ctx context.Context, tripId int, userId int) error
+
+	AddLinkToCache(ctx context.Context, uuid string, id int)
+	CheckLink(ctx context.Context, uuid string, id int) bool
 }
 
 type tripRepository struct {
@@ -428,4 +431,24 @@ func (t *tripRepository) AddTripUser(ctx context.Context, tripId int, userId int
 		return err
 	}
 	return err
+}
+
+func (t *tripRepository) AddLinkToCache(ctx context.Context, uuid string, id int) {
+	links.mu.Lock()
+	links.storage[uuid] = id
+	links.mu.Unlock()
+}
+
+func (t *tripRepository) CheckLink(ctx context.Context, uuid string, id int) bool {
+	links.mu.Lock()
+
+	tripId, found := links.storage[uuid]
+	if found && tripId == id {
+		delete(links.storage, uuid)
+		links.mu.Unlock()
+		return true
+	}
+
+	links.mu.Unlock()
+	return false
 }

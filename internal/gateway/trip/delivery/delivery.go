@@ -25,6 +25,8 @@ type TripGatewayDelivery interface {
 	TripsByUser(ctx *fasthttp.RequestCtx)
 	AlbumsByUser(ctx *fasthttp.RequestCtx)
 	AddTripUser(ctx *fasthttp.RequestCtx)
+	ShareLink(ctx *fasthttp.RequestCtx)
+	AddUserByLink(ctx *fasthttp.RequestCtx)
 }
 
 type tripGatewayDelivery struct {
@@ -313,4 +315,45 @@ func (s *tripGatewayDelivery) AddTripUser(ctx *fasthttp.RequestCtx) {
 		return
 	}
 	ctx.Write(bytes)
+}
+
+func (s *tripGatewayDelivery) ShareLink(ctx *fasthttp.RequestCtx) {
+	param, _ := strconv.Atoi(ctx.UserValue("id").(string))
+	author := ctx.UserValue(cnst.UserIDContextKey).(int)
+
+	responce, err := s.manager.ShareLink(ctx, author, param)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	bytes, err := json.Marshal(responce)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	ctx.SetStatusCode(fasthttp.StatusOK)
+	ctx.Response.SetBody(bytes)
+}
+
+func (s *tripGatewayDelivery) AddUserByLink(ctx *fasthttp.RequestCtx) {
+	code, _ := ctx.UserValue("code").(string)
+	id, _ := strconv.Atoi(ctx.UserValue("id").(string))
+	author := ctx.UserValue(cnst.UserIDContextKey).(int)
+
+	responce, err := s.manager.AddUserByLink(ctx, author, id, code)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	bytes, err := json.Marshal(responce)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
+
+	ctx.SetStatusCode(fasthttp.StatusOK)
+	ctx.Response.SetBody(bytes)
 }

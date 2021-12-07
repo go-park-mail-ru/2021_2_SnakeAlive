@@ -31,6 +31,8 @@ type TripServiceClient interface {
 	SightsByTrip(ctx context.Context, in *SightsRequest, opts ...grpc.CallOption) (*Sights, error)
 	GetAlbumsByUser(ctx context.Context, in *ByUserRequest, opts ...grpc.CallOption) (*Albums, error)
 	AddTripUser(ctx context.Context, in *AddTripUserRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	ShareLink(ctx context.Context, in *ShareRequest, opts ...grpc.CallOption) (*Link, error)
+	AddUserByLink(ctx context.Context, in *AddByShareRequest, opts ...grpc.CallOption) (*Trip, error)
 }
 
 type tripServiceClient struct {
@@ -149,6 +151,24 @@ func (c *tripServiceClient) AddTripUser(ctx context.Context, in *AddTripUserRequ
 	return out, nil
 }
 
+func (c *tripServiceClient) ShareLink(ctx context.Context, in *ShareRequest, opts ...grpc.CallOption) (*Link, error) {
+	out := new(Link)
+	err := c.cc.Invoke(ctx, "/services.trip_service.TripService/ShareLink", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tripServiceClient) AddUserByLink(ctx context.Context, in *AddByShareRequest, opts ...grpc.CallOption) (*Trip, error) {
+	out := new(Trip)
+	err := c.cc.Invoke(ctx, "/services.trip_service.TripService/AddUserByLink", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TripServiceServer is the server API for TripService service.
 // All implementations must embed UnimplementedTripServiceServer
 // for forward compatibility
@@ -165,6 +185,8 @@ type TripServiceServer interface {
 	SightsByTrip(context.Context, *SightsRequest) (*Sights, error)
 	GetAlbumsByUser(context.Context, *ByUserRequest) (*Albums, error)
 	AddTripUser(context.Context, *AddTripUserRequest) (*empty.Empty, error)
+	ShareLink(context.Context, *ShareRequest) (*Link, error)
+	AddUserByLink(context.Context, *AddByShareRequest) (*Trip, error)
 	mustEmbedUnimplementedTripServiceServer()
 }
 
@@ -207,6 +229,12 @@ func (UnimplementedTripServiceServer) GetAlbumsByUser(context.Context, *ByUserRe
 }
 func (UnimplementedTripServiceServer) AddTripUser(context.Context, *AddTripUserRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddTripUser not implemented")
+}
+func (UnimplementedTripServiceServer) ShareLink(context.Context, *ShareRequest) (*Link, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ShareLink not implemented")
+}
+func (UnimplementedTripServiceServer) AddUserByLink(context.Context, *AddByShareRequest) (*Trip, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddUserByLink not implemented")
 }
 func (UnimplementedTripServiceServer) mustEmbedUnimplementedTripServiceServer() {}
 
@@ -437,6 +465,42 @@ func _TripService_AddTripUser_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TripService_ShareLink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ShareRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TripServiceServer).ShareLink(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/services.trip_service.TripService/ShareLink",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TripServiceServer).ShareLink(ctx, req.(*ShareRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TripService_AddUserByLink_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddByShareRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TripServiceServer).AddUserByLink(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/services.trip_service.TripService/AddUserByLink",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TripServiceServer).AddUserByLink(ctx, req.(*AddByShareRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TripService_ServiceDesc is the grpc.ServiceDesc for TripService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -491,6 +555,14 @@ var TripService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AddTripUser",
 			Handler:    _TripService_AddTripUser_Handler,
+		},
+		{
+			MethodName: "ShareLink",
+			Handler:    _TripService_ShareLink_Handler,
+		},
+		{
+			MethodName: "AddUserByLink",
+			Handler:    _TripService_AddUserByLink_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

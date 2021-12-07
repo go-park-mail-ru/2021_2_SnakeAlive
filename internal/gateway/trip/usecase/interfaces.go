@@ -32,4 +32,6 @@ type tripGRPC interface {
 	DeleteAlbum(ctx context.Context, in *trip_service.AlbumRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	SightsByTrip(ctx context.Context, in *trip_service.SightsRequest, opts ...grpc.CallOption) (*trip_service.Sights, error)
 	AddTripUser(ctx context.Context, in *trip_service.AddTripUserRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	ShareLink(ctx context.Context, in *trip_service.ShareRequest, opts ...grpc.CallOption) (*trip_service.Link, error)
+	AddUserByLink(ctx context.Context, in *trip_service.AddByShareRequest, opts ...grpc.CallOption) (*trip_service.Trip, error)
 }
