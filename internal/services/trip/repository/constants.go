@@ -1,7 +1,7 @@
 package repository
 
 const (
-	AddTripQuery = `INSERT INTO Trips ("title", "description", "origin") VALUES ($1, $2, $3, $4) 
+	AddTripQuery = `INSERT INTO Trips ("title", "description", "origin") VALUES ($1, $2, $3) 
 							RETURNING id`
 	AddTripUserQuery     = `INSERT INTO TripsUsers ("trip_id", "user_id") VALUES ($1, $2)`
 	GetTripUsersQuery    = `SELECT user_id FROM TripsUsers WHERE trip_id = $1`
