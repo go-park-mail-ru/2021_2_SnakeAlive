@@ -7,9 +7,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/valyala/fasthttp"
 	"snakealive/m/internal/gateway/config"
 	"snakealive/m/internal/gateway/setup"
+
+	"github.com/valyala/fasthttp"
 )
 
 func main() {
@@ -49,7 +50,7 @@ func main() {
 
 func corsMiddleware(handler func(ctx *fasthttp.RequestCtx)) func(ctx *fasthttp.RequestCtx) {
 	return func(ctx *fasthttp.RequestCtx) {
-		ctx.Response.Header.Set("Access-Control-Allow-Origin", "http://194.58.104.204") // set domain
+		ctx.Response.Header.Set("Access-Control-Allow-Origin", "https://snakehastrip.ru") // set domain
 		ctx.Response.Header.Set("Content-Type", "application/json; charset=utf8")
 		ctx.Response.Header.Set("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
 		ctx.Response.Header.Set("Access-Control-Allow-Headers", "Origin, Content-Type")
