@@ -295,6 +295,7 @@ func (u *tripGatewayUseCase) GetTripsByUser(ctx context.Context, id int) (*[]mod
 			Users:       users,
 		})
 	}
+
 	return &trips, nil
 }
 
