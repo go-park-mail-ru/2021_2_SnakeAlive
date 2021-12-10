@@ -113,8 +113,6 @@ services:
     image: grafana/grafana:latest
     volumes:
       - ./monitoring/grafana/grafana.ini:/etc/grafana/grafana.ini
-      - ./monitoring/grafana/default.yml:/etc/grafana/provisioning/dashboards/default.yml
-      - ./monitoring/grafana/snakehastrip.json:/var/lib/grafana/dashboards/snakehastrip.json
     ports:
       - "3000:3010"
 
