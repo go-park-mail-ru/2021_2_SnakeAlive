@@ -5,8 +5,8 @@ import (
 	zap_middleware "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
+	"github.com/grpc-ecosystem/go-grpc-prometheus"
 	"google.golang.org/grpc"
-	auth_service "snakealive/m/pkg/services/auth"
 
 	"snakealive/m/internal/services/auth/config"
 	"snakealive/m/internal/services/auth/delivery"
@@ -16,6 +16,7 @@ import (
 	"snakealive/m/pkg/grpc_errors"
 	"snakealive/m/pkg/hasher"
 	"snakealive/m/pkg/helpers"
+	auth_service "snakealive/m/pkg/services/auth"
 )
 
 func SetupServer(cfg config.Config) (server *grpc.Server, cancel func(), err error) {
@@ -38,9 +39,12 @@ func SetupServer(cfg config.Config) (server *grpc.Server, cancel func(), err err
 			grpc_ctxtags.UnaryServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor)),
 			zap_middleware.UnaryServerInterceptor(cfg.Logger),
 			grpc_validator.UnaryServerInterceptor(),
+			grpc_prometheus.UnaryServerInterceptor,
 		),
+		grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
 	)
 	auth_service.RegisterAuthServiceServer(server, authDelivery)
+	grpc_prometheus.Register(server)
 
 	cancel = func() {
 		conn.Close()

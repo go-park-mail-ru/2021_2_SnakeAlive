@@ -5,6 +5,7 @@ import (
 	zap_middleware "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	grpc_ctxtags "github.com/grpc-ecosystem/go-grpc-middleware/tags"
 	grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"google.golang.org/grpc"
 	"snakealive/m/internal/services/sight/config"
 	"snakealive/m/internal/services/sight/delivery"
@@ -36,9 +37,12 @@ func SetupServer(cfg config.Config) (server *grpc.Server, cancel func(), err err
 			grpc_ctxtags.UnaryServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor)),
 			zap_middleware.UnaryServerInterceptor(cfg.Logger),
 			grpc_validator.UnaryServerInterceptor(),
+			grpc_prometheus.UnaryServerInterceptor,
 		),
+		grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
 	)
 	sight_service.RegisterSightServiceServer(server, sightDelivery)
+	grpc_prometheus.Register(server)
 
 	cancel = func() {
 		conn.Close()

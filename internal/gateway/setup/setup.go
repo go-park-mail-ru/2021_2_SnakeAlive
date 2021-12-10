@@ -21,6 +21,7 @@ import (
 	ud "snakealive/m/internal/gateway/user/delivery"
 	uu "snakealive/m/internal/gateway/user/usecase"
 	"snakealive/m/pkg/error_adapter"
+	fasthttpprom "snakealive/m/pkg/fasthttp_prom"
 	"snakealive/m/pkg/grpc_errors"
 	"snakealive/m/pkg/hasher"
 	"snakealive/m/pkg/helpers"
@@ -33,10 +34,10 @@ import (
 	"google.golang.org/grpc"
 )
 
-func Setup(cfg config.Config) (r *fsthp_router.Router, stopFunc func(), err error) {
+func Setup(cfg config.Config) (r *fsthp_router.Router, p *fasthttpprom.Prometheus, stopFunc func(), err error) {
 	pgxConn, err := helpers.CreatePGXPool(cfg.Ctx, cfg.DBUrl, cfg.Logger)
 	if err != nil {
-		return r, stopFunc, err
+		return r, p, stopFunc, err
 	}
 
 	countryRepo := repository.NewLoggingMiddleware(
@@ -50,7 +51,7 @@ func Setup(cfg config.Config) (r *fsthp_router.Router, stopFunc func(), err erro
 
 	conn, err := grpc.Dial(cfg.AuthServiceEndpoint, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
-		return r, stopFunc, err
+		return r, p, stopFunc, err
 	}
 	userGRPC := auth_service.NewAuthServiceClient(conn)
 	userUsecase := uu.NewUserUsecase(userGRPC)
@@ -63,7 +64,7 @@ func Setup(cfg config.Config) (r *fsthp_router.Router, stopFunc func(), err erro
 
 	sightConn, err := grpc.Dial(cfg.SightServiceEndpoint, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
-		return r, stopFunc, err
+		return r, p, stopFunc, err
 	}
 	sightGRPC := sight_service.NewSightServiceClient(sightConn)
 	sightUsecase := sight_usecase.NewSightGatewayUseCase(sightGRPC)
@@ -76,7 +77,7 @@ func Setup(cfg config.Config) (r *fsthp_router.Router, stopFunc func(), err erro
 
 	tripConn, err := grpc.Dial(cfg.TripServiceEndpoint, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
-		return r, stopFunc, err
+		return r, p, stopFunc, err
 	}
 	tripGRPC := trip_service.NewTripServiceClient(tripConn)
 	tripGatewayUseCase := tu.NewTripGatewayUseCase(tripGRPC, sightGRPC)
@@ -89,7 +90,7 @@ func Setup(cfg config.Config) (r *fsthp_router.Router, stopFunc func(), err erro
 
 	reviewConn, err := grpc.Dial(cfg.ReviewServiceEndpoint, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
-		return r, stopFunc, err
+		return r, p, stopFunc, err
 	}
 	reviewGRPC := review_service.NewReviewServiceClient(reviewConn)
 	reviewUsecase := review_usecase.NewReviewGatewayUseCase(reviewGRPC)
@@ -121,7 +122,7 @@ func Setup(cfg config.Config) (r *fsthp_router.Router, stopFunc func(), err erro
 			grpc_errors.PreparedCountryErrors, grpc_errors.CommonError,
 		))
 
-	r = router.SetupRouter(router.RouterConfig{
+	r, p = router.SetupRouter(router.RouterConfig{
 		AuthGRPC:            userGRPC,
 		UserDelivery:        userDelivery,
 		TripGatewayDelivery: tripDelivery,

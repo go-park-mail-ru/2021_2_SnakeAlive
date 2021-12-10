@@ -20,18 +20,21 @@ func main() {
 	}
 
 	logger := cfg.Logger.Sugar()
-	r, stop, err := setup.Setup(cfg)
+	_, p, stop, err := setup.Setup(cfg)
 	if err != nil {
 		logger.Fatal("msg", "failed to setup server", "error", err)
 		return
 	}
 
 	go func() {
-		if err := fasthttp.ListenAndServe(cfg.HTTPPort, corsMiddleware(r.Handler)); err != nil {
+		if err := fasthttp.ListenAndServe(cfg.HTTPPort, corsMiddleware(p.Handler)); err != nil {
 			logger.Fatal("failed to start server")
 			return
 		}
 	}()
+	//go func() {
+	//	log.Fatal(fasthttp.ListenAndServe(":8080", p.Handler))
+	//}()
 
 	logger.Info("gateway started ...")
 
