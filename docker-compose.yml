@@ -66,7 +66,7 @@ services:
       - "host.docker.internal:172.17.0.1"
 
   prometheus:
-    image: prom/prometheus:v2.21.0
+    image: prom/prometheus:lastest
     ports:
       - "9000:9090"
     volumes:
@@ -111,13 +111,13 @@ services:
       - "9100:9100"
 
   grafana:
-    image: grafana/grafana:7.4.5-ubuntu
+    image: grafana/grafana:latest
     volumes:
       - ./monitoring/grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./monitoring/grafana/default.yml:/etc/grafana/provisioning/dashboards/default.yml
       - ./monitoring/grafana/snakehastrip.json:/var/lib/grafana/dashboards/snakehastrip.json
     ports:
-      - "3000:3000"
+      - "3000:3010"
 
 volumes:
   prom_data:
