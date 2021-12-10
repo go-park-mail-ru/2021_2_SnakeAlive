@@ -9,6 +9,7 @@ services:
         - GOOS=linux
     ports:
       - "10123:10123"
+      - "11123:8080"
     environment:
       - USER_DB_URL=postgres://tripadvisor:12345@host.docker.internal:5432/tripadvisor
       - USER_GRPC_PORT=10123
@@ -25,6 +26,7 @@ services:
         - GOOS=linux
     ports:
       - "10124:10124"
+      - "11124:8080"
     environment:
       - SIGHT_DB_URL=postgres://tripadvisor:12345@host.docker.internal:5432/tripadvisor
       - SIGHT_GRPC_PORT=10124
@@ -40,6 +42,7 @@ services:
         - GOOS=linux
     ports:
       - "6666:6666"
+      - "16666:8080"
     environment:
       - TRIP_DB_URL=postgres://tripadvisor:12345@host.docker.internal:5432/tripadvisor
       - TRIP_GRPC_PORT=6666
@@ -55,11 +58,20 @@ services:
         - GOOS=linux
     ports:
       - "9090:9090"
+      - "19090:8080"
     environment:
       - REVIEW_DB_URL=postgres://tripadvisor:12345@host.docker.internal:5432/tripadvisor
       - REVIEW_GRPC_PORT=9090
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9000:9090"
+    volumes:
+      - ./monitoring/prometheus:/etc/prometheus
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
 
   gateway:
     depends_on:
@@ -74,9 +86,10 @@ services:
         - APP_PKG_NAME=snakealive/m
         - GOOS=linux
     ports:
-      - "8080:8080"
+      - "8080:8081"
+      - "18080:8080"
     environment:
-      - GATEWAY_HTTP_PORT=:8080
+      - GATEWAY_HTTP_PORT=:8081
       - GATEWAY_AUTH_ENDPOINT=host.docker.internal:10123
       - GATEWAY_TRIP_ENDPOINT=host.docker.internal:6666
       - GATEWAY_SIGHT_ENDPOINT=host.docker.internal:10124
@@ -90,4 +103,16 @@ services:
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
 
+  node-exporter:
+    image: prom/node-exporter:latest
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+
+  grafana:
+    image: grafana/grafana:latest
+    volumes:
+      - ./monitoring/grafana/grafana.ini:/etc/grafana/grafana.ini
+    ports:
+      - "3000:3010"
 

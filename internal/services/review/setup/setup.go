@@ -1,6 +1,7 @@
 package setup
 
 import (
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"snakealive/m/internal/services/review/config"
 	"snakealive/m/internal/services/review/delivery"
 	"snakealive/m/internal/services/review/repository"
@@ -32,9 +33,12 @@ func SetupServer(cfg config.Config) (server *grpc.Server, cancel func(), err err
 			grpc_ctxtags.UnaryServerInterceptor(grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor)),
 			zap_middleware.UnaryServerInterceptor(cfg.Logger),
 			grpc_validator.UnaryServerInterceptor(),
+			grpc_prometheus.UnaryServerInterceptor,
 		),
+		grpc.StreamInterceptor(grpc_prometheus.StreamServerInterceptor),
 	)
 	review_service.RegisterReviewServiceServer(server, reviewDelivery)
+	grpc_prometheus.Register(server)
 
 	cancel = func() {
 		conn.Close()

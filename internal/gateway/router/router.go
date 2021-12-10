@@ -9,6 +9,7 @@ import (
 	ud "snakealive/m/internal/gateway/user/delivery"
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/error_adapter"
+	fasthttpprom "snakealive/m/pkg/fasthttp_prom"
 	"snakealive/m/pkg/grpc_errors"
 	"snakealive/m/pkg/middlewares/http"
 	auth_service "snakealive/m/pkg/services/auth"
@@ -30,8 +31,11 @@ type RouterConfig struct {
 	Logger *zap.Logger
 }
 
-func SetupRouter(cfg RouterConfig) (r *router.Router) {
+func SetupRouter(cfg RouterConfig) (r *router.Router, p *fasthttpprom.Prometheus) {
 	r = router.New()
+	p = fasthttpprom.NewPrometheus("gateway")
+	p.Use(r)
+
 	lgrMw := http.NewLoggingMiddleware(cfg.Logger)
 	authMw := http.NewSessionValidatorMiddleware(
 		cfg.AuthGRPC,

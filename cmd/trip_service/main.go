@@ -3,10 +3,12 @@ package main
 import (
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"snakealive/m/internal/services/trip/config"
 	"snakealive/m/internal/services/trip/setup"
 )
@@ -38,6 +40,11 @@ func main() {
 			logger.Error("msg", "grpc server run failuer", "err", err)
 			os.Exit(1)
 		}
+	}()
+
+	go func() {
+		http.Handle("/metrics", promhttp.Handler())
+		log.Fatal(http.ListenAndServe(":8080", nil))
 	}()
 
 	logger.Info("trip service started ...")
