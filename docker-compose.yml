@@ -71,7 +71,6 @@ services:
       - "9000:9090"
     volumes:
       - ./monitoring/prometheus:/etc/prometheus
-      - ./monitoring/prom_data:/prometheus
     command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
 
   gateway:
@@ -119,5 +118,3 @@ services:
     ports:
       - "3000:3010"
 
-volumes:
-  prom_data:
