@@ -38,3 +38,18 @@ type Album struct {
 type TripUser struct {
 	Email string `json:"email"`
 }
+
+type UserInfo struct {
+	Id      int    `json:"id"`
+	Name    string `json:"name" valid:"required"`
+	Surname string `json:"surname" valid:"required"`
+	Avatar  string `json:"avatar"`
+}
+type TripWithUserInfo struct {
+	Id          int        `json:"id"`
+	Title       string     `json:"title"`
+	Description string     `json:"description"`
+	Sights      []Place    `json:"sights"`
+	Albums      []Album    `json:"albums"`
+	Users       []UserInfo `json:"users"`
+}

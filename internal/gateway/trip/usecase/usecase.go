@@ -12,11 +12,11 @@ import (
 )
 
 type TripGatewayUseCase interface {
-	AddTrip(ctx context.Context, value *models.Trip, userID int) (*models.Trip, error)
-	GetTripById(ctx context.Context, id int, userID int) (*models.Trip, error)
+	AddTrip(ctx context.Context, value *models.Trip, userID int) (*models.TripWithUserInfo, error)
+	GetTripById(ctx context.Context, id int, userID int) (*models.TripWithUserInfo, error)
 	DeleteTrip(ctx context.Context, id int, userID int) error
-	UpdateTrip(ctx context.Context, id int, updatedTrip *models.Trip, userID int) (*models.Trip, error)
-	GetTripsByUser(ctx context.Context, id int) (*[]models.Trip, error)
+	UpdateTrip(ctx context.Context, id int, updatedTrip *models.Trip, userID int) (*models.TripWithUserInfo, error)
+	GetTripsByUser(ctx context.Context, id int) (*[]models.TripWithUserInfo, error)
 
 	AddAlbum(ctx context.Context, album *models.Album, userID int) (*models.Album, error)
 	GetAlbumById(ctx context.Context, id int, userID int) (*models.Album, error)
@@ -28,7 +28,9 @@ type TripGatewayUseCase interface {
 	AddTripUser(ctx context.Context, author int, tripId int, email string) error
 
 	ShareLink(ctx context.Context, author int, tripId int) (string, error)
-	AddUserByLink(ctx context.Context, author int, tripId int, uuid string) (*models.Trip, error)
+	AddUserByLink(ctx context.Context, author int, tripId int, uuid string) (*models.TripWithUserInfo, error)
+
+	GetUserInfo(ctx context.Context, ids []int64) (*[]models.UserInfo, error)
 }
 
 type tripGatewayUseCase struct {
@@ -45,7 +47,7 @@ func NewTripGatewayUseCase(grpc tripGRPC, sightGRPC sightGRPC, authGRPC authGRPC
 	}
 }
 
-func (u *tripGatewayUseCase) AddTrip(ctx context.Context, value *models.Trip, userID int) (*models.Trip, error) {
+func (u *tripGatewayUseCase) AddTrip(ctx context.Context, value *models.Trip, userID int) (*models.TripWithUserInfo, error) {
 	days := td.ProtoDaysFromPlaces(value.Sights)
 	trip := &trip_service.Trip{
 		Id:          int64(value.Id),
@@ -66,23 +68,22 @@ func (u *tripGatewayUseCase) AddTrip(ctx context.Context, value *models.Trip, us
 
 	places := td.PlacesFromProtoDays(responce.Sights)
 	albums := td.AlbumsFromProtoAlbums(responce.Albums)
-
-	users := make([]int, 0)
-	for _, id := range responce.Users {
-		users = append(users, int(id))
+	users, err := u.GetUserInfo(ctx, responce.Users)
+	if err != nil {
+		return nil, err
 	}
 
-	return &models.Trip{
+	return &models.TripWithUserInfo{
 		Id:          int(responce.Id),
 		Title:       responce.Title,
 		Description: responce.Description,
 		Sights:      places,
 		Albums:      albums,
-		Users:       users,
+		Users:       *users,
 	}, nil
 }
 
-func (u *tripGatewayUseCase) GetTripById(ctx context.Context, tripId int, userID int) (*models.Trip, error) {
+func (u *tripGatewayUseCase) GetTripById(ctx context.Context, tripId int, userID int) (*models.TripWithUserInfo, error) {
 	responce, err := u.tripGRPC.GetTrip(ctx, &trip_service.TripRequest{
 		TripId: int64(tripId),
 		UserId: int64(userID),
@@ -97,19 +98,18 @@ func (u *tripGatewayUseCase) GetTripById(ctx context.Context, tripId int, userID
 
 	places := td.PlacesFromProtoDays(responce.Sights)
 	albums := td.AlbumsFromProtoAlbums(responce.Albums)
-
-	users := make([]int, 0)
-	for _, id := range responce.Users {
-		users = append(users, int(id))
+	users, err := u.GetUserInfo(ctx, responce.Users)
+	if err != nil {
+		return nil, err
 	}
 
-	return &models.Trip{
+	return &models.TripWithUserInfo{
 		Id:          int(responce.Id),
 		Title:       responce.Title,
 		Description: responce.Description,
 		Sights:      places,
 		Albums:      albums,
-		Users:       users,
+		Users:       *users,
 	}, nil
 }
 
@@ -121,7 +121,7 @@ func (u *tripGatewayUseCase) DeleteTrip(ctx context.Context, id int, userID int)
 	return err
 }
 
-func (u *tripGatewayUseCase) UpdateTrip(ctx context.Context, id int, updatedTrip *models.Trip, userID int) (*models.Trip, error) {
+func (u *tripGatewayUseCase) UpdateTrip(ctx context.Context, id int, updatedTrip *models.Trip, userID int) (*models.TripWithUserInfo, error) {
 	days := td.ProtoDaysFromPlaces(updatedTrip.Sights)
 	trip := &trip_service.Trip{
 		Id:          int64(id),
@@ -142,19 +142,18 @@ func (u *tripGatewayUseCase) UpdateTrip(ctx context.Context, id int, updatedTrip
 
 	places := td.PlacesFromProtoDays(responce.Sights)
 	albums := td.AlbumsFromProtoAlbums(responce.Albums)
-
-	users := make([]int, 0)
-	for _, id := range responce.Users {
-		users = append(users, int(id))
+	users, err := u.GetUserInfo(ctx, responce.Users)
+	if err != nil {
+		return nil, err
 	}
 
-	return &models.Trip{
+	return &models.TripWithUserInfo{
 		Id:          int(responce.Id),
 		Title:       responce.Title,
 		Description: responce.Description,
 		Sights:      places,
 		Albums:      albums,
-		Users:       users,
+		Users:       *users,
 	}, nil
 }
 
@@ -270,29 +269,29 @@ func (u *tripGatewayUseCase) SightsByTrip(ctx context.Context, id int) (*[]model
 	return &adapted, nil
 }
 
-func (u *tripGatewayUseCase) GetTripsByUser(ctx context.Context, id int) (*[]models.Trip, error) {
+func (u *tripGatewayUseCase) GetTripsByUser(ctx context.Context, id int) (*[]models.TripWithUserInfo, error) {
 	protoTrips, err := u.tripGRPC.GetTripsByUser(ctx, &trip_service.ByUserRequest{UserId: int64(id)})
 	if err != nil {
 		return nil, err
 	}
 
-	var trips []models.Trip
+	var trips []models.TripWithUserInfo
 	for _, trip := range protoTrips.Trips {
 		places := td.PlacesFromProtoDays(trip.Sights)
 		albums := td.AlbumsFromProtoAlbums(trip.Albums)
 
-		users := make([]int, 0)
-		for _, id := range trip.Users {
-			users = append(users, int(id))
+		users, err := u.GetUserInfo(ctx, trip.Users)
+		if err != nil {
+			return nil, err
 		}
 
-		trips = append(trips, models.Trip{
+		trips = append(trips, models.TripWithUserInfo{
 			Id:          int(trip.Id),
 			Title:       trip.Title,
 			Description: trip.Description,
 			Albums:      albums,
 			Sights:      places,
-			Users:       users,
+			Users:       *users,
 		})
 	}
 
@@ -345,7 +344,7 @@ func (u *tripGatewayUseCase) ShareLink(ctx context.Context, author int, tripId i
 	return link.Link, nil
 }
 
-func (u *tripGatewayUseCase) AddUserByLink(ctx context.Context, author int, tripId int, uuid string) (*models.Trip, error) {
+func (u *tripGatewayUseCase) AddUserByLink(ctx context.Context, author int, tripId int, uuid string) (*models.TripWithUserInfo, error) {
 
 	responce, err := u.tripGRPC.AddUserByLink(ctx,
 		&trip_service.AddByShareRequest{
@@ -360,18 +359,35 @@ func (u *tripGatewayUseCase) AddUserByLink(ctx context.Context, author int, trip
 
 	places := td.PlacesFromProtoDays(responce.Sights)
 	albums := td.AlbumsFromProtoAlbums(responce.Albums)
-
-	users := make([]int, 0)
-	for _, id := range responce.Users {
-		users = append(users, int(id))
+	users, err := u.GetUserInfo(ctx, responce.Users)
+	if err != nil {
+		return nil, err
 	}
 
-	return &models.Trip{
+	return &models.TripWithUserInfo{
 		Id:          int(responce.Id),
 		Title:       responce.Title,
 		Description: responce.Description,
 		Sights:      places,
 		Albums:      albums,
-		Users:       users,
+		Users:       *users,
 	}, nil
+}
+
+func (u *tripGatewayUseCase) GetUserInfo(ctx context.Context, ids []int64) (*[]models.UserInfo, error) {
+	users := make([]models.UserInfo, 0)
+	for _, id := range ids {
+		user, err := u.authGRPC.GetUserInfo(ctx, &auth_service.GetUserRequest{Id: id})
+		if err != nil {
+			return nil, err
+		}
+
+		users = append(users, models.UserInfo{
+			Id:      int(user.UserId),
+			Name:    user.Name,
+			Surname: user.Surname,
+			Avatar:  user.Image,
+		})
+	}
+	return &users, nil
 }

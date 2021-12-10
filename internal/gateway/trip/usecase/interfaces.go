@@ -17,6 +17,7 @@ type sightGRPC interface {
 
 type authGRPC interface {
 	GetUserByEmail(ctx context.Context, in *auth_service.UserEmailRequest, opts ...grpc.CallOption) (*auth_service.UserId, error)
+	GetUserInfo(ctx context.Context, in *auth_service.GetUserRequest, opts ...grpc.CallOption) (*auth_service.UserInfo, error)
 }
 
 type tripGRPC interface {

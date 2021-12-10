@@ -78,13 +78,13 @@ func (s *tripGatewayDelivery) AddTrip(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	trip, err := s.manager.AddTrip(ctx, trip, userID)
+	responceTrip, err := s.manager.AddTrip(ctx, trip, userID)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
 
-	bytes, err := json.Marshal(trip)
+	bytes, err := json.Marshal(responceTrip)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
@@ -104,13 +104,13 @@ func (s *tripGatewayDelivery) UpdateTrip(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	trip, err := s.manager.UpdateTrip(ctx, param, trip, userID)
+	responceTrip, err := s.manager.UpdateTrip(ctx, param, trip, userID)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
 
-	bytes, err := json.Marshal(trip)
+	bytes, err := json.Marshal(responceTrip)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
