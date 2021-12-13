@@ -65,6 +65,7 @@ func SetupRouter(cfg RouterConfig) (r *router.Router, p *fasthttpprom.Prometheus
 	r.GET(cnst.SightURL, lgrMw(cfg.SightDelivery.GetSightByID))
 	r.GET(cnst.SightSearch, lgrMw(cfg.SightDelivery.SearchSights))
 	r.GET(cnst.SightTag, lgrMw(cfg.SightDelivery.GetSightByTag))
+	r.GET(cnst.Tags, lgrMw(cfg.SightDelivery.GetTags))
 
 	r.POST(cnst.ReviewAddURL, lgrMw(authMw(cfg.ReviewDelivery.AddReviewToPlace)))
 	r.GET(cnst.ReviewURL, lgrMw(cfg.ReviewDelivery.ReviewsByPlace))

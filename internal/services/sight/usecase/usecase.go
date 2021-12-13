@@ -45,7 +45,6 @@ func (s *sightUsecase) GetSightByTag(ctx context.Context, tag int64) ([]models.S
 	return s.repo.GetSightByTag(ctx, tag)
 }
 
-
 func NewSightUsecase(repo repository.SightRepository) SightUsecase {
 	return &sightUsecase{repo: repo}
 }

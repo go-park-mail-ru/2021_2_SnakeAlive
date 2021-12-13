@@ -17,6 +17,22 @@ type loggingMiddleware struct {
 	next SightRepository
 }
 
+func (l *loggingMiddleware) GetTags(ctx context.Context) (tags []models.Tag, err error) {
+	l.logger.Infow(module,
+		"Action", "GetTags",
+	)
+	defer func() {
+		if err != nil {
+			l.logger.Infow(module,
+				"Action", "GetTags",
+				"Error", err,
+			)
+		}
+	}()
+
+	return l.next.GetTags(ctx)
+}
+
 func (l *loggingMiddleware) GetSightByTag(ctx context.Context, tag int64) (sights []models.Sight, err error) {
 	l.logger.Infow(module,
 		"Action", "GetSightByTag",
