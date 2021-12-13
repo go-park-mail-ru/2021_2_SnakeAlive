@@ -38,6 +38,8 @@ func easyjson548aff28DecodeSnakealiveMInternalModels(in *jlexer.Lexer, out *Coun
 		switch key {
 		case "id":
 			out.Id = int(in.Int())
+		case "translated":
+			out.Translated = string(in.String())
 		case "name":
 			out.Name = string(in.String())
 		case "description":
@@ -62,6 +64,11 @@ func easyjson548aff28EncodeSnakealiveMInternalModels(out *jwriter.Writer, in Cou
 		const prefix string = ",\"id\":"
 		out.RawString(prefix[1:])
 		out.Int(int(in.Id))
+	}
+	{
+		const prefix string = ",\"translated\":"
+		out.RawString(prefix)
+		out.String(string(in.Translated))
 	}
 	{
 		const prefix string = ",\"name\":"
