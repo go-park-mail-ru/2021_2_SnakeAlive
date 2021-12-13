@@ -16,13 +16,15 @@ jobs:
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-      - name: lsla
-        run: ls -la
+      - name: vendor
+        run: go mod vendor
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.HUB_USER }}
           password: ${{ secrets.HUB_TOKEN }}
+
+
       - name: Build gateway and push
         uses: docker/build-push-action@v2
         with:
@@ -30,6 +32,35 @@ jobs:
           push: true
           tags: gateway:latest
           file: Dockerfile.gateway
+      - name: Build auth_service and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: auth_service:latest
+          file: Dockerfile.auth_service
+      - name: Build review_service and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: review_service:latest
+          file: Dockerfile.review_service
+      - name: Build sight_service and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: sight_service:latest
+          file: Dockerfile.sight_service
+      - name: Build trip_service and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: trip_service:latest
+          file: Dockerfile.trip_service
+
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@master
         with:
