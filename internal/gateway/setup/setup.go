@@ -1,10 +1,6 @@
 package setup
 
 import (
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
 	"snakealive/m/internal/gateway/config"
 	country_delivery "snakealive/m/internal/gateway/country/delivery"
 	"snakealive/m/internal/gateway/country/repository"
@@ -29,6 +25,11 @@ import (
 	review_service "snakealive/m/pkg/services/review"
 	sight_service "snakealive/m/pkg/services/sight"
 	trip_service "snakealive/m/pkg/services/trip"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 
 	fsthp_router "github.com/fasthttp/router"
 	"google.golang.org/grpc"
@@ -80,7 +81,7 @@ func Setup(cfg config.Config) (r *fsthp_router.Router, p *fasthttpprom.Prometheu
 		return r, p, stopFunc, err
 	}
 	tripGRPC := trip_service.NewTripServiceClient(tripConn)
-	tripGatewayUseCase := tu.NewTripGatewayUseCase(tripGRPC, sightGRPC)
+	tripGatewayUseCase := tu.NewTripGatewayUseCase(tripGRPC, sightGRPC, userGRPC)
 	tripDelivery := td.NewTripGetewayDelivery(
 		error_adapter.NewGrpcToHttpAdapter(
 			grpc_errors.UserGatewayError, grpc_errors.CommonError,

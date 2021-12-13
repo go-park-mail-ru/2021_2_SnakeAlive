@@ -17,6 +17,7 @@ type Trip struct {
 	Description string  `json:"description"`
 	Sights      []Place `json:"sights"`
 	Albums      []Album `json:"albums"`
+	Users       []int   `json:"users"`
 }
 
 type TripSight struct {
@@ -32,4 +33,23 @@ type Album struct {
 	Title       string   `json:"title"`
 	Description string   `json:"description"`
 	Photos      []string `json:"photos"`
+}
+
+type TripUser struct {
+	Email string `json:"email"`
+}
+
+type UserInfo struct {
+	Id      int    `json:"id"`
+	Name    string `json:"name" valid:"required"`
+	Surname string `json:"surname" valid:"required"`
+	Avatar  string `json:"avatar"`
+}
+type TripWithUserInfo struct {
+	Id          int        `json:"id"`
+	Title       string     `json:"title"`
+	Description string     `json:"description"`
+	Sights      []Place    `json:"sights"`
+	Albums      []Album    `json:"albums"`
+	Users       []UserInfo `json:"users"`
 }

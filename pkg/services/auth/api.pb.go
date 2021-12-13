@@ -597,6 +597,100 @@ func (x *UserInfo) GetImage() string {
 	return ""
 }
 
+type UserEmailRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Email string `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+}
+
+func (x *UserEmailRequest) Reset() {
+	*x = UserEmailRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_services_auth_api_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UserEmailRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserEmailRequest) ProtoMessage() {}
+
+func (x *UserEmailRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_services_auth_api_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserEmailRequest.ProtoReflect.Descriptor instead.
+func (*UserEmailRequest) Descriptor() ([]byte, []int) {
+	return file_pkg_services_auth_api_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *UserEmailRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+type UserId struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *UserId) Reset() {
+	*x = UserId{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_pkg_services_auth_api_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UserId) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserId) ProtoMessage() {}
+
+func (x *UserId) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_services_auth_api_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserId.ProtoReflect.Descriptor instead.
+func (*UserId) Descriptor() ([]byte, []int) {
+	return file_pkg_services_auth_api_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *UserId) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
 var File_pkg_services_auth_api_proto protoreflect.FileDescriptor
 
 var file_pkg_services_auth_api_proto_rawDesc = []byte{
@@ -668,7 +762,12 @@ var file_pkg_services_auth_api_proto_rawDesc = []byte{
 	0x75, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x42, 0x0a, 0xfa, 0x42,
 	0x07, 0x72, 0x05, 0x18, 0x80, 0x01, 0x20, 0x01, 0x52, 0x07, 0x73, 0x75, 0x72, 0x6e, 0x61, 0x6d,
 	0x65, 0x12, 0x14, 0x0a, 0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x32, 0x8b, 0x05, 0x0a, 0x0b, 0x41, 0x75, 0x74, 0x68,
+	0x52, 0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x22, 0x34, 0x0a, 0x10, 0x55, 0x73, 0x65, 0x72, 0x45,
+	0x6d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x20, 0x0a, 0x05, 0x65,
+	0x6d, 0x61, 0x69, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x0a, 0xfa, 0x42, 0x07, 0x72,
+	0x05, 0x18, 0x80, 0x01, 0x60, 0x01, 0x52, 0x05, 0x65, 0x6d, 0x61, 0x69, 0x6c, 0x22, 0x18, 0x0a,
+	0x06, 0x55, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x32, 0xe7, 0x05, 0x0a, 0x0b, 0x41, 0x75, 0x74, 0x68,
 	0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x63, 0x0a, 0x0f, 0x56, 0x61, 0x6c, 0x69, 0x64,
 	0x61, 0x74, 0x65, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x1e, 0x2e, 0x73, 0x65, 0x72,
 	0x76, 0x69, 0x63, 0x65, 0x73, 0x2e, 0x61, 0x75, 0x74, 0x68, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69,
@@ -709,10 +808,16 @@ var file_pkg_services_auth_api_proto_rawDesc = []byte{
 	0x69, 0x63, 0x65, 0x2e, 0x47, 0x65, 0x74, 0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65,
 	0x73, 0x74, 0x1a, 0x1f, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x73, 0x2e, 0x61, 0x75,
 	0x74, 0x68, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x49,
-	0x6e, 0x66, 0x6f, 0x22, 0x00, 0x42, 0x2d, 0x5a, 0x2b, 0x73, 0x6e, 0x61, 0x6b, 0x65, 0x61, 0x6c,
-	0x69, 0x76, 0x65, 0x2f, 0x6d, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63,
-	0x65, 0x73, 0x2f, 0x61, 0x75, 0x74, 0x68, 0x3b, 0x61, 0x75, 0x74, 0x68, 0x5f, 0x73, 0x65, 0x72,
-	0x76, 0x69, 0x63, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6e, 0x66, 0x6f, 0x22, 0x00, 0x12, 0x5a, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x55, 0x73, 0x65, 0x72,
+	0x42, 0x79, 0x45, 0x6d, 0x61, 0x69, 0x6c, 0x12, 0x27, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63,
+	0x65, 0x73, 0x2e, 0x61, 0x75, 0x74, 0x68, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e,
+	0x55, 0x73, 0x65, 0x72, 0x45, 0x6d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x1d, 0x2e, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x73, 0x2e, 0x61, 0x75, 0x74, 0x68,
+	0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x2e, 0x55, 0x73, 0x65, 0x72, 0x49, 0x64, 0x22,
+	0x00, 0x42, 0x2d, 0x5a, 0x2b, 0x73, 0x6e, 0x61, 0x6b, 0x65, 0x61, 0x6c, 0x69, 0x76, 0x65, 0x2f,
+	0x6d, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x73, 0x2f, 0x61,
+	0x75, 0x74, 0x68, 0x3b, 0x61, 0x75, 0x74, 0x68, 0x5f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -727,7 +832,7 @@ func file_pkg_services_auth_api_proto_rawDescGZIP() []byte {
 	return file_pkg_services_auth_api_proto_rawDescData
 }
 
-var file_pkg_services_auth_api_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_pkg_services_auth_api_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_pkg_services_auth_api_proto_goTypes = []interface{}{
 	(*LoginRequest)(nil),            // 0: services.auth_service.LoginRequest
 	(*LoginResponse)(nil),           // 1: services.auth_service.LoginResponse
@@ -738,28 +843,32 @@ var file_pkg_services_auth_api_proto_goTypes = []interface{}{
 	(*Session)(nil),                 // 6: services.auth_service.Session
 	(*ValidateSessionResponse)(nil), // 7: services.auth_service.ValidateSessionResponse
 	(*UserInfo)(nil),                // 8: services.auth_service.UserInfo
-	(*empty.Empty)(nil),             // 9: google.protobuf.Empty
+	(*UserEmailRequest)(nil),        // 9: services.auth_service.UserEmailRequest
+	(*UserId)(nil),                  // 10: services.auth_service.UserId
+	(*empty.Empty)(nil),             // 11: google.protobuf.Empty
 }
 var file_pkg_services_auth_api_proto_depIdxs = []int32{
-	6, // 0: services.auth_service.AuthService.ValidateSession:input_type -> services.auth_service.Session
-	6, // 1: services.auth_service.AuthService.LogoutUser:input_type -> services.auth_service.Session
-	0, // 2: services.auth_service.AuthService.LoginUser:input_type -> services.auth_service.LoginRequest
-	2, // 3: services.auth_service.AuthService.RegisterUser:input_type -> services.auth_service.RegisterRequest
-	3, // 4: services.auth_service.AuthService.GetUser:input_type -> services.auth_service.GetUserRequest
-	5, // 5: services.auth_service.AuthService.UpdateUser:input_type -> services.auth_service.UpdateUserRequest
-	3, // 6: services.auth_service.AuthService.GetUserInfo:input_type -> services.auth_service.GetUserRequest
-	7, // 7: services.auth_service.AuthService.ValidateSession:output_type -> services.auth_service.ValidateSessionResponse
-	9, // 8: services.auth_service.AuthService.LogoutUser:output_type -> google.protobuf.Empty
-	1, // 9: services.auth_service.AuthService.LoginUser:output_type -> services.auth_service.LoginResponse
-	1, // 10: services.auth_service.AuthService.RegisterUser:output_type -> services.auth_service.LoginResponse
-	4, // 11: services.auth_service.AuthService.GetUser:output_type -> services.auth_service.GetUserResponse
-	4, // 12: services.auth_service.AuthService.UpdateUser:output_type -> services.auth_service.GetUserResponse
-	8, // 13: services.auth_service.AuthService.GetUserInfo:output_type -> services.auth_service.UserInfo
-	7, // [7:14] is the sub-list for method output_type
-	0, // [0:7] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	6,  // 0: services.auth_service.AuthService.ValidateSession:input_type -> services.auth_service.Session
+	6,  // 1: services.auth_service.AuthService.LogoutUser:input_type -> services.auth_service.Session
+	0,  // 2: services.auth_service.AuthService.LoginUser:input_type -> services.auth_service.LoginRequest
+	2,  // 3: services.auth_service.AuthService.RegisterUser:input_type -> services.auth_service.RegisterRequest
+	3,  // 4: services.auth_service.AuthService.GetUser:input_type -> services.auth_service.GetUserRequest
+	5,  // 5: services.auth_service.AuthService.UpdateUser:input_type -> services.auth_service.UpdateUserRequest
+	3,  // 6: services.auth_service.AuthService.GetUserInfo:input_type -> services.auth_service.GetUserRequest
+	9,  // 7: services.auth_service.AuthService.GetUserByEmail:input_type -> services.auth_service.UserEmailRequest
+	7,  // 8: services.auth_service.AuthService.ValidateSession:output_type -> services.auth_service.ValidateSessionResponse
+	11, // 9: services.auth_service.AuthService.LogoutUser:output_type -> google.protobuf.Empty
+	1,  // 10: services.auth_service.AuthService.LoginUser:output_type -> services.auth_service.LoginResponse
+	1,  // 11: services.auth_service.AuthService.RegisterUser:output_type -> services.auth_service.LoginResponse
+	4,  // 12: services.auth_service.AuthService.GetUser:output_type -> services.auth_service.GetUserResponse
+	4,  // 13: services.auth_service.AuthService.UpdateUser:output_type -> services.auth_service.GetUserResponse
+	8,  // 14: services.auth_service.AuthService.GetUserInfo:output_type -> services.auth_service.UserInfo
+	10, // 15: services.auth_service.AuthService.GetUserByEmail:output_type -> services.auth_service.UserId
+	8,  // [8:16] is the sub-list for method output_type
+	0,  // [0:8] is the sub-list for method input_type
+	0,  // [0:0] is the sub-list for extension type_name
+	0,  // [0:0] is the sub-list for extension extendee
+	0,  // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_pkg_services_auth_api_proto_init() }
@@ -876,6 +985,30 @@ func file_pkg_services_auth_api_proto_init() {
 				return nil
 			}
 		}
+		file_pkg_services_auth_api_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UserEmailRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_pkg_services_auth_api_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UserId); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -883,7 +1016,7 @@ func file_pkg_services_auth_api_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_pkg_services_auth_api_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
