@@ -2,10 +2,14 @@ package usecase
 
 import (
 	"context"
+	"fmt"
+	"strconv"
 
 	"snakealive/m/internal/services/trip/models"
 	"snakealive/m/internal/services/trip/repository"
+	cnst "snakealive/m/pkg/constants"
 
+	"github.com/google/uuid"
 	"github.com/microcosm-cc/bluemonday"
 )
 
@@ -29,6 +33,11 @@ type TripUseCase interface {
 	SightsByTrip(ctx context.Context, id int) (*[]int, error)
 	TripsByUser(ctx context.Context, id int) (*[]models.Trip, error)
 	AlbumsByUser(ctx context.Context, id int) (*[]models.Album, error)
+
+	AddTripUser(ctx context.Context, tripId int, userId int) error
+
+	ShareLink(ctx context.Context, id int) string
+	CheckLink(ctx context.Context, uuid string, id int) bool
 }
 
 type tripUseCase struct {
@@ -60,8 +69,13 @@ func (u tripUseCase) DeleteTrip(ctx context.Context, id int) error {
 }
 
 func (u tripUseCase) CheckTripAuthor(ctx context.Context, userID int, id int) (bool, error) {
-	author, err := u.tripRepository.GetTripAuthor(ctx, id)
-	return author == userID, err
+	authors, err := u.tripRepository.GetTripAuthors(ctx, id)
+	for _, author := range authors {
+		if author == userID {
+			return true, err
+		}
+	}
+	return false, err
 }
 
 func (u tripUseCase) SanitizeTrip(ctx context.Context, trip *models.Trip) *models.Trip {
@@ -114,4 +128,21 @@ func (u tripUseCase) SanitizeAlbum(ctx context.Context, album *models.Album) *mo
 
 func (u tripUseCase) AlbumsByUser(ctx context.Context, id int) (*[]models.Album, error) {
 	return u.tripRepository.AlbumsByUser(ctx, id)
+}
+
+func (u tripUseCase) AddTripUser(ctx context.Context, tripId int, userId int) error {
+	return u.tripRepository.AddTripUser(ctx, tripId, userId)
+}
+
+func (u tripUseCase) ShareLink(ctx context.Context, tripId int) string {
+
+	idStr := strconv.Itoa(tripId)
+	uuidLink := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(idStr)))
+	u.tripRepository.AddLinkToCache(ctx, uuidLink, tripId)
+
+	return cnst.ShareTrip + uuidLink + "/" + idStr
+}
+
+func (u tripUseCase) CheckLink(ctx context.Context, uuid string, id int) bool {
+	return u.tripRepository.CheckLink(ctx, uuid, id)
 }

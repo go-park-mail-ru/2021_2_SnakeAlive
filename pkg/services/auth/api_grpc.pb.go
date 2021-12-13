@@ -26,6 +26,7 @@ type AuthServiceClient interface {
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*GetUserResponse, error)
 	GetUserInfo(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*UserInfo, error)
+	GetUserByEmail(ctx context.Context, in *UserEmailRequest, opts ...grpc.CallOption) (*UserId, error)
 }
 
 type authServiceClient struct {
@@ -99,6 +100,15 @@ func (c *authServiceClient) GetUserInfo(ctx context.Context, in *GetUserRequest,
 	return out, nil
 }
 
+func (c *authServiceClient) GetUserByEmail(ctx context.Context, in *UserEmailRequest, opts ...grpc.CallOption) (*UserId, error) {
+	out := new(UserId)
+	err := c.cc.Invoke(ctx, "/services.auth_service.AuthService/GetUserByEmail", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility
@@ -110,6 +120,7 @@ type AuthServiceServer interface {
 	GetUser(context.Context, *GetUserRequest) (*GetUserResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*GetUserResponse, error)
 	GetUserInfo(context.Context, *GetUserRequest) (*UserInfo, error)
+	GetUserByEmail(context.Context, *UserEmailRequest) (*UserId, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -137,6 +148,9 @@ func (UnimplementedAuthServiceServer) UpdateUser(context.Context, *UpdateUserReq
 }
 func (UnimplementedAuthServiceServer) GetUserInfo(context.Context, *GetUserRequest) (*UserInfo, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfo not implemented")
+}
+func (UnimplementedAuthServiceServer) GetUserByEmail(context.Context, *UserEmailRequest) (*UserId, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserByEmail not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 
@@ -277,6 +291,24 @@ func _AuthService_GetUserInfo_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_GetUserByEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserEmailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).GetUserByEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/services.auth_service.AuthService/GetUserByEmail",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).GetUserByEmail(ctx, req.(*UserEmailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -311,6 +343,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserInfo",
 			Handler:    _AuthService_GetUserInfo_Handler,
+		},
+		{
+			MethodName: "GetUserByEmail",
+			Handler:    _AuthService_GetUserByEmail_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

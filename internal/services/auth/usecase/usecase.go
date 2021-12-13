@@ -19,6 +19,7 @@ type AuthUseCase interface {
 	GetUser(ctx context.Context, ID int64) (*models.User, error)
 	UpdateUser(ctx context.Context, user *models.User) (*models.User, error)
 	GetUserInfo(ctx context.Context, id int) (*models.User, error)
+	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
 }
 
 type authUseCase struct {
@@ -47,6 +48,15 @@ func (a *authUseCase) LoginUser(ctx context.Context, user *models.User) (models.
 		Cookie: cookie,
 		Token:  "??",
 	}, nil
+}
+
+func (a *authUseCase) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+	user, err := a.repo.GetUserByEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (a *authUseCase) LogoutUser(ctx context.Context, session string) error {

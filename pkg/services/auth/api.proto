@@ -97,6 +97,17 @@ message UserInfo {
   string image = 2;
 }
 
+message UserEmailRequest {
+  string email = 1 [(validate.rules).string = {
+    email: true,
+    max_len: 128,
+  }];
+}
+
+message UserId {
+  int64 id = 1 ;
+}
+
 service AuthService {
   rpc ValidateSession (Session) returns (ValidateSessionResponse) {}
   rpc LogoutUser(Session) returns (google.protobuf.Empty) {}
@@ -106,4 +117,7 @@ service AuthService {
   rpc GetUser(GetUserRequest) returns (GetUserResponse) {}
   rpc UpdateUser(UpdateUserRequest) returns (GetUserResponse) {}
   rpc GetUserInfo(GetUserRequest) returns (UserInfo) {}
+
+
+  rpc GetUserByEmail(UserEmailRequest) returns (UserId) {}
 }

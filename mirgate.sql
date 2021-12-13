@@ -64,11 +64,18 @@ CREATE TABLE Trips
     title       TEXT        NOT NULL,
     origin      INT,
     description TEXT,
-    user_id     INT         NOT NULL,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (origin) REFERENCES places (id) ON DELETE CASCADE
+);
+
+CREATE TABLE TripsUsers
+(
+    id       SERIAL NOT NULL PRIMARY KEY,
+    user_id INT    NOT NULL,
+    trip_id  INT    NOT NULL,
+    CONSTRAINT fk_trip FOREIGN KEY (trip_id) REFERENCES trips (id) ON DELETE CASCADE,
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
 CREATE TRIGGER set_timestamp

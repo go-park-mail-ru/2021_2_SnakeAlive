@@ -60,6 +60,9 @@ func SetupRouter(cfg RouterConfig) (r *router.Router, p *fasthttpprom.Prometheus
 	r.GET(cnst.SightsByTripURL, lgrMw(cfg.TripGatewayDelivery.SightsByTrip))
 	r.GET(cnst.TripsByUserURL, lgrMw(authMw(cfg.TripGatewayDelivery.TripsByUser)))
 	r.GET(cnst.AlbumsByUserURL, lgrMw(authMw(cfg.TripGatewayDelivery.AlbumsByUser)))
+	r.POST(cnst.AddTripUserURL, lgrMw(authMw(cfg.TripGatewayDelivery.AddTripUser)))
+	r.POST(cnst.ShareTripURL, lgrMw(authMw(cfg.TripGatewayDelivery.ShareLink)))
+	r.GET(cnst.SharedTripURL, lgrMw(authMw(cfg.TripGatewayDelivery.AddUserByLink)))
 
 	r.GET(cnst.SightsByCountryURL, lgrMw(cfg.SightDelivery.GetSightByCountry))
 	r.GET(cnst.SightURL, lgrMw(cfg.SightDelivery.GetSightByID))
