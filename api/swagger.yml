@@ -246,23 +246,28 @@ paths:
         '401':
           description: Authorization needed
   /sights/search:
-    get:
-      parameters:
-        - in: query
-          name: search
-          required: true
-          schema:
-            type: string
-        - in: query
-          name: skip
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: limit
-          required: true
-          schema:
-            type: integer
+    patch:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                search:
+                  type: string
+                skip:
+                  type: integer
+                limit:
+                  type: integer
+                tags:
+                  type: array
+                  items:
+                    type: integer
+                countries:
+                  type: array
+                  items:
+                    type: string
       responses:
         '200':
           description: Found sight
@@ -708,6 +713,46 @@ paths:
                   description:
                     type: string
                   photo:
+                    type: string
+        '500':
+          description: Internal db error
+        '404':
+          description: Country not found
+
+  /tags:
+    get:
+      description: Get tags
+      responses:
+        '200':
+          description: Successfully get tags
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+        '500':
+          description: Internal db error
+        '404':
+          description: Country not found
+
+  /random/tags:
+    get:
+      description: Get 5 random tags
+      responses:
+        '200':
+          description: Successfully get tags
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
                     type: string
         '500':
           description: Internal db error

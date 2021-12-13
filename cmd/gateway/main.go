@@ -33,10 +33,6 @@ func main() {
 			return
 		}
 	}()
-	//go func() {
-	//	log.Fatal(fasthttp.ListenAndServe(":8080", p.Handler))
-	//}()
-
 	logger.Info("gateway started ...")
 
 	c := make(chan os.Signal, 1)

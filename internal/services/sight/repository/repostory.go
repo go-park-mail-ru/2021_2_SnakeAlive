@@ -15,7 +15,7 @@ type SightRepository interface {
 	GetSightByID(ctx context.Context, id int) (models.Sight, error)
 	GetSightByIDs(ctx context.Context, ids []int64) ([]models.Sight, error)
 	GetSightByTag(ctx context.Context, tag int64) ([]models.Sight, error)
-	SearchSights(ctx context.Context, search string, skip, limit int64) ([]models.Sight, error)
+	SearchSights(ctx context.Context, req *models.SightsSearch) ([]models.Sight, error)
 	GetTags(ctx context.Context) ([]models.Tag, error)
 }
 
@@ -117,8 +117,8 @@ func (s *sightRepository) GetSightByTag(ctx context.Context, tag int64) ([]model
 	return sights, nil
 }
 
-func (s *sightRepository) SearchSights(ctx context.Context, search string, skip, limit int64) ([]models.Sight, error) {
-	request := s.queryFactory.CreateSearchSights(search, skip, limit)
+func (s *sightRepository) SearchSights(ctx context.Context, req *models.SightsSearch) ([]models.Sight, error) {
+	request := s.queryFactory.CreateSearchSights(req)
 	rows, err := s.conn.Query(ctx, request.Request, request.Params...)
 	if err != nil {
 		return []models.Sight{}, err

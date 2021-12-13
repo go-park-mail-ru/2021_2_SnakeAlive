@@ -24,6 +24,7 @@ type SightServiceClient interface {
 	SearchSights(ctx context.Context, in *SearchSightRequest, opts ...grpc.CallOption) (*SearchSightResponse, error)
 	GetSightsByTag(ctx context.Context, in *GetSightsByTagRequest, opts ...grpc.CallOption) (*GetSightsByTagResponse, error)
 	GetTags(ctx context.Context, in *GetTagsRequest, opts ...grpc.CallOption) (*GetTagsResponse, error)
+	GetRandomTags(ctx context.Context, in *GetTagsRequest, opts ...grpc.CallOption) (*GetTagsResponse, error)
 }
 
 type sightServiceClient struct {
@@ -88,6 +89,15 @@ func (c *sightServiceClient) GetTags(ctx context.Context, in *GetTagsRequest, op
 	return out, nil
 }
 
+func (c *sightServiceClient) GetRandomTags(ctx context.Context, in *GetTagsRequest, opts ...grpc.CallOption) (*GetTagsResponse, error) {
+	out := new(GetTagsResponse)
+	err := c.cc.Invoke(ctx, "/services.sight_service.SightService/GetRandomTags", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SightServiceServer is the server API for SightService service.
 // All implementations must embed UnimplementedSightServiceServer
 // for forward compatibility
@@ -98,6 +108,7 @@ type SightServiceServer interface {
 	SearchSights(context.Context, *SearchSightRequest) (*SearchSightResponse, error)
 	GetSightsByTag(context.Context, *GetSightsByTagRequest) (*GetSightsByTagResponse, error)
 	GetTags(context.Context, *GetTagsRequest) (*GetTagsResponse, error)
+	GetRandomTags(context.Context, *GetTagsRequest) (*GetTagsResponse, error)
 	mustEmbedUnimplementedSightServiceServer()
 }
 
@@ -122,6 +133,9 @@ func (UnimplementedSightServiceServer) GetSightsByTag(context.Context, *GetSight
 }
 func (UnimplementedSightServiceServer) GetTags(context.Context, *GetTagsRequest) (*GetTagsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTags not implemented")
+}
+func (UnimplementedSightServiceServer) GetRandomTags(context.Context, *GetTagsRequest) (*GetTagsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRandomTags not implemented")
 }
 func (UnimplementedSightServiceServer) mustEmbedUnimplementedSightServiceServer() {}
 
@@ -244,6 +258,24 @@ func _SightService_GetTags_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SightService_GetRandomTags_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTagsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SightServiceServer).GetRandomTags(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/services.sight_service.SightService/GetRandomTags",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SightServiceServer).GetRandomTags(ctx, req.(*GetTagsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SightService_ServiceDesc is the grpc.ServiceDesc for SightService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -274,6 +306,10 @@ var SightService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetTags",
 			Handler:    _SightService_GetTags_Handler,
+		},
+		{
+			MethodName: "GetRandomTags",
+			Handler:    _SightService_GetRandomTags_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

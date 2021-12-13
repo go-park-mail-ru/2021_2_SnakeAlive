@@ -59,6 +59,8 @@ message SearchSightRequest {
   int64 limit = 3 [(validate.rules).int64 = {
     gte: 0,
   }];
+  repeated string countries = 4;
+  repeated int64 tags = 5;
 }
 
 message SearchSightResponse {
@@ -88,4 +90,5 @@ service SightService {
   rpc SearchSights(SearchSightRequest) returns (SearchSightResponse) {};
   rpc GetSightsByTag(GetSightsByTagRequest) returns (GetSightsByTagResponse) {};
   rpc GetTags(GetTagsRequest) returns (GetTagsResponse) {};
+  rpc GetRandomTags(GetTagsRequest) returns (GetTagsResponse) {};
 }

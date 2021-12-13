@@ -2,9 +2,11 @@ package usecase
 
 import (
 	"context"
+	"math/rand"
 
 	"snakealive/m/internal/services/sight/models"
 	"snakealive/m/internal/services/sight/repository"
+	"snakealive/m/pkg/constants"
 )
 
 type SightUsecase interface {
@@ -12,9 +14,10 @@ type SightUsecase interface {
 	GetSightsByIDs(ctx context.Context, ids []int64) ([]models.Sight, error)
 	GetSightByID(ctx context.Context, id int) (models.Sight, error)
 	GetSightByTag(ctx context.Context, tag int64) ([]models.Sight, error)
-	SearchSights(ctx context.Context, search string, skip, limit int64) ([]models.Sight, error)
+	SearchSights(ctx context.Context, req *models.SightsSearch) ([]models.Sight, error)
 
 	GetTags(ctx context.Context) ([]models.Tag, error)
+	GetRandomTags(ctx context.Context) ([]models.Tag, error)
 }
 
 type sightUsecase struct {
@@ -25,8 +28,25 @@ func (s *sightUsecase) GetTags(ctx context.Context) ([]models.Tag, error) {
 	return s.repo.GetTags(ctx)
 }
 
-func (s *sightUsecase) SearchSights(ctx context.Context, search string, skip, limit int64) (sights []models.Sight, err error) {
-	return s.repo.SearchSights(ctx, search, skip, limit)
+func (s *sightUsecase) GetRandomTags(ctx context.Context) ([]models.Tag, error) {
+	tags, err := s.GetTags(ctx)
+	if err != nil {
+		return []models.Tag{}, err
+	}
+	if len(tags) <= constants.DefaultTagCount {
+		return tags, err
+	}
+
+	var result = make([]models.Tag, constants.DefaultTagCount)
+	for i, val := range rand.Perm(len(tags))[:constants.DefaultTagCount] {
+		result[i] = tags[val]
+	}
+
+	return result, nil
+}
+
+func (s *sightUsecase) SearchSights(ctx context.Context, req *models.SightsSearch) (sights []models.Sight, err error) {
+	return s.repo.SearchSights(ctx, req)
 }
 
 func (s *sightUsecase) GetSightsByIDs(ctx context.Context, ids []int64) ([]models.Sight, error) {

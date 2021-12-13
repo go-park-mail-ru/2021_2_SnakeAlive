@@ -15,6 +15,7 @@ const SightsByCountryURL = "/sights/{name}"
 const SightSearch = "/sights/search"
 const SightTag = "/sights/tag"
 const Tags = "/tags"
+const RandomTags = "/random/tags"
 
 const ReviewAddURL = "/review"
 const ReviewURL = "/review/{id}"
