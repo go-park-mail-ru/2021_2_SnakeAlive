@@ -21,6 +21,13 @@ jobs:
         with:
           username: ${{ secrets.HUB_USER }}
           password: ${{ secrets.HUB_TOKEN }}
+      - name: Build gateway and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: gateway:latest
+          target: Dockerfile.gateway
       - name: executing remote ssh commands using password
         uses: appleboy/ssh-action@master
         with:
