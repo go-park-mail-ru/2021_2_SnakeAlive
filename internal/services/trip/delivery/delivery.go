@@ -2,9 +2,11 @@ package delivery
 
 import (
 	"context"
+	"strconv"
 
 	"snakealive/m/internal/services/trip/models"
 	"snakealive/m/internal/services/trip/usecase"
+	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/error_adapter"
 	"snakealive/m/pkg/errors"
 	trip_service "snakealive/m/pkg/services/trip"
@@ -331,7 +333,7 @@ func (s *tripDelivery) ShareLink(ctx context.Context, request *trip_service.Shar
 	return &trip_service.Link{Link: link}, nil
 }
 
-func (s *tripDelivery) AddUserByLink(ctx context.Context, request *trip_service.AddByShareRequest) (*trip_service.Trip, error) {
+func (s *tripDelivery) AddUserByLink(ctx context.Context, request *trip_service.AddByShareRequest) (*trip_service.Link, error) {
 	authorized, err := s.tripUsecase.CheckTripAuthor(ctx, int(request.UserId), int(request.TripId))
 	if authorized || err != nil {
 		return nil, errors.DeniedAccess
@@ -346,26 +348,9 @@ func (s *tripDelivery) AddUserByLink(ctx context.Context, request *trip_service.
 		return nil, err
 	}
 
-	trip, err := s.tripUsecase.GetTripById(ctx, int(request.TripId))
-	if err != nil {
-		return nil, err
-	}
-
-	protoDays := ProtoDaysFromPlaces(trip.Sights)
-	protoAlbums := ProtoAlbumsFromAlbums(trip.Albums)
-
-	users := make([]int64, 0)
-	for _, id := range trip.Users {
-		users = append(users, int64(id))
-	}
-
-	return &trip_service.Trip{
-		Id:          int64(trip.Id),
-		Title:       trip.Title,
-		Description: trip.Description,
-		Sights:      protoDays,
-		Albums:      protoAlbums,
-		Users:       users,
+	id := strconv.Itoa(int(request.TripId))
+	return &trip_service.Link{
+		Link: cnst.TripPostURL + "/" + id,
 	}, nil
 }
 

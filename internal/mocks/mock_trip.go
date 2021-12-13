@@ -50,6 +50,18 @@ func (mr *MockTripRepositoryMockRecorder) AddAlbum(ctx, album, userID interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddAlbum", reflect.TypeOf((*MockTripRepository)(nil).AddAlbum), ctx, album, userID)
 }
 
+// AddLinkToCache mocks base method.
+func (m *MockTripRepository) AddLinkToCache(ctx context.Context, uuid string, id int) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "AddLinkToCache", ctx, uuid, id)
+}
+
+// AddLinkToCache indicates an expected call of AddLinkToCache.
+func (mr *MockTripRepositoryMockRecorder) AddLinkToCache(ctx, uuid, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddLinkToCache", reflect.TypeOf((*MockTripRepository)(nil).AddLinkToCache), ctx, uuid, id)
+}
+
 // AddTrip mocks base method.
 func (m *MockTripRepository) AddTrip(ctx context.Context, value *models.Trip, userID int) (int, error) {
 	m.ctrl.T.Helper()
@@ -63,6 +75,49 @@ func (m *MockTripRepository) AddTrip(ctx context.Context, value *models.Trip, us
 func (mr *MockTripRepositoryMockRecorder) AddTrip(ctx, value, userID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddTrip", reflect.TypeOf((*MockTripRepository)(nil).AddTrip), ctx, value, userID)
+}
+
+// AddTripUser mocks base method.
+func (m *MockTripRepository) AddTripUser(ctx context.Context, tripId, userId int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddTripUser", ctx, tripId, userId)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddTripUser indicates an expected call of AddTripUser.
+func (mr *MockTripRepositoryMockRecorder) AddTripUser(ctx, tripId, userId interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddTripUser", reflect.TypeOf((*MockTripRepository)(nil).AddTripUser), ctx, tripId, userId)
+}
+
+// AlbumsByUser mocks base method.
+func (m *MockTripRepository) AlbumsByUser(ctx context.Context, id int) (*[]models.Album, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AlbumsByUser", ctx, id)
+	ret0, _ := ret[0].(*[]models.Album)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AlbumsByUser indicates an expected call of AlbumsByUser.
+func (mr *MockTripRepositoryMockRecorder) AlbumsByUser(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AlbumsByUser", reflect.TypeOf((*MockTripRepository)(nil).AlbumsByUser), ctx, id)
+}
+
+// CheckLink mocks base method.
+func (m *MockTripRepository) CheckLink(ctx context.Context, uuid string, id int) bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckLink", ctx, uuid, id)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// CheckLink indicates an expected call of CheckLink.
+func (mr *MockTripRepositoryMockRecorder) CheckLink(ctx, uuid, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckLink", reflect.TypeOf((*MockTripRepository)(nil).CheckLink), ctx, uuid, id)
 }
 
 // DeleteAlbum mocks base method.
@@ -123,19 +178,19 @@ func (mr *MockTripRepositoryMockRecorder) GetAlbumById(ctx, id interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAlbumById", reflect.TypeOf((*MockTripRepository)(nil).GetAlbumById), ctx, id)
 }
 
-// GetTripAuthor mocks base method.
-func (m *MockTripRepository) GetTripAuthor(ctx context.Context, id int) (int, error) {
+// GetTripAuthors mocks base method.
+func (m *MockTripRepository) GetTripAuthors(ctx context.Context, id int) ([]int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetTripAuthor", ctx, id)
-	ret0, _ := ret[0].(int)
+	ret := m.ctrl.Call(m, "GetTripAuthors", ctx, id)
+	ret0, _ := ret[0].([]int)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetTripAuthor indicates an expected call of GetTripAuthor.
-func (mr *MockTripRepositoryMockRecorder) GetTripAuthor(ctx, id interface{}) *gomock.Call {
+// GetTripAuthors indicates an expected call of GetTripAuthors.
+func (mr *MockTripRepositoryMockRecorder) GetTripAuthors(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTripAuthor", reflect.TypeOf((*MockTripRepository)(nil).GetTripAuthor), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTripAuthors", reflect.TypeOf((*MockTripRepository)(nil).GetTripAuthors), ctx, id)
 }
 
 // GetTripById mocks base method.

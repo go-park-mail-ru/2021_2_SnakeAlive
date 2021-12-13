@@ -28,7 +28,7 @@ type TripGatewayUseCase interface {
 	AddTripUser(ctx context.Context, author int, tripId int, email string) error
 
 	ShareLink(ctx context.Context, author int, tripId int) (string, error)
-	AddUserByLink(ctx context.Context, author int, tripId int, uuid string) (*models.TripWithUserInfo, error)
+	AddUserByLink(ctx context.Context, author int, tripId int, uuid string) (string, error)
 
 	GetUserInfo(ctx context.Context, ids []int64) (*[]models.UserInfo, error)
 }
@@ -344,7 +344,7 @@ func (u *tripGatewayUseCase) ShareLink(ctx context.Context, author int, tripId i
 	return link.Link, nil
 }
 
-func (u *tripGatewayUseCase) AddUserByLink(ctx context.Context, author int, tripId int, uuid string) (*models.TripWithUserInfo, error) {
+func (u *tripGatewayUseCase) AddUserByLink(ctx context.Context, author int, tripId int, uuid string) (string, error) {
 
 	responce, err := u.tripGRPC.AddUserByLink(ctx,
 		&trip_service.AddByShareRequest{
@@ -354,24 +354,10 @@ func (u *tripGatewayUseCase) AddUserByLink(ctx context.Context, author int, trip
 		},
 	)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	places := td.PlacesFromProtoDays(responce.Sights)
-	albums := td.AlbumsFromProtoAlbums(responce.Albums)
-	users, err := u.GetUserInfo(ctx, responce.Users)
-	if err != nil {
-		return nil, err
-	}
-
-	return &models.TripWithUserInfo{
-		Id:          int(responce.Id),
-		Title:       responce.Title,
-		Description: responce.Description,
-		Sights:      places,
-		Albums:      albums,
-		Users:       *users,
-	}, nil
+	return responce.Link, nil
 }
 
 func (u *tripGatewayUseCase) GetUserInfo(ctx context.Context, ids []int64) (*[]models.UserInfo, error) {
