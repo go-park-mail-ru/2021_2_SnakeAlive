@@ -17,55 +17,29 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
       - name: vendor
-        run: go mod vendor && docker-compose build --parallel
+        run: go mod vendor
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.HUB_USER }}
           password: ${{ secrets.HUB_TOKEN }}
 
+      - name: build docker-compose
+        run: docker-compose build
+      - name: push image
+        run: docker-compose push
 
-      - name: Build gateway and push
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: gateway:latest
-          file: Dockerfile.gateway
-      - name: Build auth_service and push
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: auth_service:latest
-          file: Dockerfile.auth_service
-      - name: Build review_service and push
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: review_service:latest
-          file: Dockerfile.review_service
-      - name: Build sight_service and push
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: sight_service:latest
-          file: Dockerfile.sight_service
-      - name: Build trip_service and push
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: trip_service:latest
-          file: Dockerfile.trip_service
+#      - name: running latest service
+#        uses: appleboy/ssh-action@master
+#        with:
+#          host: ${{ secrets.DEST }}
+#          username: ${{ secrets.USERNAME }}
+#          password: ${{ secrets.PASSWORD }}
+#          script: |
+#            cd backend/SnakeAlive/2021_2_SnakeAlive/ &&
+#            docker-compose stop &&
+#            docker-compose rm -f &&
+#            docker-compose pull &&
+#            docker-compose up -d
 
-      - name: executing remote ssh commands using password
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.DEST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          script: whoami && docker-compose --version
 
