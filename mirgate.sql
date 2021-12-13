@@ -48,7 +48,8 @@ CREATE TABLE Places
     lng         REAL   NOT NULL,
     description TEXT,
     tags        INTEGER[],
-    photos      TEXT[]
+    photos      TEXT[],
+    tsq         TSVECTOR
 );
 
 CREATE TABLE Tags
@@ -119,6 +120,20 @@ CREATE TABLE Albums
     CONSTRAINT fk_trip FOREIGN KEY (trip_id) REFERENCES trips (id) ON DELETE CASCADE,
     CONSTRAINT fk_author FOREIGN KEY (author) REFERENCES users (id) ON DELETE CASCADE
 );
+
+CREATE OR REPLACE FUNCTION tsquery_trigger_function()
+    RETURNS TRIGGER
+    LANGUAGE PLPGSQL
+AS
+$$
+    BEGIN
+    UPDATE places SET tsq = to_tsvector('russian',LOWER(new.name)) WHERE id = NEW.id;
+    RETURN NEW;
+    END;
+$$;
+
+CREATE TRIGGER tsquery_place AFTER INSERT ON places FOR EACH ROW
+    EXECUTE PROCEDURE tsquery_trigger_function();
 
 INSERT INTO Tags ("id", "name")
 VALUES (1, 'Современные здания'), (2, 'Виды'), (3, 'Природа'),

@@ -6,4 +6,6 @@ drop table reviews cascade;
 drop table trips cascade;
 drop table tripsplaces cascade;
 drop table users cascade;
+drop table tags;
+drop trigger tsquery_country on countries;
 
