@@ -35,6 +35,7 @@ message Trip {
   string description = 3;
   repeated Sight sights = 4;
   repeated Album albums = 5;
+  repeated int64 users = 9;
 }
 
 message ModifyTripRequest {
@@ -86,6 +87,42 @@ message Albums {
   repeated Album albums = 1;
 }
 
+message AddTripUserRequest {
+  int64 trip_id = 1 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+  int64 user_id = 2 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+  int64 author = 3 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+}
+
+message ShareRequest {
+  int64 trip_id = 1 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+  int64 user_id = 2 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+}
+
+message AddByShareRequest {
+  int64 trip_id = 1 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+  int64 user_id = 2 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+
+  string uuid = 3;
+}
+
+message Link {
+  string link = 1;
+}
+
 service TripService {
   rpc GetTrip(TripRequest) returns (Trip) {}
   rpc AddTrip(ModifyTripRequest) returns (Trip) {}
@@ -99,4 +136,8 @@ service TripService {
   rpc DeleteAlbum(AlbumRequest) returns (google.protobuf.Empty) {}
   rpc SightsByTrip(SightsRequest) returns (Sights) {}
   rpc GetAlbumsByUser(ByUserRequest) returns (Albums) {}
+  rpc AddTripUser(AddTripUserRequest) returns (google.protobuf.Empty) {}
+
+  rpc ShareLink(ShareRequest) returns (Link) {}
+  rpc AddUserByLink(AddByShareRequest) returns (Link) {}
 }

@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 
+	auth_service "snakealive/m/pkg/services/auth"
 	sight_service "snakealive/m/pkg/services/sight"
 	trip_service "snakealive/m/pkg/services/trip"
 
@@ -12,6 +13,11 @@ import (
 
 type sightGRPC interface {
 	GetSightsByIDs(ctx context.Context, in *sight_service.GetSightsByIDsRequest, opts ...grpc.CallOption) (*sight_service.GetSightsByIDsResponse, error)
+}
+
+type authGRPC interface {
+	GetUserByEmail(ctx context.Context, in *auth_service.UserEmailRequest, opts ...grpc.CallOption) (*auth_service.UserId, error)
+	GetUserInfo(ctx context.Context, in *auth_service.GetUserRequest, opts ...grpc.CallOption) (*auth_service.UserInfo, error)
 }
 
 type tripGRPC interface {
@@ -26,4 +32,7 @@ type tripGRPC interface {
 	UpdateAlbum(ctx context.Context, in *trip_service.ModifyAlbumRequest, opts ...grpc.CallOption) (*trip_service.Album, error)
 	DeleteAlbum(ctx context.Context, in *trip_service.AlbumRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	SightsByTrip(ctx context.Context, in *trip_service.SightsRequest, opts ...grpc.CallOption) (*trip_service.Sights, error)
+	AddTripUser(ctx context.Context, in *trip_service.AddTripUserRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	ShareLink(ctx context.Context, in *trip_service.ShareRequest, opts ...grpc.CallOption) (*trip_service.Link, error)
+	AddUserByLink(ctx context.Context, in *trip_service.AddByShareRequest, opts ...grpc.CallOption) (*trip_service.Link, error)
 }

@@ -114,6 +114,15 @@ func (a *authDelivery) GetUserInfo(ctx context.Context, request *auth_service.Ge
 	}, nil
 }
 
+func (a *authDelivery) GetUserByEmail(ctx context.Context, request *auth_service.UserEmailRequest) (*auth_service.UserId, error) {
+	responce, err := a.authUsecase.GetUserByEmail(ctx, request.Email)
+	if err != nil {
+		return &auth_service.UserId{}, a.errorAdapter.AdaptError(err)
+	}
+
+	return &auth_service.UserId{Id: responce.ID}, nil
+}
+
 func NewAuthDelivery(
 	authUsecase usecase.AuthUseCase,
 	errorAdapter error_adapter.ErrorAdapter,
