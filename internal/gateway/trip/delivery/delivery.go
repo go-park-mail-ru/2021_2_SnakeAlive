@@ -2,12 +2,14 @@ package delivery
 
 import (
 	"encoding/json"
-	"strconv"
-
+	"log"
 	"snakealive/m/internal/gateway/trip/usecase"
+	socket "snakealive/m/internal/models"
 	"snakealive/m/internal/services/trip/models"
+	"snakealive/m/internal/websocket/config"
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/error_adapter"
+	"strconv"
 
 	"github.com/valyala/fasthttp"
 )
@@ -27,6 +29,7 @@ type TripGatewayDelivery interface {
 	AddTripUser(ctx *fasthttp.RequestCtx)
 	ShareLink(ctx *fasthttp.RequestCtx)
 	AddUserByLink(ctx *fasthttp.RequestCtx)
+	SendUpdateMessage(tripId int)
 }
 
 type tripGatewayDelivery struct {
@@ -118,6 +121,8 @@ func (s *tripGatewayDelivery) UpdateTrip(ctx *fasthttp.RequestCtx) {
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	ctx.Write(bytes)
+
+	s.SendUpdateMessage(responceTrip.Id)
 }
 
 func (s *tripGatewayDelivery) DeleteTrip(ctx *fasthttp.RequestCtx) {
@@ -356,4 +361,35 @@ func (s *tripGatewayDelivery) AddUserByLink(ctx *fasthttp.RequestCtx) {
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	ctx.Response.SetBody(bytes)
+}
+
+func (s *tripGatewayDelivery) SendUpdateMessage(tripId int) {
+	var cfg config.Config
+	if err := cfg.Setup(); err != nil {
+		log.Fatal("failed to setup cfg: ", err)
+		return
+	}
+
+	requestJSON := socket.TripRequest{
+		Message: "update",
+		TripId:  tripId,
+	}
+
+	bytes, err := json.Marshal(requestJSON)
+	if err != nil {
+		return
+	}
+
+	request := fasthttp.AcquireRequest()
+	request.Header.SetMethod("POST")
+	request.Header.SetContentType("application/json")
+	request.SetBody(bytes)
+
+	request.SetRequestURI(cfg.ServiceURL + ":" + cfg.Port + "/")
+	response := fasthttp.AcquireResponse()
+
+	fasthttp.Do(request, response)
+
+	fasthttp.ReleaseRequest(request)
+	fasthttp.ReleaseResponse(response)
 }

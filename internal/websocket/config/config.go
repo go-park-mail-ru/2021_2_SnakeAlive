@@ -10,8 +10,9 @@ import (
 )
 
 type Config struct {
-	DBUrl string `envconfig:"DB_URL" required:"true"`
-	Port  string `envconfig:"PORT" required:"true"`
+	DBUrl      string `envconfig:"DB_URL" required:"true"`
+	Port       string `envconfig:"PORT" required:"true"`
+	ServiceURL string `envconfig:"URL" required:"true"`
 
 	Ctx    context.Context
 	Cancel func()
