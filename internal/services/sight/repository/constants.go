@@ -30,7 +30,7 @@ const (
 								select name
 								from Tags t
 								where t.id = ANY(tags)
-								) as tag_arr, description, photos, lng, lat, FROM Places WHERE $1 = ANY(tags)`
+								) as tag_arr, description, photos, lng, lat FROM Places WHERE $1 = ANY(tags)`
 	GetTags = `SELECT id, name FROM tags`
 )
 
