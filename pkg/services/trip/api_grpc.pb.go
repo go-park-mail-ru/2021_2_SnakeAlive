@@ -32,7 +32,7 @@ type TripServiceClient interface {
 	GetAlbumsByUser(ctx context.Context, in *ByUserRequest, opts ...grpc.CallOption) (*Albums, error)
 	AddTripUser(ctx context.Context, in *AddTripUserRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	ShareLink(ctx context.Context, in *ShareRequest, opts ...grpc.CallOption) (*Link, error)
-	AddUserByLink(ctx context.Context, in *AddByShareRequest, opts ...grpc.CallOption) (*Trip, error)
+	AddUserByLink(ctx context.Context, in *AddByShareRequest, opts ...grpc.CallOption) (*Link, error)
 }
 
 type tripServiceClient struct {
@@ -160,8 +160,8 @@ func (c *tripServiceClient) ShareLink(ctx context.Context, in *ShareRequest, opt
 	return out, nil
 }
 
-func (c *tripServiceClient) AddUserByLink(ctx context.Context, in *AddByShareRequest, opts ...grpc.CallOption) (*Trip, error) {
-	out := new(Trip)
+func (c *tripServiceClient) AddUserByLink(ctx context.Context, in *AddByShareRequest, opts ...grpc.CallOption) (*Link, error) {
+	out := new(Link)
 	err := c.cc.Invoke(ctx, "/services.trip_service.TripService/AddUserByLink", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -186,7 +186,7 @@ type TripServiceServer interface {
 	GetAlbumsByUser(context.Context, *ByUserRequest) (*Albums, error)
 	AddTripUser(context.Context, *AddTripUserRequest) (*empty.Empty, error)
 	ShareLink(context.Context, *ShareRequest) (*Link, error)
-	AddUserByLink(context.Context, *AddByShareRequest) (*Trip, error)
+	AddUserByLink(context.Context, *AddByShareRequest) (*Link, error)
 	mustEmbedUnimplementedTripServiceServer()
 }
 
@@ -233,7 +233,7 @@ func (UnimplementedTripServiceServer) AddTripUser(context.Context, *AddTripUserR
 func (UnimplementedTripServiceServer) ShareLink(context.Context, *ShareRequest) (*Link, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ShareLink not implemented")
 }
-func (UnimplementedTripServiceServer) AddUserByLink(context.Context, *AddByShareRequest) (*Trip, error) {
+func (UnimplementedTripServiceServer) AddUserByLink(context.Context, *AddByShareRequest) (*Link, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddUserByLink not implemented")
 }
 func (UnimplementedTripServiceServer) mustEmbedUnimplementedTripServiceServer() {}

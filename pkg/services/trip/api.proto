@@ -139,5 +139,5 @@ service TripService {
   rpc AddTripUser(AddTripUserRequest) returns (google.protobuf.Empty) {}
 
   rpc ShareLink(ShareRequest) returns (Link) {}
-  rpc AddUserByLink(AddByShareRequest) returns (Trip) {}
+  rpc AddUserByLink(AddByShareRequest) returns (Link) {}
 }
