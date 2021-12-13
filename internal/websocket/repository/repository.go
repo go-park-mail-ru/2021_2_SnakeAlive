@@ -33,7 +33,7 @@ func (r *websocketRepository) GetTripById(ctx context.Context, id int) (value *m
 	defer conn.Release()
 
 	err = conn.QueryRow(context.Background(),
-		GetTripQuery,
+		getTripQuery,
 		id,
 	).Scan(&trip.Id, &trip.Title, &trip.Description)
 	if err != nil {
@@ -41,7 +41,7 @@ func (r *websocketRepository) GetTripById(ctx context.Context, id int) (value *m
 	}
 
 	rows, err := conn.Query(context.Background(),
-		GetPlaceForTripQuery,
+		getPlaceForTripQuery,
 		id)
 	if err != nil {
 		return &trip, err
@@ -54,7 +54,7 @@ func (r *websocketRepository) GetTripById(ctx context.Context, id int) (value *m
 	}
 
 	rows, err = conn.Query(context.Background(),
-		GetAlbumsByTripQuery,
+		getAlbumsByTripQuery,
 		id)
 	if err != nil {
 		return &trip, err
@@ -84,7 +84,7 @@ func (r *websocketRepository) GetTripAuthors(ctx context.Context, id int) ([]int
 	defer conn.Release()
 
 	rows, err := conn.Query(context.Background(),
-		GetTripUsersQuery,
+		getTripUsersQuery,
 		id)
 	if err != nil {
 		return []int{}, err
