@@ -58,6 +58,12 @@ CREATE TABLE Tags
     name TEXT
 );
 
+CREATE TABLE Tags
+(
+    id   SERIAL NOT NULL PRIMARY KEY,
+    name TEXT,
+)
+
 CREATE TABLE Trips
 (
     id          SERIAL      NOT NULL PRIMARY KEY,
@@ -142,11 +148,13 @@ $$;
 CREATE TRIGGER tsquery_place AFTER INSERT ON places FOR EACH ROW
     EXECUTE PROCEDURE tsquery_trigger_function();
 
+
 INSERT INTO Tags ("id", "name")
 VALUES (1, 'Современные здания'), (2, 'Виды'), (3, 'Природа'),
        (4, 'Историческое место'), (5, 'Дворец'), (6, 'Архитектура'),
        (7, 'Церковь'), (8, 'Святое место'), (9, 'Резиденция'),
        (10, 'Заброшенное'), (11, 'Город'), (12, 'Мистическое место');
+
 
 INSERT INTO Countries ("name", "description", "photo")
 VALUES ('Russia',

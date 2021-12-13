@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 
 	"snakealive/m/internal/gateway/trip/usecase"
@@ -342,18 +343,13 @@ func (s *tripGatewayDelivery) AddUserByLink(ctx *fasthttp.RequestCtx) {
 	id, _ := strconv.Atoi(ctx.UserValue("id").(string))
 	author := ctx.UserValue(cnst.UserIDContextKey).(int)
 
-	responce, err := s.manager.AddUserByLink(ctx, author, id, code)
+	redirectURI, err := s.manager.AddUserByLink(ctx, author, id, code)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
 
-	bytes, err := json.Marshal(responce)
-	if err != nil {
-		ctx.SetStatusCode(fasthttp.StatusBadRequest)
-		return
-	}
+	fmt.Println(redirectURI)
 
-	ctx.SetStatusCode(fasthttp.StatusOK)
-	ctx.Response.SetBody(bytes)
+	ctx.Redirect(redirectURI, 302)
 }
