@@ -4,7 +4,7 @@ services:
     image: znajderko/snake_auth
     build:
       dockerfile: Dockerfile.auth_service
-      context: .
+      context: ../.
       args:
         - APP_PKG_NAME=snakealive/m
         - GOOS=linux
@@ -22,7 +22,7 @@ services:
     image: znajderko/snake_sight
     build:
       dockerfile: Dockerfile.sight_service
-      context: .
+      context: ../.
       args:
         - APP_PKG_NAME=snakealive/m
         - GOOS=linux
@@ -39,7 +39,7 @@ services:
     image: znajderko/snake_trip
     build:
       dockerfile: Dockerfile.trip_service
-      context: .
+      context: ../.
       args:
         - APP_PKG_NAME=snakealive/m
         - GOOS=linux
@@ -56,7 +56,7 @@ services:
     image: znajderko/snake_review
     build:
       dockerfile: Dockerfile.review_service
-      context: .
+      context: ../.
       args:
         - APP_PKG_NAME=snakealive/m
         - GOOS=linux
@@ -78,7 +78,7 @@ services:
       - review_service
     build:
       dockerfile: Dockerfile.gateway
-      context: .
+      context: ../.
       args:
         - APP_PKG_NAME=snakealive/m
         - GOOS=linux
