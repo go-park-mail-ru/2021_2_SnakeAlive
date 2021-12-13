@@ -8,4 +8,5 @@ const (
 	ORDER BY tr.day, tr.order`
 	getAlbumsByTripQuery = `SELECT id, title, description, photos FROM Albums WHERE trip_id = $1`
 	getTripUsersQuery    = `SELECT user_id FROM TripsUsers WHERE trip_id = $1`
+	validateUserSession  = "SELECT user_id FROM Cookies WHERE hash = $1"
 )

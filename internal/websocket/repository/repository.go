@@ -13,6 +13,7 @@ type WebsocketRepository interface {
 	GetTripAuthors(ctx context.Context, id int) ([]int, error)
 	AddConnection(userId int, conn *websocket.Conn)
 	GetConnections(users []int) []*websocket.Conn
+	ValidateSession(ctx context.Context, hash string) (int, error)
 }
 
 type websocketRepository struct {
@@ -46,6 +47,7 @@ func (r *websocketRepository) GetTripById(ctx context.Context, id int) (value *m
 	if err != nil {
 		return &trip, err
 	}
+	defer rows.Close()
 
 	var place models.Place
 	for rows.Next() {
@@ -89,6 +91,7 @@ func (r *websocketRepository) GetTripAuthors(ctx context.Context, id int) ([]int
 	if err != nil {
 		return []int{}, err
 	}
+	defer rows.Close()
 
 	var ids []int
 	var userId int
@@ -113,4 +116,24 @@ func (r *websocketRepository) GetConnections(users []int) []*websocket.Conn {
 		conns.mu.Unlock()
 	}
 	return sockets
+}
+
+func (r *websocketRepository) ValidateSession(ctx context.Context, hash string) (int, error) {
+	var userId int
+
+	conn, err := r.dataHolder.Acquire(context.Background())
+	if err != nil {
+		return userId, err
+	}
+	defer conn.Release()
+
+	err = conn.QueryRow(context.Background(),
+		validateUserSession,
+		hash,
+	).Scan(&userId)
+	if err != nil {
+		return userId, err
+	}
+
+	return userId, nil
 }

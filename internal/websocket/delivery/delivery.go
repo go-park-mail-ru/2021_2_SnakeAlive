@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"snakealive/m/internal/models"
 	"snakealive/m/internal/websocket/usecase"
+	cnst "snakealive/m/pkg/constants"
 
 	"github.com/gorilla/websocket"
 )
@@ -26,16 +27,29 @@ func NewWebSocketDelivery(websocketUsecase usecase.WebsocketUseCase) WebsocketDe
 }
 
 func (d *websocketDelivery) Connect(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie(cnst.CookieName)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("{}"))
+		return
+	}
+
+	userId, err := d.websocketUsecase.ValidateSession(r.Context(), cookie.Value)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("{}"))
+		return
+	}
+
 	var upgrader = websocket.Upgrader{}
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		log.Printf("error while connecting: %s", err)
 		w.Write([]byte("{}"))
 		return
 	}
 
-	// get user id here
-	userId := 1
 	d.websocketUsecase.Connect(userId, conn)
 }
 

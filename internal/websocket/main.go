@@ -1,23 +1,27 @@
 package main
 
 import (
-	"context"
 	"log"
 	"net/http"
-	"os"
+	"snakealive/m/internal/websocket/config"
 	"snakealive/m/internal/websocket/delivery"
 	"snakealive/m/internal/websocket/repository"
 	"snakealive/m/internal/websocket/usecase"
-
-	"github.com/jackc/pgx/v4/pgxpool"
+	"snakealive/m/pkg/helpers"
 )
 
 func main() {
-	url := "postgres://tripadvisor:12345@localhost:5432/tripadvisor"
-	dbpool, err := pgxpool.Connect(context.Background(), url)
+
+	var cfg config.Config
+	if err := cfg.Setup(); err != nil {
+		log.Fatal("failed to setup cfg: ", err)
+		return
+	}
+
+	dbpool, err := helpers.CreatePGXPool(cfg.Ctx, cfg.DBUrl, cfg.Logger)
 	if err != nil {
-		log.Printf("Unable to connect to database: %v\n", err)
-		os.Exit(1)
+		log.Fatal("failed to connect to db: ", err)
+		return
 	}
 	defer dbpool.Close()
 
@@ -26,5 +30,5 @@ func main() {
 	http.HandleFunc("/connect", delivery.Connect)
 	http.HandleFunc("/", delivery.HandleRequest)
 
-	http.ListenAndServe(":5050", nil)
+	http.ListenAndServe(cfg.Port, nil)
 }

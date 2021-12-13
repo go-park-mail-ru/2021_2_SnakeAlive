@@ -14,6 +14,7 @@ type WebsocketUseCase interface {
 	Update(ctx context.Context, tripId int) (*trip.Trip, error)
 	Connect(userId int, conn *websocket.Conn)
 	SendResponce(users []int, responce models.TripResponce) error
+	ValidateSession(ctx context.Context, hash string) (int, error)
 }
 
 type websocketUseCase struct {
@@ -44,4 +45,8 @@ func (u websocketUseCase) SendResponce(users []int, responce models.TripResponce
 		conn.WriteJSON(result)
 	}
 	return nil
+}
+
+func (u websocketUseCase) ValidateSession(ctx context.Context, hash string) (int, error) {
+	return u.websocketRepository.ValidateSession(ctx, hash)
 }
