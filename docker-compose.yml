@@ -65,14 +65,6 @@ services:
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
 
-  prometheus:
-    image: prom/prometheus
-    ports:
-      - "9000:9090"
-    volumes:
-      - ./monitoring/prometheus:/etc/prometheus
-    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
-
   gateway:
     depends_on:
       - trip_service
@@ -99,17 +91,28 @@ services:
       - GATEWAY_S3_ENDPOINT=http://hb.bizmrg.com
       - GATEWAY_S3_PUBLIC_ENDPOINT=https://snakehastrip.hb.bizmrg.com/
       - GATEWAY_S3_SECRET_KEY=7qdqBBT9xeKDV3iAdKco4jqEhmjpMqiyk3bLL9PcU2S7
-      - GATEWAY_S3_SECRET_ID=rcLyfa3DhATRNmeterCZLk
+      - GATEWAY_S3_SECRET_ID=
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
 
+  prometheus:
+    profiles: ["monitoring"]
+    image: prom/prometheus
+    ports:
+      - "9000:9090"
+    volumes:
+      - ./monitoring/prometheus:/etc/prometheus
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
+
   node-exporter:
+    profiles: [ "monitoring" ]
     image: prom/node-exporter:latest
     restart: unless-stopped
     ports:
       - "9100:9100"
 
   grafana:
+    profiles: [ "monitoring" ]
     image: grafana/grafana:latest
     volumes:
       - ./monitoring/grafana/grafana.ini:/etc/grafana/grafana.ini
