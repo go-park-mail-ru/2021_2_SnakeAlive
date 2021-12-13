@@ -67,7 +67,7 @@ func (s *tripGatewayDelivery) Trip(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	ctx.Write(bytes)
+	_, _ = ctx.Write(bytes)
 }
 
 func (s *tripGatewayDelivery) AddTrip(ctx *fasthttp.RequestCtx) {
@@ -92,7 +92,7 @@ func (s *tripGatewayDelivery) AddTrip(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	ctx.Write(bytes)
+	_, _ = ctx.Write(bytes)
 }
 
 func (s *tripGatewayDelivery) UpdateTrip(ctx *fasthttp.RequestCtx) {
@@ -118,7 +118,7 @@ func (s *tripGatewayDelivery) UpdateTrip(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	ctx.Write(bytes)
+	_, _ = ctx.Write(bytes)
 }
 
 func (s *tripGatewayDelivery) DeleteTrip(ctx *fasthttp.RequestCtx) {
@@ -138,7 +138,7 @@ func (s *tripGatewayDelivery) DeleteTrip(ctx *fasthttp.RequestCtx) {
 	if err != nil {
 		return
 	}
-	ctx.Write(bytes)
+	_, _ = ctx.Write(bytes)
 }
 
 func (s *tripGatewayDelivery) Album(ctx *fasthttp.RequestCtx) {
@@ -163,7 +163,7 @@ func (s *tripGatewayDelivery) Album(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	ctx.Write(bytes)
+	_, _ = ctx.Write(bytes)
 }
 
 func (s *tripGatewayDelivery) AddAlbum(ctx *fasthttp.RequestCtx) {
@@ -188,7 +188,7 @@ func (s *tripGatewayDelivery) AddAlbum(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	ctx.Write(bytes)
+	_, _ = ctx.Write(bytes)
 }
 
 func (s *tripGatewayDelivery) UpdateAlbum(ctx *fasthttp.RequestCtx) {
@@ -214,7 +214,7 @@ func (s *tripGatewayDelivery) UpdateAlbum(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	ctx.Write(bytes)
+	_, _ = ctx.Write(bytes)
 }
 
 func (s *tripGatewayDelivery) DeleteAlbum(ctx *fasthttp.RequestCtx) {
@@ -233,7 +233,7 @@ func (s *tripGatewayDelivery) DeleteAlbum(ctx *fasthttp.RequestCtx) {
 	if err != nil {
 		return
 	}
-	ctx.Write(bytes)
+	_, _ = ctx.Write(bytes)
 }
 
 func (s *tripGatewayDelivery) SightsByTrip(ctx *fasthttp.RequestCtx) {
@@ -315,7 +315,7 @@ func (s *tripGatewayDelivery) AddTripUser(ctx *fasthttp.RequestCtx) {
 	if err != nil {
 		return
 	}
-	ctx.Write(bytes)
+	_, _ = ctx.Write(bytes)
 }
 
 func (s *tripGatewayDelivery) ShareLink(ctx *fasthttp.RequestCtx) {

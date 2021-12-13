@@ -18,11 +18,10 @@ type ListenerHandler func(c *fasthttp.RequestCtx) string
 
 // Prometheus contains the metrics gathered by the instance and its path
 type Prometheus struct {
-	reqDur        *prometheus.HistogramVec
-	router        *router.Router
-	listenAddress string
-	MetricsPath   string
-	Handler       fasthttp.RequestHandler
+	reqDur      *prometheus.HistogramVec
+	router      *router.Router
+	MetricsPath string
+	Handler     fasthttp.RequestHandler
 }
 
 // NewPrometheus generates a new set of metrics with a certain subsystem name
@@ -35,38 +34,9 @@ func NewPrometheus(subsystem string) *Prometheus {
 	return p
 }
 
-// SetListenAddress for exposing metrics on address. If not set, it will be exposed at the
-// same address of api that is being used
-func (p *Prometheus) SetListenAddress(address string) {
-	p.listenAddress = address
-	if p.listenAddress != "" {
-		p.router = router.New()
-	}
-}
-
-// SetListenAddressWithRouter for using a separate router to expose metrics. (this keeps things like GET /metrics out of
-// your content's access log).
-func (p *Prometheus) SetListenAddressWithRouter(listenAddress string, r *router.Router) {
-	p.listenAddress = listenAddress
-	if len(p.listenAddress) > 0 {
-		p.router = r
-	}
-}
-
 // SetMetricsPath set metrics paths for Custom path
 func (p *Prometheus) SetMetricsPath(r *router.Router) {
-	if p.listenAddress != "" {
-		r.GET(p.MetricsPath, prometheusHandler())
-		p.runServer()
-	} else {
-		r.GET(p.MetricsPath, prometheusHandler())
-	}
-}
-
-func (p *Prometheus) runServer() {
-	if p.listenAddress != "" {
-		go fasthttp.ListenAndServe(p.listenAddress, p.router.Handler)
-	}
+	r.GET(p.MetricsPath, prometheusHandler())
 }
 
 func (p *Prometheus) registerMetrics(subsystem string) {
@@ -80,7 +50,7 @@ func (p *Prometheus) registerMetrics(subsystem string) {
 		[]string{"code", "path", "method"},
 	)
 
-	prometheus.Register(p.reqDur)
+	_ = prometheus.Register(p.reqDur)
 }
 
 // Custom adds the middleware to a fasthttp

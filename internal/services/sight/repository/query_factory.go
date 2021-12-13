@@ -43,7 +43,7 @@ func (q *queryFactory) CreateSearchSights(req *models.SightsSearch) *query.Query
 	}
 	if req.Search != "" {
 		statements = append(statements, SearchStatement(pos))
-		params = append(params, strings.ToLower(req.Search), strings.ToLower(req.Search) + "%")
+		params = append(params, strings.ToLower(req.Search), strings.ToLower(req.Search)+"%")
 	}
 
 	return &query.Query{

@@ -35,7 +35,7 @@ const (
 )
 
 func SearchStatement(pos int) string {
-	return "(tsq @@ phraseto_tsquery('russian',LOWER($" + strconv.Itoa(pos) + ")) OR LOWER(name) LIKE $" + strconv.Itoa(pos + 1) + ")"
+	return "(tsq @@ phraseto_tsquery('russian',LOWER($" + strconv.Itoa(pos) + ")) OR LOWER(name) LIKE $" + strconv.Itoa(pos+1) + ")"
 }
 
 func Country(pos int) string {

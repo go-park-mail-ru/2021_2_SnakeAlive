@@ -31,7 +31,7 @@ func (u *countryStorage) GetCountriesList(ctx context.Context) (models.Countries
 
 	for rows.Next() {
 		var country models.Country
-		err = rows.Scan(&country.Id, &country.Name, &country.Description, &country.Photo)
+		_ = rows.Scan(&country.Id, &country.Name, &country.Description, &country.Photo)
 		countries = append(countries, country)
 	}
 

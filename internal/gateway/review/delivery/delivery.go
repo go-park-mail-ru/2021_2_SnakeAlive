@@ -2,11 +2,12 @@ package delivery
 
 import (
 	"encoding/json"
+	"strconv"
+
 	"snakealive/m/internal/gateway/review/usecase"
 	"snakealive/m/internal/services/review/models"
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/error_adapter"
-	"strconv"
 
 	"github.com/valyala/fasthttp"
 )
@@ -62,8 +63,7 @@ func (d *reviewGatewayDelivery) ReviewsByPlace(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	ctx.Write(bytes)
-
+	_, _ = ctx.Write(bytes)
 }
 func (d *reviewGatewayDelivery) AddReviewToPlace(ctx *fasthttp.RequestCtx) {
 	userID := ctx.UserValue(cnst.UserIDContextKey).(int)
@@ -88,8 +88,7 @@ func (d *reviewGatewayDelivery) AddReviewToPlace(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	ctx.Write(bytes)
-
+	_, _ = ctx.Write(bytes)
 }
 func (d *reviewGatewayDelivery) DelReview(ctx *fasthttp.RequestCtx) {
 	param, err := strconv.Atoi(ctx.UserValue("id").(string))
