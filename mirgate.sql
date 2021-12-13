@@ -77,9 +77,9 @@ CREATE TABLE Trips
 
 CREATE TABLE TripsUsers
 (
-    id       SERIAL NOT NULL PRIMARY KEY,
+    id      SERIAL NOT NULL PRIMARY KEY,
     user_id INT    NOT NULL,
-    trip_id  INT    NOT NULL,
+    trip_id INT    NOT NULL,
     CONSTRAINT fk_trip FOREIGN KEY (trip_id) REFERENCES trips (id) ON DELETE CASCADE,
     CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
@@ -119,6 +119,7 @@ CREATE TABLE Countries
     id          SERIAL NOT NULL PRIMARY KEY,
     name        TEXT   NOT NULL,
     description TEXT   NOT NULL,
+    translated  TEXT   NOT NULL,
     photo       TEXT
 );
 
@@ -134,44 +135,58 @@ CREATE TABLE Albums
     CONSTRAINT fk_author FOREIGN KEY (author) REFERENCES users (id) ON DELETE CASCADE
 );
 
-CREATE OR REPLACE FUNCTION tsquery_trigger_function()
+CREATE
+OR REPLACE FUNCTION tsquery_trigger_function()
     RETURNS TRIGGER
     LANGUAGE PLPGSQL
 AS
 $$
-    BEGIN
-    UPDATE places SET tsq = to_tsvector('russian',LOWER(new.name)) WHERE id = NEW.id;
-    RETURN NEW;
-    END;
+BEGIN
+UPDATE places
+SET tsq = to_tsvector('russian', LOWER(new.name))
+WHERE id = NEW.id;
+RETURN NEW;
+END;
 $$;
 
-CREATE TRIGGER tsquery_place AFTER INSERT ON places FOR EACH ROW
+CREATE TRIGGER tsquery_place
+    AFTER INSERT
+    ON places
+    FOR EACH ROW
     EXECUTE PROCEDURE tsquery_trigger_function();
 
 
 INSERT INTO Tags ("id", "name")
-VALUES (1, 'Современные здания'), (2, 'Виды'), (3, 'Природа'),
-       (4, 'Историческое место'), (5, 'Дворец'), (6, 'Архитектура'),
-       (7, 'Церковь'), (8, 'Святое место'), (9, 'Резиденция'),
-       (10, 'Заброшенное'), (11, 'Город'), (12, 'Мистическое место');
+VALUES (1, 'Современные здания'),
+       (2, 'Виды'),
+       (3, 'Природа'),
+       (4, 'Историческое место'),
+       (5, 'Дворец'),
+       (6, 'Архитектура'),
+       (7, 'Церковь'),
+       (8, 'Святое место'),
+       (9, 'Резиденция'),
+       (10, 'Заброшенное'),
+       (11, 'Город'),
+       (12, 'Мистическое место');
 
 
-INSERT INTO Countries ("name", "description", "photo")
+INSERT INTO Countries ("name", "description", "photo", "translated")
 VALUES ('Russia',
         'Россия – крупнейшая страна мира, расположенная в Восточной Европе и Северной Азии и омываемая водами Тихого и Северного Ледовитого океанов.',
-        'russia.jpeg');
-INSERT INTO Countries ("name", "description", "photo")
+        'russia.jpeg', 'Россия');
+INSERT INTO Countries ("name", "description", "photo", "translated")
 VALUES ('Germany',
         'Германия – государство в Западной Европе с лесами, реками, горными хребтами и пляжными курортами Северного моря.',
-        'germany.jpeg');
-INSERT INTO Countries ("name", "description", "photo")
+        'germany.jpeg', 'Германия');
+INSERT INTO Countries ("name", "description", "photo", "translated")
 VALUES ('USA',
-        ' Соединенные Штаты Америки – государство, состоящее из 50 штатов, занимает значительную часть Северной Америки. ',
-        'usa.jpeg');
-INSERT INTO Countries ("name", "description", "photo")
+        'Соединенные Штаты Америки – государство, состоящее из 50 штатов, занимает значительную часть Северной Америки. ',
+        'usa.jpeg', 'Соединенные Штаты Америки');
+INSERT INTO Countries ("name", "description", "photo", "translated")
 VALUES ('UK',
         'Великобритания (официальное название – Соединенное Королевство Великобритании и Северной Ирландии) – островное государство на северо-западе Европы, состоящее из Англии, Шотландии, Уэльса и Северной Ирландии. ',
-        'uk.jpeg');
+        'uk.jpeg', 'Великобритания');
 
 INSERT INTO Users ("name", "surname", "password", "email", "description", "avatar")
 VALUES ('Алексадра', 'Волынец', 'AAAcGFzc3dvcmQ=', 'alex@mail.ru', '', 'https://snakehastrip.hb.bizmrg.com/test.jpeg');

@@ -31,7 +31,7 @@ func (u *countryStorage) GetCountriesList(ctx context.Context) (models.Countries
 
 	for rows.Next() {
 		var country models.Country
-		_ = rows.Scan(&country.Id, &country.Name, &country.Description, &country.Photo)
+		_ = rows.Scan(&country.Id, &country.Name, &country.Description, &country.Photo, &country.Translated)
 		countries = append(countries, country)
 	}
 
@@ -43,7 +43,7 @@ func (u *countryStorage) GetById(ctx context.Context, id int) (models.Country, e
 
 	var country models.Country
 	if err := u.conn.QueryRow(ctx, request.Request, request.Params...).Scan(
-		&country.Id, &country.Name, &country.Description, &country.Photo,
+		&country.Id, &country.Name, &country.Description, &country.Photo,&country.Translated,
 	); err != nil {
 		if err == pgx.ErrNoRows {
 			return country, errors.CountryDoesNotExist
@@ -60,7 +60,7 @@ func (u *countryStorage) GetByName(ctx context.Context, name string) (models.Cou
 
 	var country models.Country
 	if err := u.conn.QueryRow(ctx, request.Request, request.Params...).Scan(
-		&country.Id, &country.Name, &country.Description, &country.Photo,
+		&country.Id, &country.Name, &country.Description, &country.Photo, &country.Translated,
 	); err != nil {
 		if err == pgx.ErrNoRows {
 			return country, errors.CountryDoesNotExist
