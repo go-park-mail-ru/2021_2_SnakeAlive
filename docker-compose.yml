@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   auth_service:
-    image: znajderko/snake
+    image: znajderko/snake/auth_service
     build:
       dockerfile: Dockerfile.auth_service
       context: .
@@ -19,7 +19,7 @@ services:
       - "host.docker.internal:172.17.0.1"
 
   sight_service:
-    image: znajderko/snake
+    image: znajderko/snake/sight_service
     build:
       dockerfile: Dockerfile.sight_service
       context: .
@@ -36,7 +36,7 @@ services:
       - "host.docker.internal:172.17.0.1"
 
   trip_service:
-    image: znajderko/snake
+    image: znajderko/snake/trip_service
     build:
       dockerfile: Dockerfile.trip_service
       context: .
@@ -53,7 +53,7 @@ services:
       - "host.docker.internal:172.17.0.1"
 
   review_service:
-    image: znajderko/snake
+    image: znajderko/snake/review_service
     build:
       dockerfile: Dockerfile.review_service
       context: .
@@ -70,7 +70,7 @@ services:
       - "host.docker.internal:172.17.0.1"
 
   gateway:
-    image: znajderko/snake
+    image: znajderko/snake/gateway
     depends_on:
       - trip_service
       - auth_service
