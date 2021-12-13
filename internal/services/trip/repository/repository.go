@@ -100,7 +100,7 @@ func (t *tripRepository) GetTripById(ctx context.Context, id int) (*models.Trip,
 
 	var place models.Place
 	for rows.Next() {
-		rows.Scan(&place.Id, &place.Name, &place.Tags, &place.Description, &place.Rating, &place.Country, &place.Photos, &place.Day)
+		_ = rows.Scan(&place.Id, &place.Name, &place.Tags, &place.Description, &place.Rating, &place.Country, &place.Photos, &place.Day)
 		trip.Sights = append(trip.Sights, place)
 	}
 
@@ -113,7 +113,7 @@ func (t *tripRepository) GetTripById(ctx context.Context, id int) (*models.Trip,
 
 	var album models.Album
 	for rows.Next() {
-		rows.Scan(&album.Id, &album.Title, &album.Description, &album.Photos)
+		_ = rows.Scan(&album.Id, &album.Title, &album.Description, &album.Photos)
 		trip.Albums = append(trip.Albums, album)
 	}
 
@@ -216,7 +216,7 @@ func (t *tripRepository) GetTripAuthors(ctx context.Context, id int) ([]int, err
 	var ids []int
 	var userId int
 	for rows.Next() {
-		rows.Scan(&userId)
+		_ = rows.Scan(&userId)
 		ids = append(ids, userId)
 	}
 	return ids, err
@@ -239,7 +239,7 @@ func (t *tripRepository) GetTripsByUser(ctx context.Context, id int) (*[]models.
 	trips := make([]models.Trip, 0)
 	var trip models.Trip
 	for rows.Next() {
-		rows.Scan(&trip.Id, &trip.Title, &trip.Description)
+		_ = rows.Scan(&trip.Id, &trip.Title, &trip.Description)
 		trips = append(trips, trip)
 	}
 
@@ -253,7 +253,7 @@ func (t *tripRepository) GetTripsByUser(ctx context.Context, id int) (*[]models.
 
 		var place models.Place
 		for rows.Next() {
-			rows.Scan(&place.Id, &place.Name, &place.Tags, &place.Description, &place.Rating, &place.Country, &place.Photos, &place.Day)
+			_ = rows.Scan(&place.Id, &place.Name, &place.Tags, &place.Description, &place.Rating, &place.Country, &place.Photos, &place.Day)
 			trips[i].Sights = append(trips[i].Sights, place)
 		}
 
@@ -266,7 +266,7 @@ func (t *tripRepository) GetTripsByUser(ctx context.Context, id int) (*[]models.
 
 		var album models.Album
 		for rows.Next() {
-			rows.Scan(&album.Id, &album.Title, &album.Description, &album.Photos)
+			_ = rows.Scan(&album.Id, &album.Title, &album.Description, &album.Photos)
 			trips[i].Albums = append(trips[i].Albums, album)
 		}
 
@@ -385,7 +385,7 @@ func (t *tripRepository) SightsByTrip(ctx context.Context, id int) (*[]int, erro
 	var ids []int
 	var sightId int
 	for rows.Next() {
-		rows.Scan(&sightId)
+		_ = rows.Scan(&sightId)
 		ids = append(ids, sightId)
 	}
 	return &ids, nil
@@ -408,7 +408,7 @@ func (t *tripRepository) AlbumsByUser(ctx context.Context, id int) (*[]models.Al
 	var albums []models.Album
 	var album models.Album
 	for rows.Next() {
-		rows.Scan(&album.Id, &album.Title, &album.Description, &album.TripId, &album.UserId, &album.Photos)
+		_ = rows.Scan(&album.Id, &album.Title, &album.Description, &album.TripId, &album.UserId, &album.Photos)
 		albums = append(albums, album)
 	}
 	return &albums, nil

@@ -10,19 +10,24 @@ import (
 type SightUseCase interface {
 	GetSightByID(ctx context.Context, id int) (models.SightMetadata, error)
 	GetSightByCountry(ctx context.Context, country string) ([]models.Sight, error)
-	SearchSights(ctx context.Context, search string, skip, limit int) ([]models.SightSearch, error)
-	GetSightsByTag(ctx context.Context, tag string) ([]models.Sight, error)
+	SearchSights(ctx context.Context, req *models.SearchSights) ([]models.SightSearch, error)
+	GetSightsByTag(ctx context.Context, tag int) ([]models.Sight, error)
+
+	GetTags(ctx context.Context) ([]models.Tag, error)
+	GetRandomTags(ctx context.Context) ([]models.Tag, error)
 }
 
 type sightUseCase struct {
 	sightGRPC sightGRPC
 }
 
-func (t *sightUseCase) SearchSights(ctx context.Context, search string, skip, limit int) ([]models.SightSearch, error) {
+func (t *sightUseCase) SearchSights(ctx context.Context, req *models.SearchSights) ([]models.SightSearch, error) {
 	response, err := t.sightGRPC.SearchSights(ctx, &sight_service.SearchSightRequest{
-		Search: search,
-		Skip:   int64(skip),
-		Limit:  int64(limit),
+		Search:    req.Search,
+		Skip:      int64(req.Skip),
+		Limit:     int64(req.Limit),
+		Countries: req.Countries,
+		Tags:      req.Tags,
 	})
 	if err != nil {
 		return []models.SightSearch{}, err
@@ -69,8 +74,42 @@ func (t *sightUseCase) GetSightByCountry(ctx context.Context, country string) ([
 	return adapted, nil
 }
 
-func (t *sightUseCase) GetSightsByTag(ctx context.Context, tag string) ([]models.Sight, error) {
-	response, err := t.sightGRPC.GetSightsByTag(ctx, &sight_service.GetSightsByTagRequest{Tag: tag})
+func (t *sightUseCase) GetTags(ctx context.Context) ([]models.Tag, error) {
+	response, err := t.sightGRPC.GetTags(ctx, &sight_service.GetTagsRequest{})
+	if err != nil {
+		return []models.Tag{}, err
+	}
+
+	tags := make([]models.Tag, len(response.Tags))
+	for i, tag := range response.Tags {
+		tags[i] = models.Tag{
+			Id:   int(tag.Id),
+			Name: tag.Name,
+		}
+	}
+
+	return tags, nil
+}
+
+func (t *sightUseCase) GetRandomTags(ctx context.Context) ([]models.Tag, error) {
+	response, err := t.sightGRPC.GetRandomTags(ctx, &sight_service.GetTagsRequest{})
+	if err != nil {
+		return []models.Tag{}, err
+	}
+
+	tags := make([]models.Tag, len(response.Tags))
+	for i, tag := range response.Tags {
+		tags[i] = models.Tag{
+			Id:   int(tag.Id),
+			Name: tag.Name,
+		}
+	}
+
+	return tags, nil
+}
+
+func (t *sightUseCase) GetSightsByTag(ctx context.Context, tag int) ([]models.Sight, error) {
+	response, err := t.sightGRPC.GetSightsByTag(ctx, &sight_service.GetSightsByTagRequest{Tag: int64(tag)})
 	if err != nil {
 		return []models.Sight{}, err
 	}

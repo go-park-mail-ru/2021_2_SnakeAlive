@@ -17,7 +17,23 @@ type loggingMiddleware struct {
 	next SightRepository
 }
 
-func (l *loggingMiddleware) GetSightByTag(ctx context.Context, tag string) (sights []models.Sight, err error) {
+func (l *loggingMiddleware) GetTags(ctx context.Context) (tags []models.Tag, err error) {
+	l.logger.Infow(module,
+		"Action", "GetTags",
+	)
+	defer func() {
+		if err != nil {
+			l.logger.Infow(module,
+				"Action", "GetTags",
+				"Error", err,
+			)
+		}
+	}()
+
+	return l.next.GetTags(ctx)
+}
+
+func (l *loggingMiddleware) GetSightByTag(ctx context.Context, tag int64) (sights []models.Sight, err error) {
 	l.logger.Infow(module,
 		"Action", "GetSightByTag",
 		"Request", tag,
@@ -89,22 +105,22 @@ func (l *loggingMiddleware) GetSightByID(ctx context.Context, id int) (sight mod
 	return l.next.GetSightByID(ctx, id)
 }
 
-func (l *loggingMiddleware) SearchSights(ctx context.Context, search string, skip, limit int64) (sights []models.Sight, err error) {
+func (l *loggingMiddleware) SearchSights(ctx context.Context, req *models.SightsSearch) (sights []models.Sight, err error) {
 	l.logger.Infow(module,
 		"Action", "GetSightByID",
-		"Request", []interface{}{search, skip, limit},
+		"Request", req,
 	)
 	defer func() {
 		if err != nil {
 			l.logger.Infow(module,
 				"Action", "GetSightByID",
-				"Request", []interface{}{search, skip, limit},
+				"Request", req,
 				"Error", err,
 			)
 		}
 	}()
 
-	return l.next.SearchSights(ctx, search, skip, limit)
+	return l.next.SearchSights(ctx, req)
 }
 
 func NewLoggingMiddleware(

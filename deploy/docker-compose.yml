@@ -4,7 +4,7 @@ services:
     image: znajderko/snake_auth
     build:
       dockerfile: Dockerfile.auth_service
-      context: .
+      context: ../.
       args:
         - APP_PKG_NAME=snakealive/m
         - GOOS=linux
@@ -12,7 +12,7 @@ services:
       - "10123:10123"
       - "11123:8080"
     environment:
-      - USER_DB_URL=postgres://tripadvisor:12345@host.docker.internal:5432/tripadvisor
+      - USER_DB_URL=${PSQL_CONN}
       - USER_GRPC_PORT=10123
       - USER_PREFIX_LEN=3
     extra_hosts:
@@ -22,7 +22,7 @@ services:
     image: znajderko/snake_sight
     build:
       dockerfile: Dockerfile.sight_service
-      context: .
+      context: ../.
       args:
         - APP_PKG_NAME=snakealive/m
         - GOOS=linux
@@ -30,7 +30,7 @@ services:
       - "10124:10124"
       - "11124:8080"
     environment:
-      - SIGHT_DB_URL=postgres://tripadvisor:12345@host.docker.internal:5432/tripadvisor
+      - SIGHT_DB_URL=${PSQL_CONN}
       - SIGHT_GRPC_PORT=10124
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
@@ -39,7 +39,7 @@ services:
     image: znajderko/snake_trip
     build:
       dockerfile: Dockerfile.trip_service
-      context: .
+      context: ../.
       args:
         - APP_PKG_NAME=snakealive/m
         - GOOS=linux
@@ -47,7 +47,7 @@ services:
       - "6666:6666"
       - "16666:8080"
     environment:
-      - TRIP_DB_URL=postgres://tripadvisor:12345@host.docker.internal:5432/tripadvisor
+      - TRIP_DB_URL=${PSQL_CONN}
       - TRIP_GRPC_PORT=6666
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
@@ -56,7 +56,7 @@ services:
     image: znajderko/snake_review
     build:
       dockerfile: Dockerfile.review_service
-      context: .
+      context: ../.
       args:
         - APP_PKG_NAME=snakealive/m
         - GOOS=linux
@@ -64,7 +64,7 @@ services:
       - "9090:9090"
       - "19090:8080"
     environment:
-      - REVIEW_DB_URL=postgres://tripadvisor:12345@host.docker.internal:5432/tripadvisor
+      - REVIEW_DB_URL=${PSQL_CONN}
       - REVIEW_GRPC_PORT=9090
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
@@ -78,7 +78,7 @@ services:
       - review_service
     build:
       dockerfile: Dockerfile.gateway
-      context: .
+      context: ../.
       args:
         - APP_PKG_NAME=snakealive/m
         - GOOS=linux
@@ -91,12 +91,12 @@ services:
       - GATEWAY_TRIP_ENDPOINT=host.docker.internal:6666
       - GATEWAY_SIGHT_ENDPOINT=host.docker.internal:10124
       - GATEWAY_REVIEW_ENDPOINT=host.docker.internal:9090
-      - GATEWAY_DB_URL=postgres://tripadvisor:12345@host.docker.internal:5432/tripadvisor
+      - GATEWAY_DB_URL=${PSQL_CONN}
       - GATEWAY_S3_BUCKET=snakehastrip
       - GATEWAY_S3_ENDPOINT=http://hb.bizmrg.com
       - GATEWAY_S3_PUBLIC_ENDPOINT=https://snakehastrip.hb.bizmrg.com/
-      - GATEWAY_S3_SECRET_KEY=7qdqBBT9xeKDV3iAdKco4jqEhmjpMqiyk3bLL9PcU2S7
-      - GATEWAY_S3_SECRET_ID=
+      - GATEWAY_S3_SECRET_KEY=${S3_KEY}
+      - GATEWAY_S3_SECRET_ID=${S3_ID}
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
 

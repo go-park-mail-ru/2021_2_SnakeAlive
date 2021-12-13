@@ -11,3 +11,15 @@ type Sight struct {
 	Description string
 	Photos      []string
 }
+
+type Tag struct {
+	Id   int
+	Name string
+}
+
+type SightsSearch struct {
+	Skip, Limit int
+	Search      string
+	Tags        []int64
+	Countries   []string
+}
