@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/mailru/easyjson"
 	"snakealive/m/internal/gateway/sight/usecase"
 	"snakealive/m/internal/models"
 	cnst "snakealive/m/pkg/constants"
@@ -70,7 +71,7 @@ func (s *sightDelivery) GetSightByID(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	b, _ := json.Marshal(response)
+	b, _ := easyjson.Marshal(response)
 	ctx.SetStatusCode(http.StatusOK)
 	ctx.SetBody(b)
 }

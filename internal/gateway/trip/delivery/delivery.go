@@ -2,14 +2,14 @@ package delivery
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 
 	"snakealive/m/internal/gateway/trip/usecase"
-	"snakealive/m/internal/services/trip/models"
+	"snakealive/m/internal/models"
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/error_adapter"
 
+	"github.com/mailru/easyjson"
 	"github.com/valyala/fasthttp"
 )
 
@@ -60,7 +60,7 @@ func (s *tripGatewayDelivery) Trip(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	bytes, err := json.Marshal(trip)
+	bytes, err := easyjson.Marshal(trip)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
@@ -74,7 +74,7 @@ func (s *tripGatewayDelivery) AddTrip(ctx *fasthttp.RequestCtx) {
 	userID := ctx.UserValue(cnst.UserIDContextKey).(int)
 
 	trip := new(models.Trip)
-	if err := json.Unmarshal(ctx.PostBody(), &trip); err != nil {
+	if err := easyjson.Unmarshal(ctx.PostBody(), trip); err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
@@ -85,7 +85,7 @@ func (s *tripGatewayDelivery) AddTrip(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	bytes, err := json.Marshal(responceTrip)
+	bytes, err := easyjson.Marshal(responceTrip)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
@@ -100,7 +100,7 @@ func (s *tripGatewayDelivery) UpdateTrip(ctx *fasthttp.RequestCtx) {
 	userID := ctx.UserValue(cnst.UserIDContextKey).(int)
 
 	trip := new(models.Trip)
-	if err := json.Unmarshal(ctx.PostBody(), &trip); err != nil {
+	if err := easyjson.Unmarshal(ctx.PostBody(), trip); err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
@@ -111,7 +111,7 @@ func (s *tripGatewayDelivery) UpdateTrip(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	bytes, err := json.Marshal(responceTrip)
+	bytes, err := easyjson.Marshal(responceTrip)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
@@ -122,7 +122,6 @@ func (s *tripGatewayDelivery) UpdateTrip(ctx *fasthttp.RequestCtx) {
 }
 
 func (s *tripGatewayDelivery) DeleteTrip(ctx *fasthttp.RequestCtx) {
-
 	param, _ := strconv.Atoi(ctx.UserValue("id").(string))
 	userID := ctx.UserValue(cnst.UserIDContextKey).(int)
 
@@ -156,7 +155,7 @@ func (s *tripGatewayDelivery) Album(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	bytes, err := json.Marshal(album)
+	bytes, err := easyjson.Marshal(album)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
@@ -170,7 +169,7 @@ func (s *tripGatewayDelivery) AddAlbum(ctx *fasthttp.RequestCtx) {
 	userID := ctx.UserValue(cnst.UserIDContextKey).(int)
 
 	album := new(models.Album)
-	if err := json.Unmarshal(ctx.PostBody(), &album); err != nil {
+	if err := easyjson.Unmarshal(ctx.PostBody(), album); err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
@@ -181,7 +180,7 @@ func (s *tripGatewayDelivery) AddAlbum(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	bytes, err := json.Marshal(album)
+	bytes, err := easyjson.Marshal(album)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
@@ -196,7 +195,7 @@ func (s *tripGatewayDelivery) UpdateAlbum(ctx *fasthttp.RequestCtx) {
 	userID := ctx.UserValue(cnst.UserIDContextKey).(int)
 
 	album := new(models.Album)
-	if err := json.Unmarshal(ctx.PostBody(), &album); err != nil {
+	if err := easyjson.Unmarshal(ctx.PostBody(), album); err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
@@ -207,7 +206,7 @@ func (s *tripGatewayDelivery) UpdateAlbum(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	bytes, err := json.Marshal(album)
+	bytes, err := easyjson.Marshal(album)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
@@ -298,7 +297,7 @@ func (s *tripGatewayDelivery) AddTripUser(ctx *fasthttp.RequestCtx) {
 	author := ctx.UserValue(cnst.UserIDContextKey).(int)
 
 	user := new(models.TripUser)
-	if err := json.Unmarshal(ctx.PostBody(), &user); err != nil {
+	if err := easyjson.Unmarshal(ctx.PostBody(), user); err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
@@ -348,8 +347,6 @@ func (s *tripGatewayDelivery) AddUserByLink(ctx *fasthttp.RequestCtx) {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
-
-	fmt.Println(redirectURI)
 
 	ctx.Redirect(redirectURI, 302)
 }

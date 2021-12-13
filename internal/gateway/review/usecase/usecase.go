@@ -3,7 +3,8 @@ package usecase
 import (
 	"context"
 	"fmt"
-	"snakealive/m/internal/services/review/models"
+
+	"snakealive/m/internal/models"
 	review_service "snakealive/m/pkg/services/review"
 
 	"github.com/golang/protobuf/ptypes/empty"

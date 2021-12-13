@@ -25,6 +25,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.6.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kr/pretty v0.3.0 // indirect
+	github.com/mailru/easyjson v0.7.7
 	github.com/microcosm-cc/bluemonday v1.0.16
 	github.com/mwitkow/go-proto-validators v0.3.2
 	github.com/prometheus/client_golang v1.11.0

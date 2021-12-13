@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/mailru/easyjson"
 	"github.com/valyala/fasthttp"
 	"snakealive/m/internal/gateway/country/usecase"
 	"snakealive/m/pkg/error_adapter"
@@ -45,7 +46,7 @@ func (c *countryDelivery) GetCountryByID(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	b, _ := json.Marshal(country)
+	b, _ := easyjson.Marshal(country)
 	ctx.SetStatusCode(http.StatusOK)
 	ctx.Response.SetBody(b)
 }
@@ -60,7 +61,7 @@ func (c *countryDelivery) GetCountryByName(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	b, _ := json.Marshal(country)
+	b, _ := easyjson.Marshal(country)
 	ctx.SetStatusCode(http.StatusOK)
 	ctx.Response.SetBody(b)
 }
