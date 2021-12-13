@@ -16,11 +16,26 @@ type SightDelivery interface {
 	GetSightByCountry(ctx *fasthttp.RequestCtx)
 	SearchSights(ctx *fasthttp.RequestCtx)
 	GetSightByTag(ctx *fasthttp.RequestCtx)
+	GetTags(ctx *fasthttp.RequestCtx)
 }
 
 type sightDelivery struct {
 	errorAdapter error_adapter.HttpAdapter
 	manager      usecase.SightUseCase
+}
+
+func (s *sightDelivery) GetTags(ctx *fasthttp.RequestCtx) {
+	response, err := s.manager.GetTags(ctx)
+	if err != nil {
+		httpError := s.errorAdapter.AdaptError(err)
+		ctx.SetStatusCode(httpError.Code)
+		ctx.SetBody([]byte(httpError.MSG))
+		return
+	}
+
+	b, _ := json.Marshal(response)
+	ctx.SetStatusCode(http.StatusOK)
+	ctx.SetBody(b)
 }
 
 func (s *sightDelivery) GetSightByID(ctx *fasthttp.RequestCtx) {
@@ -69,8 +84,13 @@ func (s *sightDelivery) GetSightByTag(ctx *fasthttp.RequestCtx) {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
+	tagID, err := strconv.Atoi(tag)
+	if err != nil {
+		ctx.SetStatusCode(fasthttp.StatusBadRequest)
+		return
+	}
 
-	response, err := s.manager.GetSightsByTag(ctx, tag)
+	response, err := s.manager.GetSightsByTag(ctx, tagID)
 	if err != nil {
 		httpError := s.errorAdapter.AdaptError(err)
 		ctx.SetStatusCode(httpError.Code)

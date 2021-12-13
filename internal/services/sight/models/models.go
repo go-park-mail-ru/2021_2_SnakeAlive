@@ -11,3 +11,8 @@ type Sight struct {
 	Description string
 	Photos      []string
 }
+
+type Tag struct {
+	Id   int
+	Name string
+}

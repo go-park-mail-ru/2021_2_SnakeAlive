@@ -11,7 +11,9 @@ type SightUseCase interface {
 	GetSightByID(ctx context.Context, id int) (models.SightMetadata, error)
 	GetSightByCountry(ctx context.Context, country string) ([]models.Sight, error)
 	SearchSights(ctx context.Context, search string, skip, limit int) ([]models.SightSearch, error)
-	GetSightsByTag(ctx context.Context, tag string) ([]models.Sight, error)
+	GetSightsByTag(ctx context.Context, tag int) ([]models.Sight, error)
+
+	GetTags(ctx context.Context) ([]models.Tag, error)
 }
 
 type sightUseCase struct {
@@ -69,8 +71,25 @@ func (t *sightUseCase) GetSightByCountry(ctx context.Context, country string) ([
 	return adapted, nil
 }
 
-func (t *sightUseCase) GetSightsByTag(ctx context.Context, tag string) ([]models.Sight, error) {
-	response, err := t.sightGRPC.GetSightsByTag(ctx, &sight_service.GetSightsByTagRequest{Tag: tag})
+func (t *sightUseCase) GetTags(ctx context.Context) ([]models.Tag, error) {
+	response, err := t.sightGRPC.GetTags(ctx, &sight_service.GetTagsRequest{})
+	if err != nil {
+		return []models.Tag{}, err
+	}
+
+	tags := make([]models.Tag, len(response.Tags))
+	for i, tag := range response.Tags {
+		tags[i] = models.Tag{
+			Id:   int(tag.Id),
+			Name: tag.Name,
+		}
+	}
+
+	return tags, nil
+}
+
+func (t *sightUseCase) GetSightsByTag(ctx context.Context, tag int) ([]models.Sight, error) {
+	response, err := t.sightGRPC.GetSightsByTag(ctx, &sight_service.GetSightsByTagRequest{Tag: int64(tag)})
 	if err != nil {
 		return []models.Sight{}, err
 	}

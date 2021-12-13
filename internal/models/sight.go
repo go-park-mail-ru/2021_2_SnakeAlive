@@ -24,3 +24,8 @@ type SightSearch struct {
 	Lng    float32  `json:"lng"`
 	Photos []string `json:"photos"`
 }
+
+type Tag struct {
+	Id   int `json:"id"`
+	Name string `json:"name"`
+}

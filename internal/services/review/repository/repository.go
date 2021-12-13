@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+
 	"snakealive/m/internal/services/review/models"
 
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -43,6 +44,7 @@ func (r *reviewRepository) Add(ctx context.Context, value *models.Review, userId
 	if err != nil {
 		return insertedId, err
 	}
+
 	return insertedId, err
 }
 
@@ -79,6 +81,7 @@ func (r *reviewRepository) GetListByPlace(ctx context.Context, id int, limit int
 	if err != nil {
 		return &reviews, err
 	}
+	defer rows.Close()
 
 	var review models.Review
 	for rows.Next() {
