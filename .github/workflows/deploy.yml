@@ -1,7 +1,10 @@
 name: tripadvisor deploy
 
 on:
-  workflow_dispatch:
+  pull_request:
+    branches: [ main, develop, pre-develop ]
+  push:
+    branches: [ main, develop, pre-develop ]
 
 jobs:
   deploy:
@@ -14,5 +17,5 @@ jobs:
           host: ${{ secrets.DEST }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
-          script: whoami
+          script: whoami && docker-compose --version
 
