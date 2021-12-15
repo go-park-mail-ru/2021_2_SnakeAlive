@@ -91,12 +91,12 @@ services:
       - GATEWAY_TRIP_ENDPOINT=host.docker.internal:6666
       - GATEWAY_SIGHT_ENDPOINT=host.docker.internal:10124
       - GATEWAY_REVIEW_ENDPOINT=host.docker.internal:9090
-      - GATEWAY_DB_URL=${PSQL_CONN}
+      - GATEWAY_DB_URL=${{ secrets.PSQL_CONN }}
       - GATEWAY_S3_BUCKET=snakehastrip
       - GATEWAY_S3_ENDPOINT=http://hb.bizmrg.com
       - GATEWAY_S3_PUBLIC_ENDPOINT=https://snakehastrip.hb.bizmrg.com/
-      - GATEWAY_S3_SECRET_KEY=${S3_KEY}
-      - GATEWAY_S3_SECRET_ID=${S3_ID}
+      - GATEWAY_S3_SECRET_KEY=${{ secrets.S3_KEY }}
+      - GATEWAY_S3_SECRET_ID=${{ secrets.S3_ID }}
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
 
