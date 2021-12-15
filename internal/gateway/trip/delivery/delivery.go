@@ -2,6 +2,8 @@ package delivery
 
 import (
 	"encoding/json"
+	"log"
+	"snakealive/m/internal/gateway/config"
 	"snakealive/m/internal/gateway/trip/usecase"
 	socket "snakealive/m/internal/models"
 	"snakealive/m/internal/services/trip/models"
@@ -362,6 +364,12 @@ func (s *tripGatewayDelivery) AddUserByLink(ctx *fasthttp.RequestCtx) {
 }
 
 func (s *tripGatewayDelivery) SendUpdateMessage(tripId int) {
+	var cfg config.Config
+	if err := cfg.Setup(); err != nil {
+		log.Fatal("failed to setup cfg: ", err)
+		return
+	}
+
 	requestJSON := socket.TripRequest{
 		Message: "update",
 		TripId:  tripId,
@@ -377,7 +385,7 @@ func (s *tripGatewayDelivery) SendUpdateMessage(tripId int) {
 	request.Header.SetContentType("application/json")
 	request.SetBody(bytes)
 
-	request.SetRequestURI("http://websocket_service:5050/")
+	request.SetRequestURI(cfg.WebSocketURL)
 	response := fasthttp.AcquireResponse()
 
 	fasthttp.Do(request, response)
