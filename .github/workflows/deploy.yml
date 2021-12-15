@@ -33,6 +33,10 @@ jobs:
 
       - name: running latest service
         uses: appleboy/ssh-action@master
+        env:
+          S3_KEY: ${{ secrets.S3_KEY }}
+          S3_ID: ${{ secrets.S3_ID }}
+          PSQL_CONN: ${{ secrets.PSQL_CONN }}
         with:
           host: ${{ secrets.DEST }}
           username: ${{ secrets.USERNAME }}
