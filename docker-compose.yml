@@ -120,10 +120,7 @@ services:
     networks:
       - mynet
 
-<<<<<<< HEAD
-=======
 networks:
   mynet:
     driver: bridge
 
->>>>>>> feature/websocket
