@@ -123,11 +123,15 @@ message Link {
   string link = 1;
 }
 
+message Users {
+  repeated int64 users = 1;
+}
+
 service TripService {
   rpc GetTrip(TripRequest) returns (Trip) {}
   rpc AddTrip(ModifyTripRequest) returns (Trip) {}
   rpc UpdateTrip(ModifyTripRequest) returns (Trip) {}
-  rpc DeleteTrip(TripRequest) returns (google.protobuf.Empty) {}
+  rpc DeleteTrip(TripRequest) returns (Users) {}
   rpc GetTripsByUser(ByUserRequest) returns (Trips) {}
 
   rpc GetAlbum(AlbumRequest) returns (Album) {}

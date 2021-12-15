@@ -21,6 +21,7 @@ type Config struct {
 	S3PublicEndpoint      string `envconfig:"S3_PUBLIC_ENDPOINT" required:"true"`
 	SecretKey             string `envconfig:"S3_SECRET_KEY" required:"true"`
 	ID                    string `envconfig:"S3_SECRET_ID" required:"true"`
+	WebSocketURL          string `envconfig:"WEBSOCKET_URL" required:"true"`
 
 	Ctx    context.Context
 	Cancel func()

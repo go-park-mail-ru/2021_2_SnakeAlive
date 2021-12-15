@@ -22,7 +22,11 @@ type TripServiceClient interface {
 	GetTrip(ctx context.Context, in *TripRequest, opts ...grpc.CallOption) (*Trip, error)
 	AddTrip(ctx context.Context, in *ModifyTripRequest, opts ...grpc.CallOption) (*Trip, error)
 	UpdateTrip(ctx context.Context, in *ModifyTripRequest, opts ...grpc.CallOption) (*Trip, error)
+<<<<<<< HEAD
 	DeleteTrip(ctx context.Context, in *TripRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+=======
+	DeleteTrip(ctx context.Context, in *TripRequest, opts ...grpc.CallOption) (*Users, error)
+>>>>>>> feature/websocket
 	GetTripsByUser(ctx context.Context, in *ByUserRequest, opts ...grpc.CallOption) (*Trips, error)
 	GetAlbum(ctx context.Context, in *AlbumRequest, opts ...grpc.CallOption) (*Album, error)
 	AddAlbum(ctx context.Context, in *ModifyAlbumRequest, opts ...grpc.CallOption) (*Album, error)
@@ -70,8 +74,13 @@ func (c *tripServiceClient) UpdateTrip(ctx context.Context, in *ModifyTripReques
 	return out, nil
 }
 
+<<<<<<< HEAD
 func (c *tripServiceClient) DeleteTrip(ctx context.Context, in *TripRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
+=======
+func (c *tripServiceClient) DeleteTrip(ctx context.Context, in *TripRequest, opts ...grpc.CallOption) (*Users, error) {
+	out := new(Users)
+>>>>>>> feature/websocket
 	err := c.cc.Invoke(ctx, "/services.trip_service.TripService/DeleteTrip", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -176,7 +185,11 @@ type TripServiceServer interface {
 	GetTrip(context.Context, *TripRequest) (*Trip, error)
 	AddTrip(context.Context, *ModifyTripRequest) (*Trip, error)
 	UpdateTrip(context.Context, *ModifyTripRequest) (*Trip, error)
+<<<<<<< HEAD
 	DeleteTrip(context.Context, *TripRequest) (*emptypb.Empty, error)
+=======
+	DeleteTrip(context.Context, *TripRequest) (*Users, error)
+>>>>>>> feature/websocket
 	GetTripsByUser(context.Context, *ByUserRequest) (*Trips, error)
 	GetAlbum(context.Context, *AlbumRequest) (*Album, error)
 	AddAlbum(context.Context, *ModifyAlbumRequest) (*Album, error)
@@ -203,7 +216,11 @@ func (UnimplementedTripServiceServer) AddTrip(context.Context, *ModifyTripReques
 func (UnimplementedTripServiceServer) UpdateTrip(context.Context, *ModifyTripRequest) (*Trip, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateTrip not implemented")
 }
+<<<<<<< HEAD
 func (UnimplementedTripServiceServer) DeleteTrip(context.Context, *TripRequest) (*emptypb.Empty, error) {
+=======
+func (UnimplementedTripServiceServer) DeleteTrip(context.Context, *TripRequest) (*Users, error) {
+>>>>>>> feature/websocket
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteTrip not implemented")
 }
 func (UnimplementedTripServiceServer) GetTripsByUser(context.Context, *ByUserRequest) (*Trips, error) {

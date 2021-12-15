@@ -16,7 +16,7 @@ import (
 type TripUseCase interface {
 	AddTrip(ctx context.Context, value *models.Trip, userID int) (int, error)
 	GetTripById(ctx context.Context, id int) (*models.Trip, error)
-	DeleteTrip(ctx context.Context, id int) error
+	DeleteTrip(ctx context.Context, id int) ([]int, error)
 	UpdateTrip(ctx context.Context, id int, updatedTrip *models.Trip) error
 
 	CheckTripAuthor(ctx context.Context, userID int, id int) (bool, error)
@@ -64,7 +64,7 @@ func (u tripUseCase) UpdateTrip(ctx context.Context, id int, updatedTrip *models
 	return u.tripRepository.UpdateTrip(ctx, id, cleanTrip)
 }
 
-func (u tripUseCase) DeleteTrip(ctx context.Context, id int) error {
+func (u tripUseCase) DeleteTrip(ctx context.Context, id int) ([]int, error) {
 	return u.tripRepository.DeleteTrip(ctx, id)
 }
 
