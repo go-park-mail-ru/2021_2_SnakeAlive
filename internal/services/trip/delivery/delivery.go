@@ -133,18 +133,23 @@ func (s *tripDelivery) UpdateTrip(ctx context.Context, request *trip_service.Mod
 	}, nil
 }
 
-func (s *tripDelivery) DeleteTrip(ctx context.Context, request *trip_service.TripRequest) (*empty.Empty, error) {
+func (s *tripDelivery) DeleteTrip(ctx context.Context, request *trip_service.TripRequest) (*trip_service.Users, error) {
 	authorized, err := s.tripUsecase.CheckTripAuthor(ctx, int(request.UserId), int(request.TripId))
 	if !authorized || err != nil {
-		return &empty.Empty{}, errors.DeniedAccess
+		return &trip_service.Users{}, errors.DeniedAccess
 	}
 
-	err = s.tripUsecase.DeleteTrip(ctx, int(request.TripId))
+	responce, err := s.tripUsecase.DeleteTrip(ctx, int(request.TripId))
 	if err != nil {
 		return nil, s.errorAdapter.AdaptError(err)
 	}
 
-	return &empty.Empty{}, nil
+	var users trip_service.Users
+	for _, user := range responce {
+		users.Users = append(users.Users, int64(user))
+	}
+
+	return &users, nil
 }
 
 func (s *tripDelivery) GetAlbum(ctx context.Context, request *trip_service.AlbumRequest) (*trip_service.Album, error) {

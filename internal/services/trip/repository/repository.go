@@ -11,7 +11,7 @@ import (
 type TripRepository interface {
 	AddTrip(ctx context.Context, value *models.Trip, userID int) (int, error)
 	GetTripById(ctx context.Context, id int) (value *models.Trip, err error)
-	DeleteTrip(ctx context.Context, id int) error
+	DeleteTrip(ctx context.Context, id int) ([]int, error)
 	UpdateTrip(ctx context.Context, id int, value *models.Trip) error
 	GetTripAuthors(ctx context.Context, id int) ([]int, error)
 	GetTripsByUser(ctx context.Context, id int) (*[]models.Trip, error)
@@ -149,21 +149,27 @@ func (t *tripRepository) UpdateTrip(ctx context.Context, id int, value *models.T
 	return err
 }
 
-func (t *tripRepository) DeleteTrip(ctx context.Context, id int) error {
+func (t *tripRepository) DeleteTrip(ctx context.Context, id int) ([]int, error) {
 	conn, err := t.dataHolder.Acquire(context.Background())
 	if err != nil {
-		return err
+		return []int{}, err
 	}
 	defer conn.Release()
 
 	if err = t.deletePlaces(ctx, id); err != nil {
-		return err
+		return []int{}, err
 	}
+
+	ids, err := t.GetTripAuthors(ctx, id)
+	if err != nil {
+		return []int{}, err
+	}
+
 	_, err = conn.Exec(context.Background(),
 		DeleteTripQuery,
 		id,
 	)
-	return err
+	return ids, err
 }
 
 func (t *tripRepository) deletePlaces(ctx context.Context, tripId int) error {

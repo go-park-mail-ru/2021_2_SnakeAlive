@@ -14,7 +14,7 @@ import (
 type TripGatewayUseCase interface {
 	AddTrip(ctx context.Context, value *models.Trip, userID int) (*models.TripWithUserInfo, error)
 	GetTripById(ctx context.Context, id int, userID int) (*models.TripWithUserInfo, error)
-	DeleteTrip(ctx context.Context, id int, userID int) error
+	DeleteTrip(ctx context.Context, id int, userID int) ([]int, error)
 	UpdateTrip(ctx context.Context, id int, updatedTrip *models.Trip, userID int) (*models.TripWithUserInfo, error)
 	GetTripsByUser(ctx context.Context, id int) (*[]models.TripWithUserInfo, error)
 
@@ -113,12 +113,21 @@ func (u *tripGatewayUseCase) GetTripById(ctx context.Context, tripId int, userID
 	}, nil
 }
 
-func (u *tripGatewayUseCase) DeleteTrip(ctx context.Context, id int, userID int) error {
-	_, err := u.tripGRPC.DeleteTrip(ctx, &trip_service.TripRequest{
+func (u *tripGatewayUseCase) DeleteTrip(ctx context.Context, id int, userID int) ([]int, error) {
+	responce, err := u.tripGRPC.DeleteTrip(ctx, &trip_service.TripRequest{
 		TripId: int64(id),
 		UserId: int64(userID),
 	})
-	return err
+	if err != nil {
+		return []int{}, err
+	}
+
+	var users []int
+	for _, user := range responce.Users {
+		users = append(users, int(user))
+	}
+
+	return users, err
 }
 
 func (u *tripGatewayUseCase) UpdateTrip(ctx context.Context, id int, updatedTrip *models.Trip, userID int) (*models.TripWithUserInfo, error) {
