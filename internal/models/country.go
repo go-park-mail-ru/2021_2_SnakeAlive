@@ -8,4 +8,5 @@ type Country struct {
 	Photo       string `json:"photo"`
 }
 
+//easyjson:json
 type Countries []Country
