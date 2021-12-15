@@ -11,3 +11,9 @@ type TripResponce struct {
 	Message string      `json:"message"`
 	Trip    models.Trip `json:"trip"`
 }
+
+type UsersTripRequest struct {
+	Message string `json:"message"`
+	TripId  int    `json:"trip_id"`
+	Users   []int  `json:"users"`
+}

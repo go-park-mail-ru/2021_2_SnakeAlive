@@ -14,6 +14,8 @@ import (
 type WebsocketDelivery interface {
 	HandleRequest(w http.ResponseWriter, r *http.Request)
 	Connect(w http.ResponseWriter, r *http.Request)
+	Update(w http.ResponseWriter, r *http.Request, request models.UsersTripRequest)
+	Delete(w http.ResponseWriter, request models.UsersTripRequest)
 }
 
 type websocketDelivery struct {
@@ -64,7 +66,7 @@ func (d *websocketDelivery) HandleRequest(w http.ResponseWriter, r *http.Request
 
 	decoder := json.NewDecoder(r.Body)
 
-	request := new(models.TripRequest)
+	request := new(models.UsersTripRequest)
 	err := decoder.Decode(request)
 	if err != nil {
 		log.Printf("error while unmarshalling JSON: %s", err)
@@ -72,6 +74,16 @@ func (d *websocketDelivery) HandleRequest(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	if request.Message == "delete" {
+		d.Delete(w, *request)
+	}
+
+	if request.Message == "update" {
+		d.Update(w, r, *request)
+	}
+}
+
+func (d *websocketDelivery) Update(w http.ResponseWriter, r *http.Request, request models.UsersTripRequest) {
 	trip, err := d.websocketUsecase.Update(r.Context(), request.TripId)
 	if err != nil {
 		log.Printf("error while getting trip info: %s", err)
@@ -79,9 +91,21 @@ func (d *websocketDelivery) HandleRequest(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err = d.websocketUsecase.SendResponce(trip.Users, models.TripResponce{
+	err = d.websocketUsecase.SendUpdateResponce(trip.Users, models.TripResponce{
 		Message: request.Message,
 		Trip:    *trip,
+	})
+	if err != nil {
+		log.Printf("error while marshalling JSON: %s", err)
+		w.Write([]byte("{}"))
+		return
+	}
+}
+
+func (d *websocketDelivery) Delete(w http.ResponseWriter, request models.UsersTripRequest) {
+	err := d.websocketUsecase.SendDeleteResponce(request.Users, models.TripRequest{
+		Message: request.Message,
+		TripId:  request.TripId,
 	})
 	if err != nil {
 		log.Printf("error while marshalling JSON: %s", err)

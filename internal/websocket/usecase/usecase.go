@@ -12,7 +12,8 @@ import (
 type WebsocketUseCase interface {
 	Update(ctx context.Context, tripId int) (*trip.Trip, error)
 	Connect(userId int, conn *websocket.Conn)
-	SendResponce(users []int, responce models.TripResponce) error
+	SendUpdateResponce(users []int, responce models.TripResponce) error
+	SendDeleteResponce(users []int, responce models.TripRequest) error
 	ValidateSession(ctx context.Context, hash string) (int, error)
 }
 
@@ -32,7 +33,16 @@ func (u websocketUseCase) Connect(userId int, conn *websocket.Conn) {
 	u.websocketRepository.AddConnection(userId, conn)
 }
 
-func (u websocketUseCase) SendResponce(users []int, responce models.TripResponce) error {
+func (u websocketUseCase) SendUpdateResponce(users []int, responce models.TripResponce) error {
+	conns := u.websocketRepository.GetConnections(users)
+
+	for _, conn := range conns {
+		conn.WriteJSON(responce)
+	}
+	return nil
+}
+
+func (u websocketUseCase) SendDeleteResponce(users []int, responce models.TripRequest) error {
 	conns := u.websocketRepository.GetConnections(users)
 
 	for _, conn := range conns {
