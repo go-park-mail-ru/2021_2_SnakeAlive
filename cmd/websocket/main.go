@@ -30,5 +30,9 @@ func main() {
 	http.HandleFunc("/connect", delivery.Connect)
 	http.HandleFunc("/", delivery.HandleRequest)
 
-	http.ListenAndServe(cfg.Port, nil)
+	err = http.ListenAndServe(cfg.Port, nil)
+	if err != nil {
+		log.Fatal("failed to start server")
+		return
+	}
 }
