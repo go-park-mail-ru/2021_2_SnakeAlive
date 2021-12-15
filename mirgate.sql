@@ -58,12 +58,6 @@ CREATE TABLE Tags
     name TEXT
 );
 
-CREATE TABLE Tags
-(
-    id   SERIAL NOT NULL PRIMARY KEY,
-    name TEXT
-);
-
 CREATE TABLE Trips
 (
     id          SERIAL      NOT NULL PRIMARY KEY,
