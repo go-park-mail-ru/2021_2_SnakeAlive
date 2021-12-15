@@ -11,6 +11,11 @@ ENV CGO_ENABLED=0 \
     CGO_LDFLAGS="-L/usr/lib -lpthread -lrt -lstdc++ -lm -lc -lgcc -lz " \
     PKG_CONFIG_PATH="/usr/lib/pkgconfig"
 
+RUN --mount=type=secret,id=S3_ID \
+  --mount=type=secret,id=SQL_CONN \
+   export S3_ID=$(cat /run/secrets/S3_ID) && \
+   export GATEWAY_DB_URL=$(cat /run/secrets/SQL_CONN)
+
 ARG APP_PKG_NAME
 WORKDIR /go/src/$APP_PKG_NAME
 COPY ./cmd ./cmd
