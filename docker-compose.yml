@@ -96,7 +96,7 @@ services:
       - GATEWAY_S3_ENDPOINT=http://hb.bizmrg.com
       - GATEWAY_S3_PUBLIC_ENDPOINT=https://snakehastrip.hb.bizmrg.com/
       - GATEWAY_S3_SECRET_KEY=7qdqBBT9xeKDV3iAdKco4jqEhmjpMqiyk3bLL9PcU2S7
-      - GATEWAY_S3_SECRET_ID=
+      - GATEWAY_S3_SECRET_ID=rcLyfa3DhATRNmeterCZLk
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
 

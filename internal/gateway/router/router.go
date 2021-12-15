@@ -79,7 +79,7 @@ func SetupRouter(cfg RouterConfig) (r *router.Router, p *fasthttpprom.Prometheus
 	r.GET(cnst.CountryIdURL, lgrMw(cfg.CountryDelivery.GetCountryByID))
 	r.GET(cnst.CountryListURL, lgrMw(cfg.CountryDelivery.ListCountries))
 
-	r.POST(cnst.UploadURL, lgrMw(authMw(cfg.MediaDelivery.UploadFile)))
+	r.POST(cnst.UploadURL, lgrMw(cfg.MediaDelivery.UploadFile))
 
 	return
 }
