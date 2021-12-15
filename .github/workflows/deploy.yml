@@ -28,17 +28,24 @@ jobs:
         env:
           S3_KEY: ${{ secrets.S3_KEY }}
           S3_ID: ${{ secrets.S3_ID }}
-          PSQL_CONN: ${{ secrets.PSQL_CONN }}
-        run: echo $PSQL_CONN && cd deploy && docker-compose build && docker-compose push
+          PSQL_CONN: aaaaaa
+        run: cd deploy && docker-compose build && docker-compose push
 
       - name: running latest service
         uses: appleboy/ssh-action@master
+        env:
+          S3_KEY: ${{ secrets.S3_KEY }}
+          S3_ID: ${{ secrets.S3_ID }}
+          PSQL_CONN: ${{ secrets.PSQL_CONN }}
         with:
           host: ${{ secrets.DEST }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           script: |
             cd ${{ secrets.PATH }} &&
+            export PSQL_CONN=${{ secrets.PSQL_CONN }} &&
+            export S3_ID=${{ secrets.S3_ID }} &&
+            export S3_KEY=${{ secrets.S3_KEY }} &&
             docker-compose stop &&
             docker-compose rm -f &&
             docker-compose pull &&
