@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"encoding/json"
 	"snakealive/m/internal/models"
 	trip "snakealive/m/internal/services/trip/models"
 	"snakealive/m/internal/websocket/repository"
@@ -34,15 +33,10 @@ func (u websocketUseCase) Connect(userId int, conn *websocket.Conn) {
 }
 
 func (u websocketUseCase) SendResponce(users []int, responce models.TripResponce) error {
-	result, err := json.Marshal(responce)
-	if err != nil {
-		return err
-	}
-
 	conns := u.websocketRepository.GetConnections(users)
 
 	for _, conn := range conns {
-		conn.WriteJSON(result)
+		conn.WriteJSON(responce)
 	}
 	return nil
 }

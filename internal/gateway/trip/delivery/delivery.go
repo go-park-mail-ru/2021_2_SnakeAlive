@@ -377,11 +377,10 @@ func (s *tripGatewayDelivery) SendUpdateMessage(tripId int) {
 	request.Header.SetContentType("application/json")
 	request.SetBody(bytes)
 
-	request.SetRequestURI("host.docker.internal:5050/")
+	request.SetRequestURI("http://websocket_service:5050/")
 	response := fasthttp.AcquireResponse()
 
 	fasthttp.Do(request, response)
-
 	fasthttp.ReleaseRequest(request)
 	fasthttp.ReleaseResponse(response)
 }
