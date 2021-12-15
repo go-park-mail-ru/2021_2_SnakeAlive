@@ -75,6 +75,8 @@ services:
       - WEBSOCKET_URL="http://localhost"
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
+    networks:
+      - mynet
 
   gateway:
     depends_on:
@@ -105,5 +107,10 @@ services:
       - GATEWAY_S3_SECRET_ID=rcLyfa3DhATRNmeterCZLk
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
+    networks:
+      - mynet
 
+networks:
+  mynet:
+    driver: bridge
 
