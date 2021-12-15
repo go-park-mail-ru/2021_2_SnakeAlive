@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"fmt"
 
 	logs "snakealive/m/pkg/logger"
 
@@ -31,7 +32,8 @@ func (c *Config) Setup() error {
 	if err := envconfig.Process("GATEWAY", c); err != nil {
 		return err
 	}
-
+	fmt.Println(c.ID)
+	fmt.Println(c.DBUrl)
 	lgr := logs.BuildLogger()
 	c.Logger = lgr.Logger
 	c.Ctx, c.Cancel = context.WithCancel(context.Background())

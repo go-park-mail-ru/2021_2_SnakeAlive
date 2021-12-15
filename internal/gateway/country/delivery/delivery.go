@@ -1,7 +1,6 @@
 package delivery
 
 import (
-	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -31,7 +30,7 @@ func (c *countryDelivery) ListCountries(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	b, _ := json.Marshal(countries)
+	b, _ := easyjson.Marshal(countries)
 	ctx.SetStatusCode(http.StatusOK)
 	ctx.Response.SetBody(b)
 }
