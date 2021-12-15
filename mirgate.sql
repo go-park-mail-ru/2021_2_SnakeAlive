@@ -61,8 +61,8 @@ CREATE TABLE Tags
 CREATE TABLE Tags
 (
     id   SERIAL NOT NULL PRIMARY KEY,
-    name TEXT,
-)
+    name TEXT
+);
 
 CREATE TABLE Trips
 (
