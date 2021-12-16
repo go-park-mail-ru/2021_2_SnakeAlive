@@ -20,4 +20,4 @@ _Проект команды "Змея Живая!"_
 -------
 |   |  |  |
 | ------------- | ------------- | ------------- |
-|Ершков Алексей|[github](https://github.com/alexey-ershkov "Alexey Ershkov")|[telegram](https://t.me/alexey_ershkov "@alexey_ershkov")|
+|Михаил Трущелев|[github](https://github.com/ThePsina "Михаил Трущелев")|[telegram](https://t.me/MichaelPsi "@MichaelPsi")|
