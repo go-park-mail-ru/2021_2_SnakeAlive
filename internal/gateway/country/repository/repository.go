@@ -43,7 +43,7 @@ func (u *countryStorage) GetById(ctx context.Context, id int) (models.Country, e
 
 	var country models.Country
 	if err := u.conn.QueryRow(ctx, request.Request, request.Params...).Scan(
-		&country.Id, &country.Name, &country.Description, &country.Photo,&country.Translated,
+		&country.Id, &country.Name, &country.Description, &country.Photo, &country.Translated,
 	); err != nil {
 		if err == pgx.ErrNoRows {
 			return country, errors.CountryDoesNotExist

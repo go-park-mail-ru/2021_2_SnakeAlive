@@ -2,8 +2,10 @@ package delivery
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
+
 	"snakealive/m/internal/models"
 	"snakealive/m/internal/websocket/usecase"
 	cnst "snakealive/m/pkg/constants"
@@ -32,14 +34,14 @@ func (d *websocketDelivery) Connect(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie(cnst.CookieName)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte("{}"))
+		_, _ = w.Write([]byte("{}"))
 		return
 	}
 
 	userId, err := d.websocketUsecase.ValidateSession(r.Context(), cookie.Value)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte("{}"))
+		_, _ = w.Write([]byte("{}"))
 		return
 	}
 
@@ -54,7 +56,7 @@ func (d *websocketDelivery) Connect(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		log.Printf("error while connecting: %s", err)
-		w.Write([]byte("{}"))
+		_, _ = w.Write([]byte("{}"))
 		return
 	}
 
@@ -62,7 +64,12 @@ func (d *websocketDelivery) Connect(w http.ResponseWriter, r *http.Request) {
 }
 
 func (d *websocketDelivery) HandleRequest(w http.ResponseWriter, r *http.Request) {
-	defer r.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			return
+		}
+	}(r.Body)
 
 	decoder := json.NewDecoder(r.Body)
 
@@ -70,7 +77,7 @@ func (d *websocketDelivery) HandleRequest(w http.ResponseWriter, r *http.Request
 	err := decoder.Decode(request)
 	if err != nil {
 		log.Printf("error while unmarshalling JSON: %s", err)
-		w.Write([]byte("{}"))
+		_, _ = w.Write([]byte("{}"))
 		return
 	}
 
@@ -87,7 +94,7 @@ func (d *websocketDelivery) Update(w http.ResponseWriter, r *http.Request, reque
 	trip, err := d.websocketUsecase.Update(r.Context(), request.TripId)
 	if err != nil {
 		log.Printf("error while getting trip info: %s", err)
-		w.Write([]byte("{}"))
+		_, _ = w.Write([]byte("{}"))
 		return
 	}
 
@@ -97,7 +104,7 @@ func (d *websocketDelivery) Update(w http.ResponseWriter, r *http.Request, reque
 	})
 	if err != nil {
 		log.Printf("error while marshalling JSON: %s", err)
-		w.Write([]byte("{}"))
+		_, _ = w.Write([]byte("{}"))
 		return
 	}
 }
@@ -109,7 +116,7 @@ func (d *websocketDelivery) Delete(w http.ResponseWriter, request models.UsersTr
 	})
 	if err != nil {
 		log.Printf("error while marshalling JSON: %s", err)
-		w.Write([]byte("{}"))
+		_, _ = w.Write([]byte("{}"))
 		return
 	}
 }

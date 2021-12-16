@@ -200,7 +200,7 @@ func TestHandler_DeleteTrip(t *testing.T) {
 		r.EXPECT().GetTripAuthors(ctx, id).Return([]int{userID}, nil).AnyTimes()
 	}
 	mockDeleteTrip := func(r *service_mocks.MockTripRepository, ctx context.Context, id int) {
-		r.EXPECT().DeleteTrip(ctx, id).Return(nil).AnyTimes()
+		r.EXPECT().DeleteTrip(ctx, id).Return([]int{1, 2, 3}, nil).AnyTimes()
 	}
 
 	c := gomock.NewController(t)

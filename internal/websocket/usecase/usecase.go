@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+
 	"snakealive/m/internal/models"
 	trip "snakealive/m/internal/services/trip/models"
 	"snakealive/m/internal/websocket/repository"
@@ -37,7 +38,7 @@ func (u websocketUseCase) SendUpdateResponce(users []int, responce models.TripRe
 	conns := u.websocketRepository.GetConnections(users)
 
 	for _, conn := range conns {
-		conn.WriteJSON(responce)
+		_ = conn.WriteJSON(responce)
 	}
 	return nil
 }
@@ -46,7 +47,7 @@ func (u websocketUseCase) SendDeleteResponce(users []int, responce models.TripRe
 	conns := u.websocketRepository.GetConnections(users)
 
 	for _, conn := range conns {
-		conn.WriteJSON(responce)
+		_ = conn.WriteJSON(responce)
 	}
 	return nil
 }

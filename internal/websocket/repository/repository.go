@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	"snakealive/m/internal/services/trip/models"
 
 	"github.com/gorilla/websocket"
@@ -51,7 +52,7 @@ func (r *websocketRepository) GetTripById(ctx context.Context, id int) (value *m
 
 	var place models.Place
 	for rows.Next() {
-		rows.Scan(&place.Id, &place.Name, &place.Tags, &place.Description, &place.Rating, &place.Country, &place.Photos, &place.Day)
+		_ = rows.Scan(&place.Id, &place.Name, &place.Tags, &place.Description, &place.Rating, &place.Country, &place.Photos, &place.Day)
 		trip.Sights = append(trip.Sights, place)
 	}
 
@@ -64,7 +65,7 @@ func (r *websocketRepository) GetTripById(ctx context.Context, id int) (value *m
 
 	var album models.Album
 	for rows.Next() {
-		rows.Scan(&album.Id, &album.Title, &album.Description, &album.Photos)
+		_ = rows.Scan(&album.Id, &album.Title, &album.Description, &album.Photos)
 		trip.Albums = append(trip.Albums, album)
 	}
 
@@ -96,7 +97,7 @@ func (r *websocketRepository) GetTripAuthors(ctx context.Context, id int) ([]int
 	var ids []int
 	var userId int
 	for rows.Next() {
-		rows.Scan(&userId)
+		_ = rows.Scan(&userId)
 		ids = append(ids, userId)
 	}
 	return ids, err

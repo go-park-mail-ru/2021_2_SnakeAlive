@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strconv"
+
 	"snakealive/m/internal/gateway/config"
 	"snakealive/m/internal/gateway/trip/usecase"
 	"snakealive/m/internal/models"
 	socket "snakealive/m/internal/models"
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/error_adapter"
-	"strconv"
 
 	"github.com/mailru/easyjson"
 	"github.com/valyala/fasthttp"
@@ -124,7 +125,7 @@ func (s *tripGatewayDelivery) UpdateTrip(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	ctx.Write(bytes)
+	_, _ = ctx.Write(bytes)
 
 	s.SendUpdateMessage(responceTrip.Id)
 }
@@ -145,7 +146,7 @@ func (s *tripGatewayDelivery) DeleteTrip(ctx *fasthttp.RequestCtx) {
 	if err != nil {
 		return
 	}
-	ctx.Write(bytes)
+	_, _ = ctx.Write(bytes)
 
 	s.SendDeleteMessage(param, users)
 }
@@ -324,7 +325,7 @@ func (s *tripGatewayDelivery) AddTripUser(ctx *fasthttp.RequestCtx) {
 	if err != nil {
 		return
 	}
-	ctx.Write(bytes)
+	_, _ = ctx.Write(bytes)
 
 	s.SendUpdateMessage(param)
 }
@@ -388,7 +389,7 @@ func (s *tripGatewayDelivery) SendUpdateMessage(tripId int) {
 	request.SetRequestURI(cfg.WebSocketURL)
 	response := fasthttp.AcquireResponse()
 
-	fasthttp.Do(request, response)
+	_ = fasthttp.Do(request, response)
 	fasthttp.ReleaseRequest(request)
 	fasthttp.ReleaseResponse(response)
 }
@@ -419,7 +420,7 @@ func (s *tripGatewayDelivery) SendDeleteMessage(tripId int, users []int) {
 	request.SetRequestURI(cfg.WebSocketURL)
 	response := fasthttp.AcquireResponse()
 
-	fasthttp.Do(request, response)
+	_ = fasthttp.Do(request, response)
 	fasthttp.ReleaseRequest(request)
 	fasthttp.ReleaseResponse(response)
 }
