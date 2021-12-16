@@ -70,6 +70,7 @@ services:
       - "host.docker.internal:172.17.0.1"
 
   websocket_service:
+    image: znajderko/websocket_service
     build:
       dockerfile: Dockerfile.websocket
       context: ../.
