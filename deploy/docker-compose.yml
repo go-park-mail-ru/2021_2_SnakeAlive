@@ -115,6 +115,7 @@ services:
       - GATEWAY_S3_PUBLIC_ENDPOINT=https://snakehastrip.hb.bizmrg.com/
       - GATEWAY_S3_SECRET_KEY=${S3_KEY}
       - GATEWAY_S3_SECRET_ID=${S3_ID}
+      - GATEWAY_WEBSOCKET_URL=http://websocket_service:5050/
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
     networks:
