@@ -2,12 +2,14 @@ package delivery
 
 import (
 	"encoding/json"
-	"snakealive/m/internal/gateway/review/usecase"
-	"snakealive/m/internal/services/review/models"
-	cnst "snakealive/m/pkg/constants"
-	"snakealive/m/pkg/error_adapter"
 	"strconv"
 
+	"snakealive/m/internal/gateway/review/usecase"
+	"snakealive/m/internal/models"
+	cnst "snakealive/m/pkg/constants"
+	"snakealive/m/pkg/error_adapter"
+
+	"github.com/mailru/easyjson"
 	"github.com/valyala/fasthttp"
 )
 
@@ -62,15 +64,14 @@ func (d *reviewGatewayDelivery) ReviewsByPlace(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	ctx.Write(bytes)
-
+	_, _ = ctx.Write(bytes)
 }
 func (d *reviewGatewayDelivery) AddReviewToPlace(ctx *fasthttp.RequestCtx) {
 	userID := ctx.UserValue(cnst.UserIDContextKey).(int)
 
 	review := new(models.Review)
 
-	if err := json.Unmarshal(ctx.PostBody(), &review); err != nil {
+	if err := easyjson.Unmarshal(ctx.PostBody(), review); err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
@@ -81,15 +82,14 @@ func (d *reviewGatewayDelivery) AddReviewToPlace(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	bytes, err := json.Marshal(review)
+	bytes, err := easyjson.Marshal(review)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
-	ctx.Write(bytes)
-
+	_, _ = ctx.Write(bytes)
 }
 func (d *reviewGatewayDelivery) DelReview(ctx *fasthttp.RequestCtx) {
 	param, err := strconv.Atoi(ctx.UserValue("id").(string))

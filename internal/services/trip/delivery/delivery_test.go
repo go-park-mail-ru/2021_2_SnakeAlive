@@ -2,13 +2,14 @@ package delivery
 
 import (
 	"context"
+	"testing"
+
 	service_mocks "snakealive/m/internal/mocks"
 	"snakealive/m/internal/services/trip/models"
 	trip_usecase "snakealive/m/internal/services/trip/usecase"
 	"snakealive/m/pkg/error_adapter"
 	"snakealive/m/pkg/grpc_errors"
 	trip_service "snakealive/m/pkg/services/trip"
-	"testing"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -199,7 +200,7 @@ func TestHandler_DeleteTrip(t *testing.T) {
 		r.EXPECT().GetTripAuthors(ctx, id).Return([]int{userID}, nil).AnyTimes()
 	}
 	mockDeleteTrip := func(r *service_mocks.MockTripRepository, ctx context.Context, id int) {
-		r.EXPECT().DeleteTrip(ctx, id).Return(nil).AnyTimes()
+		r.EXPECT().DeleteTrip(ctx, id).Return([]int{1, 2, 3}, nil).AnyTimes()
 	}
 
 	c := gomock.NewController(t)
@@ -467,8 +468,6 @@ func TestHandler_TripsByUser(t *testing.T) {
 	c := gomock.NewController(t)
 	defer c.Finish()
 
-	trips := make([]models.Trip, 0)
-	trips = append(trips, trip)
 	tripRepo := service_mocks.NewMockTripRepository(c)
 	mockGetTripAuthor(tripRepo, ctx, tripID, userID)
 	mockGetTripByUser(tripRepo, ctx, userID, &[]models.Trip{trip})

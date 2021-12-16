@@ -135,11 +135,12 @@ func (mr *MockTripRepositoryMockRecorder) DeleteAlbum(ctx, id interface{}) *gomo
 }
 
 // DeleteTrip mocks base method.
-func (m *MockTripRepository) DeleteTrip(ctx context.Context, id int) error {
+func (m *MockTripRepository) DeleteTrip(ctx context.Context, id int) ([]int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteTrip", ctx, id)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].([]int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // DeleteTrip indicates an expected call of DeleteTrip.
@@ -176,6 +177,21 @@ func (m *MockTripRepository) GetAlbumById(ctx context.Context, id int) (*models.
 func (mr *MockTripRepositoryMockRecorder) GetAlbumById(ctx, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAlbumById", reflect.TypeOf((*MockTripRepository)(nil).GetAlbumById), ctx, id)
+}
+
+// GetTags mocks base method.
+func (m *MockTripRepository) GetTags(ctx context.Context, ids []int) ([]models.Tag, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTags", ctx, ids)
+	ret0, _ := ret[0].([]models.Tag)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTags indicates an expected call of GetTags.
+func (mr *MockTripRepositoryMockRecorder) GetTags(ctx, ids interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTags", reflect.TypeOf((*MockTripRepository)(nil).GetTags), ctx, ids)
 }
 
 // GetTripAuthors mocks base method.

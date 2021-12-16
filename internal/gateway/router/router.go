@@ -66,8 +66,10 @@ func SetupRouter(cfg RouterConfig) (r *router.Router, p *fasthttpprom.Prometheus
 
 	r.GET(cnst.SightsByCountryURL, lgrMw(cfg.SightDelivery.GetSightByCountry))
 	r.GET(cnst.SightURL, lgrMw(cfg.SightDelivery.GetSightByID))
-	r.GET(cnst.SightSearch, lgrMw(cfg.SightDelivery.SearchSights))
+	r.PATCH(cnst.SightSearch, lgrMw(cfg.SightDelivery.SearchSights))
 	r.GET(cnst.SightTag, lgrMw(cfg.SightDelivery.GetSightByTag))
+	r.GET(cnst.Tags, lgrMw(cfg.SightDelivery.GetTags))
+	r.GET(cnst.RandomTags, lgrMw(cfg.SightDelivery.GetRandomTags))
 
 	r.POST(cnst.ReviewAddURL, lgrMw(authMw(cfg.ReviewDelivery.AddReviewToPlace)))
 	r.GET(cnst.ReviewURL, lgrMw(cfg.ReviewDelivery.ReviewsByPlace))
@@ -77,7 +79,7 @@ func SetupRouter(cfg RouterConfig) (r *router.Router, p *fasthttpprom.Prometheus
 	r.GET(cnst.CountryIdURL, lgrMw(cfg.CountryDelivery.GetCountryByID))
 	r.GET(cnst.CountryListURL, lgrMw(cfg.CountryDelivery.ListCountries))
 
-	r.POST(cnst.UploadURL, lgrMw(authMw(cfg.MediaDelivery.UploadFile)))
+	r.POST(cnst.UploadURL, lgrMw(cfg.MediaDelivery.UploadFile))
 
 	return
 }

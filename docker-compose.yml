@@ -1,6 +1,7 @@
 version: '3.7'
 services:
   auth_service:
+    image: znajderko/snake_auth
     build:
       dockerfile: Dockerfile.auth_service
       context: .
@@ -18,6 +19,7 @@ services:
       - "host.docker.internal:172.17.0.1"
 
   sight_service:
+    image: znajderko/snake_sight
     build:
       dockerfile: Dockerfile.sight_service
       context: .
@@ -34,6 +36,7 @@ services:
       - "host.docker.internal:172.17.0.1"
 
   trip_service:
+    image: znajderko/snake_trip
     build:
       dockerfile: Dockerfile.trip_service
       context: .
@@ -50,6 +53,7 @@ services:
       - "host.docker.internal:172.17.0.1"
 
   review_service:
+    image: znajderko/snake_review
     build:
       dockerfile: Dockerfile.review_service
       context: .
@@ -64,21 +68,31 @@ services:
       - REVIEW_GRPC_PORT=9090
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
-
-  prometheus:
-    image: prom/prometheus
+  websocket_service:
+    build:
+      dockerfile: Dockerfile.websocket
+      context: .
+      args:
+        - APP_PKG_NAME=snakealive/m
+        - GOOS=linux
     ports:
-      - "9000:9090"
-    volumes:
-      - ./monitoring/prometheus:/etc/prometheus
-    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
+      - "5050:5050"
+    environment:
+      - WEBSOCKET_DB_URL=postgres://tripadvisor:12345@host.docker.internal:5432/tripadvisor
+      - WEBSOCKET_PORT=:5050
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+    networks:
+      - mynet
 
   gateway:
+    image: znajderko/snake_gateway
     depends_on:
       - trip_service
       - auth_service
       - sight_service
       - review_service
+      - websocket_service
     build:
       dockerfile: Dockerfile.gateway
       context: .
@@ -100,19 +114,13 @@ services:
       - GATEWAY_S3_PUBLIC_ENDPOINT=https://snakehastrip.hb.bizmrg.com/
       - GATEWAY_S3_SECRET_KEY=7qdqBBT9xeKDV3iAdKco4jqEhmjpMqiyk3bLL9PcU2S7
       - GATEWAY_S3_SECRET_ID=rcLyfa3DhATRNmeterCZLk
+      - GATEWAY_WEBSOCKET_URL=http://websocket_service:5050/
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
+    networks:
+      - mynet
 
-  node-exporter:
-    image: prom/node-exporter:latest
-    restart: unless-stopped
-    ports:
-      - "9100:9100"
-
-  grafana:
-    image: grafana/grafana:latest
-    volumes:
-      - ./monitoring/grafana/grafana.ini:/etc/grafana/grafana.ini
-    ports:
-      - "3000:3010"
+networks:
+  mynet:
+    driver: bridge
 

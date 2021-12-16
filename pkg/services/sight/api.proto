@@ -5,6 +5,11 @@ option go_package = "snakealive/m/pkg/services/sight;sight_service";
 
 import "third_party/go-proto-validators/validator.proto";
 
+message Tag {
+  int64 id = 1;
+  string name = 2;
+}
+
 message Sight {
   int64 id = 1;
   string name = 2;
@@ -54,6 +59,8 @@ message SearchSightRequest {
   int64 limit = 3 [(validate.rules).int64 = {
     gte: 0,
   }];
+  repeated string countries = 4;
+  repeated int64 tags = 5;
 }
 
 message SearchSightResponse {
@@ -61,14 +68,19 @@ message SearchSightResponse {
 }
 
 message GetSightsByTagRequest {
-  string tag = 1 [(validate.rules).string = {
-    max_len: 128,
-    min_bytes: 1,
+  int64 tag = 1 [(validate.rules).int64 = {
+    gte: 0,
   }];
 }
 
 message GetSightsByTagResponse {
   repeated Sight sights = 1;
+}
+
+message GetTagsRequest {}
+
+message GetTagsResponse {
+  repeated Tag tags =1;
 }
 
 service SightService {
@@ -77,4 +89,6 @@ service SightService {
   rpc GetSightsByIDs(GetSightsByIDsRequest) returns (GetSightsByIDsResponse) {};
   rpc SearchSights(SearchSightRequest) returns (SearchSightResponse) {};
   rpc GetSightsByTag(GetSightsByTagRequest) returns (GetSightsByTagResponse) {};
+  rpc GetTags(GetTagsRequest) returns (GetTagsResponse) {};
+  rpc GetRandomTags(GetTagsRequest) returns (GetTagsResponse) {};
 }

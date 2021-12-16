@@ -63,7 +63,13 @@ func (s *sightDelivery) GetSightsByIDs(
 func (s *sightDelivery) SearchSights(
 	ctx context.Context, request *sight_service.SearchSightRequest,
 ) (response *sight_service.SearchSightResponse, err error) {
-	sights, err := s.usecase.SearchSights(ctx, request.Search, request.Skip, request.Limit)
+	sights, err := s.usecase.SearchSights(ctx, &models.SightsSearch{
+		Skip:      int(request.Skip),
+		Limit:     int(request.Limit),
+		Search:    request.Search,
+		Tags:      request.Tags,
+		Countries: request.Countries,
+	})
 	if err != nil {
 		return &sight_service.SearchSightResponse{}, err
 	}
@@ -89,6 +95,44 @@ func (s *sightDelivery) GetSightsByTag(
 	}
 
 	return adapted, nil
+}
+
+func (s *sightDelivery) GetTags(
+	ctx context.Context, request *sight_service.GetTagsRequest,
+) (response *sight_service.GetTagsResponse, err error) {
+	tags, err := s.usecase.GetTags(ctx)
+	if err != nil {
+		return &sight_service.GetTagsResponse{}, err
+	}
+
+	response = &sight_service.GetTagsResponse{Tags: make([]*sight_service.Tag, len(tags))}
+	for i, tag := range tags {
+		response.Tags[i] = &sight_service.Tag{
+			Id:   int64(tag.Id),
+			Name: tag.Name,
+		}
+	}
+
+	return response, nil
+}
+
+func (s *sightDelivery) GetRandomTags(
+	ctx context.Context, request *sight_service.GetTagsRequest,
+) (response *sight_service.GetTagsResponse, err error) {
+	tags, err := s.usecase.GetRandomTags(ctx)
+	if err != nil {
+		return &sight_service.GetTagsResponse{}, err
+	}
+
+	response = &sight_service.GetTagsResponse{Tags: make([]*sight_service.Tag, len(tags))}
+	for i, tag := range tags {
+		response.Tags[i] = &sight_service.Tag{
+			Id:   int64(tag.Id),
+			Name: tag.Name,
+		}
+	}
+
+	return response, nil
 }
 
 func (s *sightDelivery) adaptSight(sight models.Sight) *sight_service.Sight {

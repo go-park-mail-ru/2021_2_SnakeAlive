@@ -135,18 +135,23 @@ func (s *tripDelivery) UpdateTrip(ctx context.Context, request *trip_service.Mod
 	}, nil
 }
 
-func (s *tripDelivery) DeleteTrip(ctx context.Context, request *trip_service.TripRequest) (*empty.Empty, error) {
+func (s *tripDelivery) DeleteTrip(ctx context.Context, request *trip_service.TripRequest) (*trip_service.Users, error) {
 	authorized, err := s.tripUsecase.CheckTripAuthor(ctx, int(request.UserId), int(request.TripId))
 	if !authorized || err != nil {
-		return &empty.Empty{}, errors.DeniedAccess
+		return &trip_service.Users{}, errors.DeniedAccess
 	}
 
-	err = s.tripUsecase.DeleteTrip(ctx, int(request.TripId))
+	responce, err := s.tripUsecase.DeleteTrip(ctx, int(request.TripId))
 	if err != nil {
 		return nil, s.errorAdapter.AdaptError(err)
 	}
 
-	return &empty.Empty{}, nil
+	var users trip_service.Users
+	for _, user := range responce {
+		users.Users = append(users.Users, int64(user))
+	}
+
+	return &users, nil
 }
 
 func (s *tripDelivery) GetAlbum(ctx context.Context, request *trip_service.AlbumRequest) (*trip_service.Album, error) {
@@ -357,12 +362,20 @@ func (s *tripDelivery) AddUserByLink(ctx context.Context, request *trip_service.
 func ProtoDaysFromPlaces(places []models.Place) []*trip_service.Sight {
 	var protoDays []*trip_service.Sight
 	for _, sight := range places {
+		var tags []*trip_service.Tag
+		for _, tag := range sight.Tags {
+			tags = append(tags, &trip_service.Tag{
+				Id:   int64(tag.Id),
+				Name: tag.Name,
+			})
+		}
+
 		protoSight := trip_service.Sight{
 			Id:          int64(sight.Id),
 			Name:        sight.Name,
 			Country:     sight.Country,
 			Rating:      sight.Rating,
-			Tags:        sight.Tags,
+			Tags:        tags,
 			Description: sight.Description,
 			Photos:      sight.Photos,
 			Day:         int64(sight.Day),
@@ -375,12 +388,20 @@ func ProtoDaysFromPlaces(places []models.Place) []*trip_service.Sight {
 func PlacesFromProtoDays(sights []*trip_service.Sight) []models.Place {
 	var places []models.Place
 	for _, sight := range sights {
+		var tags []models.Tag
+		for _, tag := range sight.Tags {
+			tags = append(tags, models.Tag{
+				Id:   int(tag.Id),
+				Name: tag.Name,
+			})
+		}
+
 		placesSight := models.Place{
 			Id:          int(sight.Id),
 			Name:        sight.Name,
 			Country:     sight.Country,
 			Rating:      sight.Rating,
-			Tags:        sight.Tags,
+			Tags:        tags,
 			Description: sight.Description,
 			Photos:      sight.Photos,
 			Day:         int(sight.Day),

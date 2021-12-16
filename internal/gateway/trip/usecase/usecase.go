@@ -3,8 +3,7 @@ package usecase
 import (
 	"context"
 
-	td "snakealive/m/internal/services/trip/delivery"
-	"snakealive/m/internal/services/trip/models"
+	"snakealive/m/internal/models"
 	"snakealive/m/pkg/errors"
 	auth_service "snakealive/m/pkg/services/auth"
 	sight_service "snakealive/m/pkg/services/sight"
@@ -14,7 +13,7 @@ import (
 type TripGatewayUseCase interface {
 	AddTrip(ctx context.Context, value *models.Trip, userID int) (*models.TripWithUserInfo, error)
 	GetTripById(ctx context.Context, id int, userID int) (*models.TripWithUserInfo, error)
-	DeleteTrip(ctx context.Context, id int, userID int) error
+	DeleteTrip(ctx context.Context, id int, userID int) ([]int, error)
 	UpdateTrip(ctx context.Context, id int, updatedTrip *models.Trip, userID int) (*models.TripWithUserInfo, error)
 	GetTripsByUser(ctx context.Context, id int) (*[]models.TripWithUserInfo, error)
 
@@ -48,7 +47,7 @@ func NewTripGatewayUseCase(grpc tripGRPC, sightGRPC sightGRPC, authGRPC authGRPC
 }
 
 func (u *tripGatewayUseCase) AddTrip(ctx context.Context, value *models.Trip, userID int) (*models.TripWithUserInfo, error) {
-	days := td.ProtoDaysFromPlaces(value.Sights)
+	days := ProtoDaysFromPlaces(value.Sights)
 	trip := &trip_service.Trip{
 		Id:          int64(value.Id),
 		Title:       value.Title,
@@ -66,8 +65,8 @@ func (u *tripGatewayUseCase) AddTrip(ctx context.Context, value *models.Trip, us
 		return nil, err
 	}
 
-	places := td.PlacesFromProtoDays(responce.Sights)
-	albums := td.AlbumsFromProtoAlbums(responce.Albums)
+	places := PlacesFromProtoDays(responce.Sights)
+	albums := AlbumsFromProtoAlbums(responce.Albums)
 	users, err := u.GetUserInfo(ctx, responce.Users)
 	if err != nil {
 		return nil, err
@@ -96,8 +95,8 @@ func (u *tripGatewayUseCase) GetTripById(ctx context.Context, tripId int, userID
 		return nil, errors.TripNotFound
 	}
 
-	places := td.PlacesFromProtoDays(responce.Sights)
-	albums := td.AlbumsFromProtoAlbums(responce.Albums)
+	places := PlacesFromProtoDays(responce.Sights)
+	albums := AlbumsFromProtoAlbums(responce.Albums)
 	users, err := u.GetUserInfo(ctx, responce.Users)
 	if err != nil {
 		return nil, err
@@ -113,16 +112,25 @@ func (u *tripGatewayUseCase) GetTripById(ctx context.Context, tripId int, userID
 	}, nil
 }
 
-func (u *tripGatewayUseCase) DeleteTrip(ctx context.Context, id int, userID int) error {
-	_, err := u.tripGRPC.DeleteTrip(ctx, &trip_service.TripRequest{
+func (u *tripGatewayUseCase) DeleteTrip(ctx context.Context, id int, userID int) ([]int, error) {
+	responce, err := u.tripGRPC.DeleteTrip(ctx, &trip_service.TripRequest{
 		TripId: int64(id),
 		UserId: int64(userID),
 	})
-	return err
+	if err != nil {
+		return []int{}, err
+	}
+
+	var users []int
+	for _, user := range responce.Users {
+		users = append(users, int(user))
+	}
+
+	return users, err
 }
 
 func (u *tripGatewayUseCase) UpdateTrip(ctx context.Context, id int, updatedTrip *models.Trip, userID int) (*models.TripWithUserInfo, error) {
-	days := td.ProtoDaysFromPlaces(updatedTrip.Sights)
+	days := ProtoDaysFromPlaces(updatedTrip.Sights)
 	trip := &trip_service.Trip{
 		Id:          int64(id),
 		Title:       updatedTrip.Title,
@@ -140,8 +148,8 @@ func (u *tripGatewayUseCase) UpdateTrip(ctx context.Context, id int, updatedTrip
 		return nil, err
 	}
 
-	places := td.PlacesFromProtoDays(responce.Sights)
-	albums := td.AlbumsFromProtoAlbums(responce.Albums)
+	places := PlacesFromProtoDays(responce.Sights)
+	albums := AlbumsFromProtoAlbums(responce.Albums)
 	users, err := u.GetUserInfo(ctx, responce.Users)
 	if err != nil {
 		return nil, err
@@ -277,8 +285,8 @@ func (u *tripGatewayUseCase) GetTripsByUser(ctx context.Context, id int) (*[]mod
 
 	var trips []models.TripWithUserInfo
 	for _, trip := range protoTrips.Trips {
-		places := td.PlacesFromProtoDays(trip.Sights)
-		albums := td.AlbumsFromProtoAlbums(trip.Albums)
+		places := PlacesFromProtoDays(trip.Sights)
+		albums := AlbumsFromProtoAlbums(trip.Albums)
 
 		users, err := u.GetUserInfo(ctx, trip.Users)
 		if err != nil {
@@ -376,4 +384,84 @@ func (u *tripGatewayUseCase) GetUserInfo(ctx context.Context, ids []int64) (*[]m
 		})
 	}
 	return &users, nil
+}
+
+func ProtoDaysFromPlaces(places []models.Place) []*trip_service.Sight {
+	var protoDays []*trip_service.Sight
+	for _, sight := range places {
+		var tags []*trip_service.Tag
+		for _, tag := range sight.Tags {
+			tags = append(tags, &trip_service.Tag{
+				Id:   int64(tag.Id),
+				Name: tag.Name,
+			})
+		}
+
+		protoSight := trip_service.Sight{
+			Id:          int64(sight.Id),
+			Name:        sight.Name,
+			Country:     sight.Country,
+			Rating:      sight.Rating,
+			Tags:        tags,
+			Description: sight.Description,
+			Photos:      sight.Photos,
+			Day:         int64(sight.Day),
+		}
+		protoDays = append(protoDays, &protoSight)
+	}
+	return protoDays
+}
+
+func PlacesFromProtoDays(sights []*trip_service.Sight) []models.Place {
+	var places []models.Place
+	for _, sight := range sights {
+		var tags []models.Tag
+		for _, tag := range sight.Tags {
+			tags = append(tags, models.Tag{
+				Id:   int(tag.Id),
+				Name: tag.Name,
+			})
+		}
+
+		placesSight := models.Place{
+			Id:          int(sight.Id),
+			Name:        sight.Name,
+			Country:     sight.Country,
+			Rating:      sight.Rating,
+			Tags:        tags,
+			Description: sight.Description,
+			Photos:      sight.Photos,
+			Day:         int(sight.Day),
+		}
+		places = append(places, placesSight)
+	}
+	return places
+}
+
+func ProtoAlbumsFromAlbums(albums []models.Album) []*trip_service.Album {
+	var protoAlbums []*trip_service.Album
+	for _, album := range albums {
+		protoAlbum := trip_service.Album{
+			Id:          int64(album.Id),
+			Title:       album.Title,
+			Description: album.Description,
+			Photos:      album.Photos,
+		}
+		protoAlbums = append(protoAlbums, &protoAlbum)
+	}
+	return protoAlbums
+}
+
+func AlbumsFromProtoAlbums(protoAlbums []*trip_service.Album) []models.Album {
+	var albums []models.Album
+	for _, album := range protoAlbums {
+		modelAlbum := models.Album{
+			Id:          int(album.Id),
+			Title:       album.Title,
+			Description: album.Description,
+			Photos:      album.Photos,
+		}
+		albums = append(albums, modelAlbum)
+	}
+	return albums
 }
