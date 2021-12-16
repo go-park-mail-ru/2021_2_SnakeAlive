@@ -389,12 +389,20 @@ func (u *tripGatewayUseCase) GetUserInfo(ctx context.Context, ids []int64) (*[]m
 func ProtoDaysFromPlaces(places []models.Place) []*trip_service.Sight {
 	var protoDays []*trip_service.Sight
 	for _, sight := range places {
+		var tags []*trip_service.Tag
+		for _, tag := range sight.Tags {
+			tags = append(tags, &trip_service.Tag{
+				Id:   int64(tag.Id),
+				Name: tag.Name,
+			})
+		}
+
 		protoSight := trip_service.Sight{
 			Id:          int64(sight.Id),
 			Name:        sight.Name,
 			Country:     sight.Country,
 			Rating:      sight.Rating,
-			Tags:        sight.Tags,
+			Tags:        tags,
 			Description: sight.Description,
 			Photos:      sight.Photos,
 			Day:         int64(sight.Day),
@@ -407,12 +415,20 @@ func ProtoDaysFromPlaces(places []models.Place) []*trip_service.Sight {
 func PlacesFromProtoDays(sights []*trip_service.Sight) []models.Place {
 	var places []models.Place
 	for _, sight := range sights {
+		var tags []models.Tag
+		for _, tag := range sight.Tags {
+			tags = append(tags, models.Tag{
+				Id:   int(tag.Id),
+				Name: tag.Name,
+			})
+		}
+
 		placesSight := models.Place{
 			Id:          int(sight.Id),
 			Name:        sight.Name,
 			Country:     sight.Country,
 			Rating:      sight.Rating,
-			Tags:        sight.Tags,
+			Tags:        tags,
 			Description: sight.Description,
 			Photos:      sight.Photos,
 			Day:         int(sight.Day),

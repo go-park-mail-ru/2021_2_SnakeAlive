@@ -15,12 +15,17 @@ message TripRequest {
   }];
 }
 
+message Tag {
+  int64 id = 1;
+  string name = 2;
+}
+
 message Sight {
   int64 id = 1;
   string name = 2;
   string country = 3;
   float rating = 4;
-  repeated string tags = 5;
+  repeated Tag tags = 5;
   string description = 6;
   repeated string photos = 7;
   int64 day = 8;

@@ -278,6 +278,8 @@ func easyjsonEe053225DecodeSnakealiveMInternalModels2(in *jlexer.Lexer, out *Sig
 			out.Id = int(in.Int())
 		case "name":
 			out.Name = string(in.String())
+		case "description":
+			out.Description = string(in.String())
 		case "tags":
 			if in.IsNull() {
 				in.Skip()
@@ -355,6 +357,11 @@ func easyjsonEe053225EncodeSnakealiveMInternalModels2(out *jwriter.Writer, in Si
 		const prefix string = ",\"name\":"
 		out.RawString(prefix)
 		out.String(string(in.Name))
+	}
+	{
+		const prefix string = ",\"description\":"
+		out.RawString(prefix)
+		out.String(string(in.Description))
 	}
 	{
 		const prefix string = ",\"tags\":"

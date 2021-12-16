@@ -29,6 +29,7 @@ type TripRepository interface {
 
 	AddLinkToCache(ctx context.Context, uuid string, id int)
 	CheckLink(ctx context.Context, uuid string, id int) bool
+	GetTags(ctx context.Context, ids []int) ([]models.Tag, error)
 }
 
 type tripRepository struct {
@@ -99,8 +100,17 @@ func (t *tripRepository) GetTripById(ctx context.Context, id int) (*models.Trip,
 	}
 
 	var place models.Place
+	tagIds := make([]int, 0)
+
 	for rows.Next() {
-		_ = rows.Scan(&place.Id, &place.Name, &place.Tags, &place.Description, &place.Rating, &place.Country, &place.Photos, &place.Day)
+		_ = rows.Scan(&place.Id, &place.Name, &tagIds, &place.Description, &place.Rating, &place.Country, &place.Photos, &place.Day)
+
+		tags, err := t.GetTags(ctx, tagIds)
+		if err != nil {
+			return &trip, err
+		}
+
+		place.Tags = tags
 		trip.Sights = append(trip.Sights, place)
 	}
 
@@ -258,8 +268,17 @@ func (t *tripRepository) GetTripsByUser(ctx context.Context, id int) (*[]models.
 		}
 
 		var place models.Place
+		var tagIds []int
+
 		for rows.Next() {
-			_ = rows.Scan(&place.Id, &place.Name, &place.Tags, &place.Description, &place.Rating, &place.Country, &place.Photos, &place.Day)
+			_ = rows.Scan(&place.Id, &place.Name, &tagIds, &place.Description, &place.Rating, &place.Country, &place.Photos, &place.Day)
+
+			tags, err := t.GetTags(ctx, tagIds)
+			if err != nil {
+				return &trips, err
+			}
+			place.Tags = tags
+
 			trips[i].Sights = append(trips[i].Sights, place)
 		}
 
@@ -457,4 +476,34 @@ func (t *tripRepository) CheckLink(ctx context.Context, uuid string, id int) boo
 
 	links.mu.Unlock()
 	return false
+}
+
+func (t *tripRepository) GetTags(ctx context.Context, ids []int) ([]models.Tag, error) {
+	conn, err := t.dataHolder.Acquire(context.Background())
+	if err != nil {
+		return []models.Tag{}, err
+	}
+	defer conn.Release()
+
+	tags := make([]models.Tag, 0)
+	var name string
+	for _, tag := range ids {
+		err = conn.QueryRow(context.Background(),
+			GetTagNameQuery,
+			tag,
+		).Scan(&name)
+		if err != nil {
+			return []models.Tag{}, err
+		}
+
+		tags = append(tags, models.Tag{
+			Id:   tag,
+			Name: name,
+		})
+	}
+
+	if err != nil {
+		return []models.Tag{}, err
+	}
+	return tags, err
 }

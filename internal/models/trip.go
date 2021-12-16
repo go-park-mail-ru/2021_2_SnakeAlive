@@ -5,7 +5,7 @@ type Place struct {
 	Name        string   `json:"name"`
 	Country     string   `json:"country"`
 	Rating      float32  `json:"rating"`
-	Tags        []string `json:"tags"`
+	Tags        []Tag    `json:"tags"`
 	Description string   `json:"description"`
 	Photos      []string `json:"photos"`
 	Day         int      `json:"day"`

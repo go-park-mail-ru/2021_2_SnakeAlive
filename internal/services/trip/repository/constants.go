@@ -7,9 +7,11 @@ const (
 	GetTripUsersQuery    = `SELECT user_id FROM TripsUsers WHERE trip_id = $1`
 	GetTripQuery         = `SELECT id, title, description FROM Trips WHERE id = $1`
 	GetPlaceForTripQuery = `SELECT pl.id, pl.name, pl.tags, pl.description, pl.rating, pl.country, pl.photos, tr.day
-								FROM TripsPlaces AS tr JOIN Places AS pl ON tr.place_id = pl.id 
+								FROM TripsPlaces AS tr 
+								JOIN Places AS pl ON tr.place_id = pl.id
 								WHERE tr.trip_id = $1
 								ORDER BY tr.day, tr.order`
+	GetTagNameQuery          = `SELECT name FROM Tags WHERE id = $1`
 	UpdateTripQuery          = `UPDATE Trips SET "title" = $1, "description" = $2, "origin" = $3 WHERE id = $4`
 	DeleteTripQuery          = `DELETE FROM Trips WHERE id = $1`
 	DeletePlacesForTripQuery = `DELETE FROM TripsPlaces WHERE trip_id = $1`

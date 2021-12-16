@@ -679,16 +679,16 @@ func easyjson30497fe1DecodeSnakealiveMInternalModels5(in *jlexer.Lexer, out *Pla
 				in.Delim('[')
 				if out.Tags == nil {
 					if !in.IsDelim(']') {
-						out.Tags = make([]string, 0, 4)
+						out.Tags = make([]Tag, 0, 2)
 					} else {
-						out.Tags = []string{}
+						out.Tags = []Tag{}
 					}
 				} else {
 					out.Tags = (out.Tags)[:0]
 				}
 				for !in.IsDelim(']') {
-					var v19 string
-					v19 = string(in.String())
+					var v19 Tag
+					easyjson30497fe1DecodeSnakealiveMInternalModels6(in, &v19)
 					out.Tags = append(out.Tags, v19)
 					in.WantComma()
 				}
@@ -766,7 +766,7 @@ func easyjson30497fe1EncodeSnakealiveMInternalModels5(out *jwriter.Writer, in Pl
 				if v21 > 0 {
 					out.RawByte(',')
 				}
-				out.String(string(v22))
+				easyjson30497fe1EncodeSnakealiveMInternalModels6(out, v22)
 			}
 			out.RawByte(']')
 		}
@@ -823,7 +823,56 @@ func (v *Place) UnmarshalJSON(data []byte) error {
 func (v *Place) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjson30497fe1DecodeSnakealiveMInternalModels5(l, v)
 }
-func easyjson30497fe1DecodeSnakealiveMInternalModels6(in *jlexer.Lexer, out *Album) {
+func easyjson30497fe1DecodeSnakealiveMInternalModels6(in *jlexer.Lexer, out *Tag) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeFieldName(false)
+		in.WantColon()
+		if in.IsNull() {
+			in.Skip()
+			in.WantComma()
+			continue
+		}
+		switch key {
+		case "id":
+			out.Id = int(in.Int())
+		case "name":
+			out.Name = string(in.String())
+		default:
+			in.SkipRecursive()
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjson30497fe1EncodeSnakealiveMInternalModels6(out *jwriter.Writer, in Tag) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	{
+		const prefix string = ",\"id\":"
+		out.RawString(prefix[1:])
+		out.Int(int(in.Id))
+	}
+	{
+		const prefix string = ",\"name\":"
+		out.RawString(prefix)
+		out.String(string(in.Name))
+	}
+	out.RawByte('}')
+}
+func easyjson30497fe1DecodeSnakealiveMInternalModels7(in *jlexer.Lexer, out *Album) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -885,7 +934,7 @@ func easyjson30497fe1DecodeSnakealiveMInternalModels6(in *jlexer.Lexer, out *Alb
 		in.Consumed()
 	}
 }
-func easyjson30497fe1EncodeSnakealiveMInternalModels6(out *jwriter.Writer, in Album) {
+func easyjson30497fe1EncodeSnakealiveMInternalModels7(out *jwriter.Writer, in Album) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -936,23 +985,23 @@ func easyjson30497fe1EncodeSnakealiveMInternalModels6(out *jwriter.Writer, in Al
 // MarshalJSON supports json.Marshaler interface
 func (v Album) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson30497fe1EncodeSnakealiveMInternalModels6(&w, v)
+	easyjson30497fe1EncodeSnakealiveMInternalModels7(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Album) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson30497fe1EncodeSnakealiveMInternalModels6(w, v)
+	easyjson30497fe1EncodeSnakealiveMInternalModels7(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Album) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson30497fe1DecodeSnakealiveMInternalModels6(&r, v)
+	easyjson30497fe1DecodeSnakealiveMInternalModels7(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Album) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson30497fe1DecodeSnakealiveMInternalModels6(l, v)
+	easyjson30497fe1DecodeSnakealiveMInternalModels7(l, v)
 }

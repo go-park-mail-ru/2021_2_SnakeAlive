@@ -127,14 +127,15 @@ func (t *sightUseCase) GetSightsByTag(ctx context.Context, tag int) ([]models.Si
 
 func (t *sightUseCase) adaptSightMeta(sight *sight_service.Sight) models.SightMetadata {
 	return models.SightMetadata{
-		Id:      int(sight.Id),
-		Name:    sight.Name,
-		Tags:    sight.Tags,
-		Photos:  sight.Photos,
-		Country: sight.Country,
-		Rating:  sight.Rating,
-		Lat:     sight.Lat,
-		Lng:     sight.Lng,
+		Id:          int(sight.Id),
+		Name:        sight.Name,
+		Tags:        sight.Tags,
+		Photos:      sight.Photos,
+		Description: sight.Description,
+		Country:     sight.Country,
+		Rating:      sight.Rating,
+		Lat:         sight.Lat,
+		Lng:         sight.Lng,
 	}
 }
 

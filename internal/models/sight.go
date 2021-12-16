@@ -6,14 +6,15 @@ type Sight struct {
 }
 
 type SightMetadata struct {
-	Id      int      `json:"id"`
-	Name    string   `json:"name"`
-	Tags    []string `json:"tags"`
-	Photos  []string `json:"photos"`
-	Country string   `json:"country"`
-	Rating  float32  `json:"rating"`
-	Lat     float32  `json:"lat"`
-	Lng     float32  `json:"lng"`
+	Id          int      `json:"id"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Tags        []string `json:"tags"`
+	Photos      []string `json:"photos"`
+	Country     string   `json:"country"`
+	Rating      float32  `json:"rating"`
+	Lat         float32  `json:"lat"`
+	Lng         float32  `json:"lng"`
 }
 
 type SightSearch struct {
