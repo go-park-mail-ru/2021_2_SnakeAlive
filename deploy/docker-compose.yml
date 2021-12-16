@@ -69,6 +69,23 @@ services:
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
 
+  websocket_service:
+    build:
+      dockerfile: Dockerfile.websocket
+      context: ../.
+      args:
+        - APP_PKG_NAME=snakealive/m
+        - GOOS=linux
+    ports:
+      - "5050:5050"
+    environment:
+      - WEBSOCKET_DB_URL=${PSQL_CONN}
+      - WEBSOCKET_PORT=:5050
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+    networks:
+      - mynet
+
   gateway:
     image: znajderko/snake_gateway
     depends_on:
@@ -76,6 +93,7 @@ services:
       - auth_service
       - sight_service
       - review_service
+      - websocket_service
     build:
       dockerfile: Dockerfile.gateway
       context: ../.
@@ -99,4 +117,9 @@ services:
       - GATEWAY_S3_SECRET_ID=${S3_ID}
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
+    networks:
+      - mynet
 
+networks:
+  mynet:
+    driver: bridge
