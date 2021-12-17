@@ -341,7 +341,7 @@ func (s *tripDelivery) ShareLink(ctx context.Context, request *trip_service.Shar
 func (s *tripDelivery) AddUserByLink(ctx context.Context, request *trip_service.AddByShareRequest) (*trip_service.Link, error) {
 	authorized, err := s.tripUsecase.CheckTripAuthor(ctx, int(request.UserId), int(request.TripId))
 	if authorized || err != nil {
-		return nil, errors.DeniedAccess
+		return nil, errors.UserIsAlreadyAuthor
 	}
 
 	if !s.tripUsecase.CheckLink(ctx, request.Uuid, int(request.TripId)) {

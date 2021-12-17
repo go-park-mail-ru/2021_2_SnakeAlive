@@ -12,6 +12,7 @@ var (
 
 var DeniedAccess = errors.New("user doesn't have permission for this action")
 var TripNotFound = errors.New("trip not found")
+var UserIsAlreadyAuthor = errors.New("user is already author")
 
 var (
 	GatewayErrorMsgSessionNotFound = "сессия отсутствует"
