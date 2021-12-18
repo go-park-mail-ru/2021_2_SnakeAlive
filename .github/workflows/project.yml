@@ -5,6 +5,8 @@ on:
     branches: [ main, develop, pre-develop ]
   push:
     branches: [ main, develop, pre-develop ]
+    tags:
+      - "v*"
 
 permissions:
   contents: read
