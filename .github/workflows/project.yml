@@ -24,6 +24,7 @@ jobs:
       - run: go fmt ./...
 
   lint:
+    needs: [vet]
     name: lint
     runs-on: ubuntu-latest
     steps:
@@ -37,6 +38,7 @@ jobs:
           version: latest
 
   test:
+    needs: [lint]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -46,6 +48,7 @@ jobs:
       - run: go test ./...
 
   deploy:
+    needs: [lint, test, vet]
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
