@@ -13,7 +13,6 @@ import (
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/error_adapter"
 
-	"github.com/mailru/easyjson"
 	"github.com/valyala/fasthttp"
 )
 
@@ -66,7 +65,7 @@ func (s *tripGatewayDelivery) Trip(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	bytes, err := easyjson.Marshal(trip)
+	bytes, err := json.Marshal(trip)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
@@ -80,7 +79,7 @@ func (s *tripGatewayDelivery) AddTrip(ctx *fasthttp.RequestCtx) {
 	userID := ctx.UserValue(cnst.UserIDContextKey).(int)
 
 	trip := new(models.Trip)
-	if err := easyjson.Unmarshal(ctx.PostBody(), trip); err != nil {
+	if err := json.Unmarshal(ctx.PostBody(), trip); err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
@@ -92,7 +91,7 @@ func (s *tripGatewayDelivery) AddTrip(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	bytes, err := easyjson.Marshal(responceTrip)
+	bytes, err := json.Marshal(responceTrip)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
@@ -107,7 +106,7 @@ func (s *tripGatewayDelivery) UpdateTrip(ctx *fasthttp.RequestCtx) {
 	userID := ctx.UserValue(cnst.UserIDContextKey).(int)
 
 	trip := new(models.Trip)
-	if err := easyjson.Unmarshal(ctx.PostBody(), trip); err != nil {
+	if err := json.Unmarshal(ctx.PostBody(), trip); err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
@@ -118,7 +117,7 @@ func (s *tripGatewayDelivery) UpdateTrip(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	bytes, err := easyjson.Marshal(responceTrip)
+	bytes, err := json.Marshal(responceTrip)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
@@ -166,7 +165,7 @@ func (s *tripGatewayDelivery) Album(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	bytes, err := easyjson.Marshal(album)
+	bytes, err := json.Marshal(album)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
@@ -180,7 +179,7 @@ func (s *tripGatewayDelivery) AddAlbum(ctx *fasthttp.RequestCtx) {
 	userID := ctx.UserValue(cnst.UserIDContextKey).(int)
 
 	album := new(models.Album)
-	if err := easyjson.Unmarshal(ctx.PostBody(), album); err != nil {
+	if err := json.Unmarshal(ctx.PostBody(), album); err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
@@ -191,7 +190,7 @@ func (s *tripGatewayDelivery) AddAlbum(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	bytes, err := easyjson.Marshal(album)
+	bytes, err := json.Marshal(album)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
@@ -206,7 +205,7 @@ func (s *tripGatewayDelivery) UpdateAlbum(ctx *fasthttp.RequestCtx) {
 	userID := ctx.UserValue(cnst.UserIDContextKey).(int)
 
 	album := new(models.Album)
-	if err := easyjson.Unmarshal(ctx.PostBody(), album); err != nil {
+	if err := json.Unmarshal(ctx.PostBody(), album); err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
@@ -217,7 +216,7 @@ func (s *tripGatewayDelivery) UpdateAlbum(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	bytes, err := easyjson.Marshal(album)
+	bytes, err := json.Marshal(album)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
@@ -308,7 +307,7 @@ func (s *tripGatewayDelivery) AddTripUser(ctx *fasthttp.RequestCtx) {
 	author := ctx.UserValue(cnst.UserIDContextKey).(int)
 
 	user := new(models.TripUser)
-	if err := easyjson.Unmarshal(ctx.PostBody(), user); err != nil {
+	if err := json.Unmarshal(ctx.PostBody(), user); err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}

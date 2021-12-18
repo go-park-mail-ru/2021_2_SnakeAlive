@@ -1,11 +1,11 @@
 package delivery
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 	"time"
 
-	"github.com/mailru/easyjson"
 	"snakealive/m/internal/gateway/user/usecase"
 	"snakealive/m/internal/models"
 	cnst "snakealive/m/pkg/constants"
@@ -31,7 +31,7 @@ type userDelivery struct {
 
 func (u *userDelivery) Login(ctx *fasthttp.RequestCtx) {
 	var request = &models.LoginUserRequest{}
-	if err := easyjson.Unmarshal(ctx.Request.Body(), request); err != nil {
+	if err := json.Unmarshal(ctx.Request.Body(), request); err != nil {
 		ctx.SetStatusCode(http.StatusBadRequest)
 		ctx.SetBody([]byte(cnst.WrongRequestBody))
 		return
@@ -45,7 +45,7 @@ func (u *userDelivery) Login(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	b, _ := easyjson.Marshal(response)
+	b, _ := json.Marshal(response)
 	ctx.SetStatusCode(http.StatusOK)
 	ctx.SetBody(b)
 
@@ -72,7 +72,7 @@ func (u *userDelivery) Logout(ctx *fasthttp.RequestCtx) {
 
 func (u *userDelivery) Register(ctx *fasthttp.RequestCtx) {
 	var request = &models.RegisterUserRequest{}
-	if err := easyjson.Unmarshal(ctx.Request.Body(), request); err != nil {
+	if err := json.Unmarshal(ctx.Request.Body(), request); err != nil {
 		ctx.SetStatusCode(http.StatusBadRequest)
 		ctx.SetBody([]byte(cnst.WrongRequestBody))
 		return
@@ -86,7 +86,7 @@ func (u *userDelivery) Register(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	b, _ := easyjson.Marshal(response)
+	b, _ := json.Marshal(response)
 	ctx.SetStatusCode(http.StatusOK)
 	ctx.SetBody(b)
 
@@ -109,14 +109,14 @@ func (u *userDelivery) GetProfile(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	b, _ := easyjson.Marshal(response)
+	b, _ := json.Marshal(response)
 	ctx.SetStatusCode(http.StatusOK)
 	ctx.SetBody(b)
 }
 
 func (u *userDelivery) UpdateProfile(ctx *fasthttp.RequestCtx) {
 	var request = &models.UpdateProfileRequest{}
-	if err := easyjson.Unmarshal(ctx.Request.Body(), request); err != nil {
+	if err := json.Unmarshal(ctx.Request.Body(), request); err != nil {
 		ctx.SetStatusCode(http.StatusBadRequest)
 		ctx.SetBody([]byte(cnst.WrongRequestBody))
 		return
@@ -131,7 +131,7 @@ func (u *userDelivery) UpdateProfile(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	b, _ := easyjson.Marshal(response)
+	b, _ := json.Marshal(response)
 	ctx.SetStatusCode(http.StatusOK)
 	ctx.SetBody(b)
 }
@@ -146,7 +146,7 @@ func (u *userDelivery) GetUserInfo(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	b, _ := easyjson.Marshal(responce)
+	b, _ := json.Marshal(responce)
 	ctx.SetStatusCode(http.StatusOK)
 	ctx.SetBody(b)
 }

@@ -1,11 +1,11 @@
 package delivery
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"path/filepath"
 
-	"github.com/mailru/easyjson"
 	"github.com/valyala/fasthttp"
 	"snakealive/m/internal/gateway/media/usecase"
 	"snakealive/m/internal/models"
@@ -42,7 +42,7 @@ func (m *mediaDelivery) UploadFile(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	b, _ := easyjson.Marshal(models.UploadFileResponse{Filename: filename})
+	b, _ := json.Marshal(models.UploadFileResponse{Filename: filename})
 	ctx.Response.SetBody(b)
 	ctx.SetStatusCode(http.StatusOK)
 }
