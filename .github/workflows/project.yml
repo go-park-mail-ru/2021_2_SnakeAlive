@@ -2,9 +2,9 @@ name: tripadvisor prepare
 
 on:
   pull_request:
-    branches: [ main, develop, pre-develop ]
+    branches: [ main, develop ]
   push:
-    branches: [ main, develop, pre-develop ]
+    branches: [ main, develop ]
     tags:
       - "v*"
 
