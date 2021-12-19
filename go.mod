@@ -11,11 +11,8 @@ require github.com/jackc/pgx/v4 v4.13.0
 require github.com/stretchr/testify v1.7.0
 
 require (
-	github.com/701search/fasthttp-prometheus-middleware v1.0.2 // indirect
 	github.com/aws/aws-sdk-go v1.42.12
-	github.com/buaazp/fasthttprouter v0.1.1 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.1.0
-	github.com/flf2ko/fasthttp-prometheus v0.0.0-20190919043550-19a35482dac4 // indirect
 	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.2

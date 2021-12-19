@@ -12,7 +12,6 @@ import (
 	socket "snakealive/m/internal/models"
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/error_adapter"
-	"snakealive/m/pkg/errors"
 
 	"github.com/mailru/easyjson"
 	"github.com/valyala/fasthttp"
@@ -357,7 +356,8 @@ func (s *tripGatewayDelivery) AddUserByLink(ctx *fasthttp.RequestCtx) {
 	author := ctx.UserValue(cnst.UserIDContextKey).(int)
 
 	redirectURI, err := s.manager.AddUserByLink(ctx, author, id, code)
-	if err != nil && err != errors.UserIsAlreadyAuthor {
+
+	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
