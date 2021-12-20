@@ -3,11 +3,14 @@ package repository
 import "strconv"
 
 const (
-	GetSightByIdQuery = `SELECT id, name, country, rating, array(
-								select name
-								from Tags t
-								where t.id = ANY(tags)
-								) as tag_arr, description, photos, lng, lat FROM Places WHERE id = $1`
+	GetSightByIdQuery = `SELECT pl.id, pl.name, ct.translated, pl.rating, array(
+							select name
+							from Tags t
+							where t.id = ANY(tags)
+							) as tag_arr, pl.description,
+       						pl.photos, pl.lng, pl.lat FROM Places AS pl
+							JOIN Countries AS ct
+							ON ct.name = pl.country WHERE pl.id = $1`
 	GetSightsByCountryQuery = `SELECT id, name, description, array(
 								select name
 								from Tags t

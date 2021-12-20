@@ -32,6 +32,7 @@ func NewWebSocketDelivery(websocketUsecase usecase.WebsocketUseCase) WebsocketDe
 }
 
 func (d *websocketDelivery) Connect(w http.ResponseWriter, r *http.Request) {
+
 	fmt.Println("Got in Connect  ", r.URL.String())
 	cookie, err := r.Cookie(cnst.CookieName)
 	if err != nil {
