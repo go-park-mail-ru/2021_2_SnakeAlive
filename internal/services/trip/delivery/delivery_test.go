@@ -2,16 +2,20 @@ package delivery
 
 import (
 	"context"
+	"fmt"
+	"strconv"
 	"testing"
 
 	service_mocks "snakealive/m/internal/mocks"
 	"snakealive/m/internal/services/trip/models"
 	trip_usecase "snakealive/m/internal/services/trip/usecase"
+	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/error_adapter"
 	"snakealive/m/pkg/grpc_errors"
 	trip_service "snakealive/m/pkg/services/trip"
 
 	"github.com/golang/mock/gomock"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/valyala/fasthttp"
 )
@@ -479,4 +483,160 @@ func TestHandler_TripsByUser(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedTrips, aquiredTrip)
+}
+
+func TestHandler_GetAlbumsByUser(t *testing.T) {
+	ctx := &fasthttp.RequestCtx{}
+
+	userID := 1
+	albums := make([]models.Album, 0)
+	albums = append(albums, models.Album{
+		Id:          1,
+		Title:       "Best album",
+		Description: "Wow so cool",
+	})
+
+	var expectedAlbums trip_service.Albums
+	expectedAlbums.Albums = append(expectedAlbums.Albums, &trip_service.Album{
+		Id:          1,
+		Title:       "Best album",
+		Description: "Wow so cool",
+	})
+
+	request := &trip_service.ByUserRequest{
+		UserId: int64(userID),
+	}
+
+	mockGetAlbumsByUser := func(r *service_mocks.MockTripRepository, ctx context.Context, id int, albums *[]models.Album) {
+		r.EXPECT().AlbumsByUser(ctx, id).Return(albums, nil).AnyTimes()
+	}
+
+	c := gomock.NewController(t)
+	defer c.Finish()
+
+	tripRepo := service_mocks.NewMockTripRepository(c)
+	mockGetAlbumsByUser(tripRepo, ctx, userID, &albums)
+
+	tripUsecase := trip_usecase.NewTripUseCase(tripRepo)
+	tripDelivery := NewTripDelivery(tripUsecase, error_adapter.NewErrorAdapter(grpc_errors.PreparedAuthServiceErrorMap))
+
+	aquiredAlbum, err := tripDelivery.GetAlbumsByUser(ctx, request)
+
+	assert.Nil(t, err)
+	assert.Equal(t, &expectedAlbums, aquiredAlbum)
+}
+
+func TestHandler_AddTripUser(t *testing.T) {
+	ctx := &fasthttp.RequestCtx{}
+
+	author := 1
+	userID := 2
+	tripID := 1
+
+	request := &trip_service.AddTripUserRequest{
+		UserId: int64(userID),
+		TripId: int64(tripID),
+		Author: int64(author),
+	}
+
+	mockAddTripUser := func(r *service_mocks.MockTripRepository, ctx context.Context, tripId int, userID int) {
+		r.EXPECT().AddTripUser(ctx, tripId, userID).Return(nil).AnyTimes()
+	}
+	mockGetTripAuthor := func(r *service_mocks.MockTripRepository, ctx context.Context, id int, userID int) {
+		r.EXPECT().GetTripAuthors(ctx, id).Return([]int{userID}, nil).AnyTimes()
+	}
+
+	c := gomock.NewController(t)
+	defer c.Finish()
+
+	tripRepo := service_mocks.NewMockTripRepository(c)
+	mockAddTripUser(tripRepo, ctx, tripID, userID)
+	mockGetTripAuthor(tripRepo, ctx, tripID, author)
+
+	tripUsecase := trip_usecase.NewTripUseCase(tripRepo)
+	tripDelivery := NewTripDelivery(tripUsecase, error_adapter.NewErrorAdapter(grpc_errors.PreparedAuthServiceErrorMap))
+
+	_, err := tripDelivery.AddTripUser(ctx, request)
+
+	assert.Nil(t, err)
+}
+
+func TestHandler_ShareLink(t *testing.T) {
+	ctx := &fasthttp.RequestCtx{}
+
+	author := 1
+	tripID := 1
+
+	request := &trip_service.ShareRequest{
+		UserId: int64(author),
+		TripId: int64(tripID),
+	}
+
+	idStr := strconv.Itoa(tripID)
+	uuidLink := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(idStr)))
+	link := cnst.ShareTrip + uuidLink + "/" + idStr
+
+	mockAddLinkToCache := func(r *service_mocks.MockTripRepository, ctx context.Context, tripId int, link string) {
+		r.EXPECT().AddLinkToCache(ctx, link, tripId).Return().AnyTimes()
+	}
+	mockGetTripAuthor := func(r *service_mocks.MockTripRepository, ctx context.Context, id int, userID int) {
+		r.EXPECT().GetTripAuthors(ctx, id).Return([]int{userID}, nil).AnyTimes()
+	}
+
+	c := gomock.NewController(t)
+	defer c.Finish()
+
+	tripRepo := service_mocks.NewMockTripRepository(c)
+	mockAddLinkToCache(tripRepo, ctx, tripID, uuidLink)
+	mockGetTripAuthor(tripRepo, ctx, tripID, author)
+
+	tripUsecase := trip_usecase.NewTripUseCase(tripRepo)
+	tripDelivery := NewTripDelivery(tripUsecase, error_adapter.NewErrorAdapter(grpc_errors.PreparedAuthServiceErrorMap))
+
+	aquiredLink, err := tripDelivery.ShareLink(ctx, request)
+
+	assert.Equal(t, link, aquiredLink.Link)
+	assert.Nil(t, err)
+}
+
+func TestHandler_AddUserByLink(t *testing.T) {
+	ctx := &fasthttp.RequestCtx{}
+
+	author := 1
+	tripID := 1
+	idStr := strconv.Itoa(tripID)
+	uuidLink := fmt.Sprint(uuid.NewMD5(uuid.UUID{}, []byte(idStr)))
+	link := cnst.TripPostURL + "/" + idStr
+
+	request := &trip_service.AddByShareRequest{
+		UserId: int64(author),
+		TripId: int64(tripID),
+		Uuid:   uuidLink,
+	}
+
+	mockAddTripUser := func(r *service_mocks.MockTripRepository, ctx context.Context, tripId int, userID int) {
+		r.EXPECT().AddTripUser(ctx, tripId, userID).Return(nil).AnyTimes()
+	}
+	mockGetTripAuthor := func(r *service_mocks.MockTripRepository, ctx context.Context, id int, userID int) {
+		r.EXPECT().GetTripAuthors(ctx, id).Return([]int{}, nil).AnyTimes()
+	}
+	mockCheckLink := func(r *service_mocks.MockTripRepository, ctx context.Context, link string, userID int) {
+		r.EXPECT().CheckLink(ctx, link, userID).Return(true).AnyTimes()
+	}
+
+	c := gomock.NewController(t)
+	defer c.Finish()
+
+	tripRepo := service_mocks.NewMockTripRepository(c)
+	mockAddTripUser(tripRepo, ctx, tripID, author)
+	mockGetTripAuthor(tripRepo, ctx, tripID, author)
+	mockCheckLink(tripRepo, ctx, uuidLink, tripID)
+
+	tripUsecase := trip_usecase.NewTripUseCase(tripRepo)
+	tripDelivery := NewTripDelivery(tripUsecase, error_adapter.NewErrorAdapter(grpc_errors.PreparedAuthServiceErrorMap))
+
+	aquiredLink, err := tripDelivery.AddUserByLink(ctx, request)
+
+	assert.Equal(t, link, aquiredLink.Link)
+	assert.Nil(t, err)
 }
