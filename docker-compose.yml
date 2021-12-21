@@ -75,7 +75,6 @@ services:
       - auth_service
       - sight_service
       - review_service
-      - websocket_service
     build:
       dockerfile: Dockerfile.gateway
       context: .
