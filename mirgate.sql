@@ -460,10 +460,10 @@ VALUES ('Крепость Пражский Град',
         'Пражский Град является символом чешского государства вот уже более тысячи лет. Он был заложен в 9-м столетии и стал резиденцией чешских королей, а потом – и президентов. Один из самых больших крепостных комплексов в мире, он объединяет дворцовые, служебные, фортификационные, религиозные сооружения, сады и живописные уголки. Панорама Града – незабываемое зрелище, которое останется в Вашей памяти навсегда.',
         ARRAY[4, 2, 6, 15],
         ARRAY[
-        'https://snakehastrip.hb.bizmrg.com/krep_prazh_grad1.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/krep_prazh_grad2.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/krep_prazh_grad3.jpeg'
-        'https://snakehastrip.hb.bizmrg.com/krep_prazh_grad4.jpeg',
+        'https://snakehastrip.hb.bizmrg.com/krep_prazh_grad1.webp',
+        'https://snakehastrip.hb.bizmrg.com/krep_prazh_grad2.webp',
+        'https://snakehastrip.hb.bizmrg.com/krep_prazh_grad3.webp'
+        'https://snakehastrip.hb.bizmrg.com/krep_prazh_grad4.webp',
            ]),
         ('Карлов Мост',
         'Czech',
@@ -473,9 +473,9 @@ VALUES ('Крепость Пражский Град',
         'Карлов мост – символ Праги, самая популярная достопримечательность города и второй в истории каменный мост через Влтаву. Он до сих пор привлекает людей не только своей красотой и тридцатью барочными статуями XVII века, но и множеством легенд и загадок. Его история связана с магией, астрологией и неразгаданными тайнами. Удивительно, что мост преподносит сюрпризы исследователям до сих пор.',
         ARRAY[4, 2, 11],
         ARRAY[
-            'https://snakehastrip.hb.bizmrg.com/czech_carlov_most1.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/czech_carlov_most2.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/czech_carlov_most3.jpeg'
+            'https://snakehastrip.hb.bizmrg.com/czech_carlov_most1.webp',
+        'https://snakehastrip.hb.bizmrg.com/czech_carlov_most2.webp',
+        'https://snakehastrip.hb.bizmrg.com/czech_carlov_most3.webp'
            ]),
         ('Собор Святого Вита',
         'Czech',
@@ -485,9 +485,9 @@ VALUES ('Крепость Пражский Град',
         'Собор Святого Вита – храм, украшающий исторический центр чешской столицы; доминанта Пражского града. Это один из самых знаменитых долгостроев Европы: подлинная средневековая готика органично сочетается в нем с элементами барокко и искусными неоготическими стилизациями.',
         ARRAY[4, 2, 6, 12],
         ARRAY[
-            'https://snakehastrip.hb.bizmrg.com/czech_st_vit1.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/czech_st_vit12.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/czech_st_vit3.jpeg'
+            'https://snakehastrip.hb.bizmrg.com/czech_st_vit1.webp',
+        'https://snakehastrip.hb.bizmrg.com/czech_st_vit12.webp',
+        'https://snakehastrip.hb.bizmrg.com/czech_st_vit3.webp'
             ]),
        ('Петршин Холм',
         'Czech',
@@ -497,9 +497,9 @@ VALUES ('Крепость Пражский Град',
         'Холм Петршин, как известно, раньше имел несколько других названий. Сначала он назывался горой, потом носил им Копец или Холм Св. Лаврентия, тогда там был установлен крест',
         ARRAY[2, 16],
         ARRAY[
-            'https://snakehastrip.hb.bizmrg.com/czech_petr_1.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/czech_petr_2.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/czech_petr_3.jpeg'
+            'https://snakehastrip.hb.bizmrg.com/czech_petr_1.webp',
+        'https://snakehastrip.hb.bizmrg.com/czech_petr_2.webp',
+        'https://snakehastrip.hb.bizmrg.com/czech_petr_3.webp'
             ]),
        ('Йозефов',
         'Czech',
@@ -509,9 +509,9 @@ VALUES ('Крепость Пражский Град',
         'Йозефов – самый таинственный район Праги, овеянный множеством легенд, преданий и мифов. До 1850 года представлял собой сердце еврейской общины Праги, поэтому его также называют еврейским кварталом. Район находится между правым берегом реки Влтавы и Староместской площадью.',
         ARRAY[4, 12],
         ARRAY[
-            'https://snakehastrip.hb.bizmrg.com/czech_josefov1.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/czech_josefov2.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/czech_josefov3.jpeg'
+            'https://snakehastrip.hb.bizmrg.com/czech_josefov1.webp',
+        'https://snakehastrip.hb.bizmrg.com/czech_josefov2.webp',
+        'https://snakehastrip.hb.bizmrg.com/czech_josefov3.webp'
             ]),
        ('Староместская площадь',
         'Czech',
@@ -521,9 +521,9 @@ VALUES ('Крепость Пражский Град',
         'Холм Петршин, как известно, раньше имел несколько других названий. Сначала он назывался горой, потом носил им Копец или Холм Св. Лаврентия, тогда там был установлен крест',
         ARRAY[4, 6, 8],
         ARRAY[
-            'https://snakehastrip.hb.bizmrg.com/czech_pl1.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/czech_pl2.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/czech_pl3.jpeg'
+            'https://snakehastrip.hb.bizmrg.com/czech_pl1.webp',
+        'https://snakehastrip.hb.bizmrg.com/czech_pl2.webp',
+        'https://snakehastrip.hb.bizmrg.com/czech_pl3.webp'
             ]);
 
 
@@ -540,9 +540,9 @@ VALUES ('Музей Рембрандта',
         'Музей Рембрандта — художественный музей на улице Йоденбреестраат в Еврейском квартале Амстердама. Музей открылся в 1911 году в доме, который Рембрандт приобрёл на пике славы в 1639 году и в котором проживал до своего банкротства в 1656 году.',
         ARRAY[17],
         ARRAY[
-            'https://snakehastrip.hb.bizmrg.com/neth_rembrandthuis1.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/neth_rembrandthuis2.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/neth_rembrandthuis3.jpeg'
+            'https://snakehastrip.hb.bizmrg.com/neth_rembrandthuis1.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_rembrandthuis2.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_rembrandthuis3.webp'
            ]),
        ('Улица Красных Фонарей',
         'Netherlands',
@@ -552,9 +552,9 @@ VALUES ('Музей Рембрандта',
         'Улица Красных Фонарей — район Амстердама, являющийся одной из самых известных и пикантных достопримечательностей города. Он состоит из сети переулков с невысокими зданиями, содержащими множество однокомнатных номеров с витринами.',
         ARRAY[1, 6],
         ARRAY[
-            'https://snakehastrip.hb.bizmrg.com/neth_red_light1.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/neth_red_light2.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/neth_red_light3.jpeg'
+            'https://snakehastrip.hb.bizmrg.com/neth_red_light1.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_red_light2.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_red_light3.webp'
            ]),
        ('Музей Ван Гога',
         'Netherlands',
@@ -564,10 +564,10 @@ VALUES ('Музей Рембрандта',
         'Музей Ван Гога в Амстердаме — самая большая коллекция творений Ван Гога в мире, здесь представлено 200 картин, 437 рисунков и 31 гравюра, включая знаменитые Подсолнухи, Белый сад и Желтый дом, а также множество автопортретов художника.',
         ARRAY[6, 17],
         ARRAY[
-            'https://snakehastrip.hb.bizmrg.com/neth_van1.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/neth_van2.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/neth_van3.jpeg'
-            'https://snakehastrip.hb.bizmrg.com/neth_van4.jpeg',
+            'https://snakehastrip.hb.bizmrg.com/neth_van1.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_van2.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_van3.webp'
+            'https://snakehastrip.hb.bizmrg.com/neth_van4.webp',
            ]),
        ('Площадь Дам',
         'Netherlands',
@@ -577,9 +577,9 @@ VALUES ('Музей Рембрандта',
         'Площадь Дам – центральное место Амстердама, где проходят ярмарки, концерты и прочие торжественные события. Она находится в 750 м от основного транспортного узла столицы Нидерландов – станции Сентрал. Данное место по форме является прямоугольником площадью 20 000 м². К площади примыкает бульвар Дамрак и улицы Рокин, Ньивендейк, Кальверстрат, Дамстрат.',
         ARRAY[2, 6, 11, 15],
         ARRAY[
-            'https://snakehastrip.hb.bizmrg.com/neth_sq_dam1.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/neth_sq_dam2.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/neth_sq_dam3.jpeg'
+            'https://snakehastrip.hb.bizmrg.com/neth_sq_dam1.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_sq_dam2.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_sq_dam3.webp'
            ]),
        ('Рейксмузеум',
         'Netherlands',
@@ -589,9 +589,9 @@ VALUES ('Музей Рембрандта',
         'Рейксмузеум — Амстердамский Государственный музей, крупнейший музей искусства в Нидерландах. В нем хранится более миллиона экспонатов. Рейксмузеум был открыт в 1885 году и стал достопримечательностью города, сочетая черты готического стиля и Возрождения.',
         ARRAY[4, 17],
         ARRAY[
-            'https://snakehastrip.hb.bizmrg.com/neth_wtf1.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/neth_wtf2.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/neth_wtf3.jpeg'
+            'https://snakehastrip.hb.bizmrg.com/neth_wtf1.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_wtf2.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_wtf3.webp'
            ]),
        ('Парк цветов Кекенхоф',
         'Netherlands',
@@ -601,7 +601,7 @@ VALUES ('Музей Рембрандта',
         'Кекенхоф — всемирно известный королевский парк цветов в Нидерландах. Находится на побережье между Амстердамом и Гаагой в небольшом городке Лиссе, при приближении к которому можно видеть указатели маршрута на Кекенхоф.',
         ARRAY[2, 3],
         ARRAY[
-            'https://snakehastrip.hb.bizmrg.com/neth_park1.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/neth_park2.jpeg',
-        'https://snakehastrip.hb.bizmrg.com/neth_park3.jpeg'
+            'https://snakehastrip.hb.bizmrg.com/neth_park1.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_park2.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_park3.webp'
            ]);
