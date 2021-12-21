@@ -51,7 +51,7 @@ func (t *sightUseCase) SearchSights(ctx context.Context, req *models.SearchSight
 func (t *sightUseCase) GetSightByID(ctx context.Context, id int) (models.SightMetadata, error) {
 	response, err := t.sightGRPC.GetSight(ctx, &sight_service.GetSightRequest{Id: int64(id)})
 	if err != nil {
-		return models.SightMetadata{}, nil
+		return models.SightMetadata{}, err
 	}
 
 	return t.adaptSightMeta(response.Sight), nil
