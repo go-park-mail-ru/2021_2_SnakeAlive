@@ -6,19 +6,19 @@ protogen-api-with-validator:
     		--go_out=. --go_opt=paths=source_relative 				\
 			--go-grpc_out=. --go-grpc_opt=paths=source_relative \
     		--validate_out=lang=go,paths=source_relative:. \
-    		$(path)
+    		$(path)/api.proto && mockgen -source=$(path)/api_grpc.pb.go -destination=$(path)/mock/api_mock.go
 
 protogen-api-auth-service:
-	make protogen-api-with-validator path=pkg/services/auth/api.proto
+	make protogen-api-with-validator path=pkg/services/auth
 
 protogen-api-trip-service:
-	make protogen-api-with-validator path=pkg/services/trip/api.proto
+	make protogen-api-with-validator path=pkg/services/trip
 
 protogen-api-sight-service:
-	make protogen-api-with-validator path=pkg/services/sight/api.proto
+	make protogen-api-with-validator path=pkg/services/sight
 
 protogen-api-review-service:
-	make protogen-api-with-validator path=pkg/services/review/api.proto
+	make protogen-api-with-validator path=pkg/services/review
 
 protogen-all-services:
 	make protogen-api-auth-service && \
