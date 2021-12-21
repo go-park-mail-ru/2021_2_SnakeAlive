@@ -3,13 +3,10 @@ package delivery
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"strconv"
 
-	"snakealive/m/internal/gateway/config"
 	"snakealive/m/internal/gateway/trip/usecase"
 	"snakealive/m/internal/models"
-	socket "snakealive/m/internal/models"
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/error_adapter"
 
@@ -32,8 +29,6 @@ type TripGatewayDelivery interface {
 	AddTripUser(ctx *fasthttp.RequestCtx)
 	ShareLink(ctx *fasthttp.RequestCtx)
 	AddUserByLink(ctx *fasthttp.RequestCtx)
-	SendUpdateMessage(tripId int)
-	SendDeleteMessage(tripId int, users []int)
 }
 
 type tripGatewayDelivery struct {
@@ -126,15 +121,13 @@ func (s *tripGatewayDelivery) UpdateTrip(ctx *fasthttp.RequestCtx) {
 
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	_, _ = ctx.Write(bytes)
-
-	s.SendUpdateMessage(responceTrip.Id)
 }
 
 func (s *tripGatewayDelivery) DeleteTrip(ctx *fasthttp.RequestCtx) {
 	param, _ := strconv.Atoi(ctx.UserValue("id").(string))
 	userID := ctx.UserValue(cnst.UserIDContextKey).(int)
 
-	users, err := s.manager.DeleteTrip(ctx, param, userID)
+	_, err := s.manager.DeleteTrip(ctx, param, userID)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
@@ -147,8 +140,6 @@ func (s *tripGatewayDelivery) DeleteTrip(ctx *fasthttp.RequestCtx) {
 		return
 	}
 	_, _ = ctx.Write(bytes)
-
-	s.SendDeleteMessage(param, users)
 }
 
 func (s *tripGatewayDelivery) Album(ctx *fasthttp.RequestCtx) {
@@ -326,8 +317,6 @@ func (s *tripGatewayDelivery) AddTripUser(ctx *fasthttp.RequestCtx) {
 		return
 	}
 	_, _ = ctx.Write(bytes)
-
-	s.SendUpdateMessage(param)
 }
 
 func (s *tripGatewayDelivery) ShareLink(ctx *fasthttp.RequestCtx) {
@@ -363,65 +352,4 @@ func (s *tripGatewayDelivery) AddUserByLink(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.Redirect(redirectURI, 302)
-}
-
-func (s *tripGatewayDelivery) SendUpdateMessage(tripId int) {
-	var cfg config.Config
-	if err := cfg.Setup(); err != nil {
-		log.Fatal("failed to setup cfg: ", err)
-		return
-	}
-
-	requestJSON := socket.TripRequest{
-		Message: "update",
-		TripId:  tripId,
-	}
-
-	bytes, err := json.Marshal(requestJSON)
-	if err != nil {
-		return
-	}
-
-	request := fasthttp.AcquireRequest()
-	request.Header.SetMethod("POST")
-	request.Header.SetContentType("application/json")
-	request.SetBody(bytes)
-
-	request.SetRequestURI(cfg.WebSocketURL)
-	response := fasthttp.AcquireResponse()
-
-	_ = fasthttp.Do(request, response)
-	fasthttp.ReleaseRequest(request)
-	fasthttp.ReleaseResponse(response)
-}
-
-func (s *tripGatewayDelivery) SendDeleteMessage(tripId int, users []int) {
-	var cfg config.Config
-	if err := cfg.Setup(); err != nil {
-		log.Fatal("failed to setup cfg: ", err)
-		return
-	}
-
-	requestJSON := socket.UsersTripRequest{
-		Message: "delete",
-		TripId:  tripId,
-		Users:   users,
-	}
-
-	bytes, err := json.Marshal(requestJSON)
-	if err != nil {
-		return
-	}
-
-	request := fasthttp.AcquireRequest()
-	request.Header.SetMethod("POST")
-	request.Header.SetContentType("application/json")
-	request.SetBody(bytes)
-
-	request.SetRequestURI(cfg.WebSocketURL)
-	response := fasthttp.AcquireResponse()
-
-	_ = fasthttp.Do(request, response)
-	fasthttp.ReleaseRequest(request)
-	fasthttp.ReleaseResponse(response)
 }

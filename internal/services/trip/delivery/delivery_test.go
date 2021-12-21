@@ -24,18 +24,60 @@ func TestHandler_GetTrip(t *testing.T) {
 	ctx := &fasthttp.RequestCtx{}
 	userID := 1
 	tripID := 1
+	album := models.Album{
+		Id:          1,
+		TripId:      tripID,
+		UserId:      1,
+		Title:       "title",
+		Description: "Description",
+		Photos:      []string{"photo.jpg"},
+	}
+	place := models.Place{
+		Id:   1,
+		Name: "Name",
+		Tags: []models.Tag{
+			{
+				Id:   1,
+				Name: "tag",
+			},
+		},
+	}
+
+	var protoAlbums []*trip_service.Album
+	protoAlbums = append(protoAlbums, &trip_service.Album{
+		Id: 1,
+
+		Title:       "title",
+		Description: "Description",
+		Photos:      []string{"photo.jpg"},
+	})
+	var protoPlace []*trip_service.Sight
+	protoPlace = append(protoPlace, &trip_service.Sight{
+		Id:   1,
+		Name: "Name",
+		Tags: []*trip_service.Tag{
+			{
+				Id:   1,
+				Name: "tag",
+			},
+		},
+	})
+
 	trip := models.Trip{
 		Id:          1,
 		Title:       "Best trip",
 		Description: "So cool",
-		Sights:      []models.Place{},
+		Sights:      []models.Place{place},
 		Users:       []int{userID},
+		Albums:      []models.Album{album},
 	}
 	expectedTrip := &trip_service.Trip{
 		Id:          1,
 		Title:       "Best trip",
 		Description: "So cool",
+		Sights:      protoPlace,
 		Users:       []int64{int64(userID)},
+		Albums:      protoAlbums,
 	}
 
 	request := &trip_service.TripRequest{

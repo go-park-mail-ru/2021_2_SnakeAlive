@@ -68,23 +68,6 @@ services:
       - REVIEW_GRPC_PORT=9090
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
-  websocket_service:
-    build:
-      dockerfile: Dockerfile.websocket
-      context: .
-      args:
-        - APP_PKG_NAME=snakealive/m
-        - GOOS=linux
-    ports:
-      - "5050:5050"
-    environment:
-      - WEBSOCKET_DB_URL=postgres://tripadvisor:12345@host.docker.internal:5432/tripadvisor
-      - WEBSOCKET_PORT=:5050
-    extra_hosts:
-      - "host.docker.internal:172.17.0.1"
-    networks:
-      - mynet
-
   gateway:
     image: znajderko/snake_gateway
     depends_on:
@@ -114,7 +97,6 @@ services:
       - GATEWAY_S3_PUBLIC_ENDPOINT=https://snakehastrip.hb.bizmrg.com/
       - GATEWAY_S3_SECRET_KEY=7qdqBBT9xeKDV3iAdKco4jqEhmjpMqiyk3bLL9PcU2S7
       - GATEWAY_S3_SECRET_ID=rcLyfa3DhATRNmeterCZLk
-      - GATEWAY_WEBSOCKET_URL=http://websocket_service:5050/
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
     networks:
