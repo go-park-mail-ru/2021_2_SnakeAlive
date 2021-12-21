@@ -9,7 +9,6 @@ import (
 	cnst "snakealive/m/pkg/constants"
 	"snakealive/m/pkg/error_adapter"
 
-	"github.com/mailru/easyjson"
 	"github.com/valyala/fasthttp"
 )
 
@@ -71,7 +70,7 @@ func (d *reviewGatewayDelivery) AddReviewToPlace(ctx *fasthttp.RequestCtx) {
 
 	review := new(models.Review)
 
-	if err := easyjson.Unmarshal(ctx.PostBody(), review); err != nil {
+	if err := json.Unmarshal(ctx.PostBody(), review); err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
@@ -82,7 +81,7 @@ func (d *reviewGatewayDelivery) AddReviewToPlace(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	bytes, err := easyjson.Marshal(review)
+	bytes, err := json.Marshal(review)
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return

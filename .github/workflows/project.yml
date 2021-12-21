@@ -1,14 +1,41 @@
-name: tripadvisor deploy
+name: tripadvisor prepare
 
 on:
+  pull_request:
+    branches: [ main, develop ]
   push:
-    branches:
-      - "!*"
+    branches: [ main, develop ]
     tags:
       - "v*"
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
+  vet:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.17.1'
+      - run: go vet ./...
+      - run: go fmt ./...
+
+  test:
+    needs: [vet]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.17.1'
+      - run: go test ./...
+
   deploy:
+    needs: [lint, test, vet]
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -50,5 +77,4 @@ jobs:
             docker-compose rm -f &&
             docker-compose pull &&
             docker-compose up -d
-
 

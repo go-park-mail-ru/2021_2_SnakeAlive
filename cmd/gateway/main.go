@@ -21,14 +21,14 @@ func main() {
 	}
 
 	logger := cfg.Logger.Sugar()
-	_, p, stop, err := setup.Setup(cfg)
+	p, stop, err := setup.Setup(cfg)
 	if err != nil {
 		logger.Fatal("msg", "failed to setup server", "error", err)
 		return
 	}
 
 	go func() {
-		if err := fasthttp.ListenAndServe(cfg.HTTPPort, corsMiddleware(p.Handler)); err != nil {
+		if err := fasthttp.ListenAndServe(cfg.HTTPPort, corsMiddleware(p.GetHandler())); err != nil {
 			logger.Fatal("failed to start server")
 			return
 		}

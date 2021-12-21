@@ -162,7 +162,10 @@ VALUES (1, 'Современные здания'),
        (9, 'Резиденция'),
        (10, 'Заброшенное'),
        (11, 'Город'),
-       (12, 'Мистическое место');
+       (12, 'Мистическое место'),
+       (13, 'Мост'),
+       (14, 'Зоопарк'),
+       (15, 'Крепость'), (16, 'Обзорное место'), (17, 'Музей');
 
 
 INSERT INTO Countries ("name", "description", "photo", "translated")
@@ -442,3 +445,163 @@ INSERT INTO Reviews (id, title, text, rating, user_id, place_id, created_at)
 VALUES (DEFAULT, 'title2', 'text2', 11, 1, 1, DEFAULT);
 INSERT INTO Reviews (id, title, text, rating, user_id, place_id, created_at)
 VALUES (DEFAULT, 'title3', 'text3', 12, 1, 2, DEFAULT);
+
+INSERT INTO Countries ("name", "description", "photo", "translated")
+VALUES ('Czech',
+        'Чехия, или Чешская Республика — центральноевропейское государство, граничащее на севере с Польшей, на западе — с Германией, на юге — с Австрией, и на востоке — со Словакией.',
+        'https://snakehastrip.hb.bizmrg.com/czech.jpeg', 'Чехия');
+
+INSERT INTO Places ("name", "country", "lat", "lng", "rating", "description", "tags", "photos")
+VALUES ('Крепость Пражский Град',
+        'Czech',
+        50.0911,
+        14.4016,
+        4.4,
+        'Пражский Град является символом чешского государства вот уже более тысячи лет. Он был заложен в 9-м столетии и стал резиденцией чешских королей, а потом – и президентов. Один из самых больших крепостных комплексов в мире, он объединяет дворцовые, служебные, фортификационные, религиозные сооружения, сады и живописные уголки. Панорама Града – незабываемое зрелище, которое останется в Вашей памяти навсегда.',
+        ARRAY[4, 2, 6, 15],
+        ARRAY[
+        'https://snakehastrip.hb.bizmrg.com/krep_prazh_grad1.webp',
+        'https://snakehastrip.hb.bizmrg.com/krep_prazh_grad2.webp',
+        'https://snakehastrip.hb.bizmrg.com/krep_prazh_grad3.webp'
+        'https://snakehastrip.hb.bizmrg.com/krep_prazh_grad4.webp',
+           ]),
+        ('Карлов Мост',
+        'Czech',
+        50.08635,
+        14.4119534,
+        4.8,
+        'Карлов мост – символ Праги, самая популярная достопримечательность города и второй в истории каменный мост через Влтаву. Он до сих пор привлекает людей не только своей красотой и тридцатью барочными статуями XVII века, но и множеством легенд и загадок. Его история связана с магией, астрологией и неразгаданными тайнами. Удивительно, что мост преподносит сюрпризы исследователям до сих пор.',
+        ARRAY[4, 2, 11],
+        ARRAY[
+            'https://snakehastrip.hb.bizmrg.com/czech_carlov_most1.webp',
+        'https://snakehastrip.hb.bizmrg.com/czech_carlov_most2.webp',
+        'https://snakehastrip.hb.bizmrg.com/czech_carlov_most3.webp'
+           ]),
+        ('Собор Святого Вита',
+        'Czech',
+        50.0908918,
+        14.4005114,
+        4.8,
+        'Собор Святого Вита – храм, украшающий исторический центр чешской столицы; доминанта Пражского града. Это один из самых знаменитых долгостроев Европы: подлинная средневековая готика органично сочетается в нем с элементами барокко и искусными неоготическими стилизациями.',
+        ARRAY[4, 2, 6, 12],
+        ARRAY[
+            'https://snakehastrip.hb.bizmrg.com/czech_st_vit1.webp',
+        'https://snakehastrip.hb.bizmrg.com/czech_st_vit12.webp',
+        'https://snakehastrip.hb.bizmrg.com/czech_st_vit3.webp'
+            ]),
+       ('Петршин Холм',
+        'Czech',
+        50.08138,
+        14.39388,
+        4.2,
+        'Холм Петршин, как известно, раньше имел несколько других названий. Сначала он назывался горой, потом носил им Копец или Холм Св. Лаврентия, тогда там был установлен крест',
+        ARRAY[2, 16],
+        ARRAY[
+            'https://snakehastrip.hb.bizmrg.com/czech_petr_1.webp',
+        'https://snakehastrip.hb.bizmrg.com/czech_petr_2.webp',
+        'https://snakehastrip.hb.bizmrg.com/czech_petr_3.webp'
+            ]),
+       ('Йозефов',
+        'Czech',
+        50.089,
+        14.419,
+        4.6,
+        'Йозефов – самый таинственный район Праги, овеянный множеством легенд, преданий и мифов. До 1850 года представлял собой сердце еврейской общины Праги, поэтому его также называют еврейским кварталом. Район находится между правым берегом реки Влтавы и Староместской площадью.',
+        ARRAY[4, 12],
+        ARRAY[
+            'https://snakehastrip.hb.bizmrg.com/czech_josefov1.webp',
+        'https://snakehastrip.hb.bizmrg.com/czech_josefov2.webp',
+        'https://snakehastrip.hb.bizmrg.com/czech_josefov3.webp'
+            ]),
+       ('Староместская площадь',
+        'Czech',
+        50.0875692,
+        14.4211874,
+        4.7,
+        'Холм Петршин, как известно, раньше имел несколько других названий. Сначала он назывался горой, потом носил им Копец или Холм Св. Лаврентия, тогда там был установлен крест',
+        ARRAY[4, 6, 8],
+        ARRAY[
+            'https://snakehastrip.hb.bizmrg.com/czech_pl1.webp',
+        'https://snakehastrip.hb.bizmrg.com/czech_pl2.webp',
+        'https://snakehastrip.hb.bizmrg.com/czech_pl3.webp'
+            ]);
+
+
+
+INSERT INTO Countries ("name", "description", "photo", "translated")
+VALUES ('Netherlands',
+        'Нидерланды или официально Королевство Нидерландов – европейское государство, включающее в себя материковую часть, расположенную в Западной Европе, и три острова в Карибском море – Бонэйр, Саба и Синт-Эстатиус. Помимо того, на правах членов королевства в состав страны входят три самоуправляемых государственных образования, занимающих острова Кюрасау, Аруба и Синт-Мартин.',
+        'https://snakehastrip.hb.bizmrg.com/netherlands.jpeg', 'Нидерланды');
+VALUES ('Музей Рембрандта',
+        'Netherlands',
+        52.369369,
+        4.9012351
+        4.89,
+        'Музей Рембрандта — художественный музей на улице Йоденбреестраат в Еврейском квартале Амстердама. Музей открылся в 1911 году в доме, который Рембрандт приобрёл на пике славы в 1639 году и в котором проживал до своего банкротства в 1656 году.',
+        ARRAY[17],
+        ARRAY[
+            'https://snakehastrip.hb.bizmrg.com/neth_rembrandthuis1.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_rembrandthuis2.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_rembrandthuis3.webp'
+           ]),
+       ('Улица Красных Фонарей',
+        'Netherlands',
+        52.3724309,
+        4.8975156,
+        4.5,
+        'Улица Красных Фонарей — район Амстердама, являющийся одной из самых известных и пикантных достопримечательностей города. Он состоит из сети переулков с невысокими зданиями, содержащими множество однокомнатных номеров с витринами.',
+        ARRAY[1, 6],
+        ARRAY[
+            'https://snakehastrip.hb.bizmrg.com/neth_red_light1.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_red_light2.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_red_light3.webp'
+           ]),
+       ('Музей Ван Гога',
+        'Netherlands',
+        52.3584159,
+        4.8810756,
+        4.1,
+        'Музей Ван Гога в Амстердаме — самая большая коллекция творений Ван Гога в мире, здесь представлено 200 картин, 437 рисунков и 31 гравюра, включая знаменитые Подсолнухи, Белый сад и Желтый дом, а также множество автопортретов художника.',
+        ARRAY[6, 17],
+        ARRAY[
+            'https://snakehastrip.hb.bizmrg.com/neth_van1.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_van2.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_van3.webp'
+            'https://snakehastrip.hb.bizmrg.com/neth_van4.webp',
+           ]),
+       ('Площадь Дам',
+        'Netherlands',
+        52.3730144,
+        4.8933578,
+        4.13,
+        'Площадь Дам – центральное место Амстердама, где проходят ярмарки, концерты и прочие торжественные события. Она находится в 750 м от основного транспортного узла столицы Нидерландов – станции Сентрал. Данное место по форме является прямоугольником площадью 20 000 м². К площади примыкает бульвар Дамрак и улицы Рокин, Ньивендейк, Кальверстрат, Дамстрат.',
+        ARRAY[2, 6, 11, 15],
+        ARRAY[
+            'https://snakehastrip.hb.bizmrg.com/neth_sq_dam1.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_sq_dam2.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_sq_dam3.webp'
+           ]),
+       ('Рейксмузеум',
+        'Netherlands',
+        52.3599648,
+        4.8853368,
+        4.35,
+        'Рейксмузеум — Амстердамский Государственный музей, крупнейший музей искусства в Нидерландах. В нем хранится более миллиона экспонатов. Рейксмузеум был открыт в 1885 году и стал достопримечательностью города, сочетая черты готического стиля и Возрождения.',
+        ARRAY[4, 17],
+        ARRAY[
+            'https://snakehastrip.hb.bizmrg.com/neth_wtf1.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_wtf2.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_wtf3.webp'
+           ]),
+       ('Парк цветов Кекенхоф',
+        'Netherlands',
+        52.2700188,
+        4.5463893,
+        4.93,
+        'Кекенхоф — всемирно известный королевский парк цветов в Нидерландах. Находится на побережье между Амстердамом и Гаагой в небольшом городке Лиссе, при приближении к которому можно видеть указатели маршрута на Кекенхоф.',
+        ARRAY[2, 3],
+        ARRAY[
+            'https://snakehastrip.hb.bizmrg.com/neth_park1.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_park2.webp',
+        'https://snakehastrip.hb.bizmrg.com/neth_park3.webp'
+           ]);
