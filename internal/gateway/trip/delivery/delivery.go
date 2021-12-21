@@ -355,6 +355,7 @@ func (s *tripGatewayDelivery) AddUserByLink(ctx *fasthttp.RequestCtx) {
 	author := ctx.UserValue(cnst.UserIDContextKey).(int)
 
 	redirectURI, err := s.manager.AddUserByLink(ctx, author, id, code)
+
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return

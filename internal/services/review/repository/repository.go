@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"errors"
 
 	"snakealive/m/internal/services/review/models"
 
@@ -91,9 +90,7 @@ func (r *reviewRepository) GetListByPlace(ctx context.Context, id int, limit int
 	if rows.Err() != nil {
 		return &reviews, err
 	}
-	if len(reviews) == 0 {
-		return &reviews, errors.New("no reviews")
-	}
+
 	return &reviews, err
 }
 

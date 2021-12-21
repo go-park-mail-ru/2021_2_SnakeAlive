@@ -27,12 +27,31 @@ func main() {
 
 	delivery := delivery.NewWebSocketDelivery(usecase.NewWebsocketUseCase(repository.NewWebsocketRepository(dbpool)))
 
-	http.HandleFunc("/connect", delivery.Connect)
-	http.HandleFunc("/", delivery.HandleRequest)
+	http.HandleFunc("/connect", corsMiddleware(delivery.Connect))
+	http.HandleFunc("/", corsMiddleware(delivery.HandleRequest))
 
 	err = http.ListenAndServe(cfg.Port, nil)
 	if err != nil {
 		log.Fatal("failed to start server")
 		return
+	}
+}
+
+func corsMiddleware(handler func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "https://snakehastrip.ru") // set domain
+		w.Header().Set("Content-Type", "application/json; charset=utf8")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
+		w.Header().Set("Access-Control-Expose-Headers", "Authorization")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Max-Age", "3600")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		handler(w, r)
 	}
 }

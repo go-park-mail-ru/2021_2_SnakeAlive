@@ -340,8 +340,15 @@ func (s *tripDelivery) ShareLink(ctx context.Context, request *trip_service.Shar
 
 func (s *tripDelivery) AddUserByLink(ctx context.Context, request *trip_service.AddByShareRequest) (*trip_service.Link, error) {
 	authorized, err := s.tripUsecase.CheckTripAuthor(ctx, int(request.UserId), int(request.TripId))
-	if authorized || err != nil {
-		return nil, errors.DeniedAccess
+	id := strconv.Itoa(int(request.TripId))
+	if err != nil {
+		return nil, err
+	}
+
+	if authorized {
+		return &trip_service.Link{
+			Link: cnst.TripPostURL + "/" + id,
+		}, nil
 	}
 
 	if !s.tripUsecase.CheckLink(ctx, request.Uuid, int(request.TripId)) {
@@ -353,7 +360,6 @@ func (s *tripDelivery) AddUserByLink(ctx context.Context, request *trip_service.
 		return nil, err
 	}
 
-	id := strconv.Itoa(int(request.TripId))
 	return &trip_service.Link{
 		Link: cnst.TripPostURL + "/" + id,
 	}, nil

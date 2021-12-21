@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -31,6 +32,8 @@ func NewWebSocketDelivery(websocketUsecase usecase.WebsocketUseCase) WebsocketDe
 }
 
 func (d *websocketDelivery) Connect(w http.ResponseWriter, r *http.Request) {
+
+	fmt.Println("Got in Connect  ", r.URL.String())
 	cookie, err := r.Cookie(cnst.CookieName)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -64,6 +67,7 @@ func (d *websocketDelivery) Connect(w http.ResponseWriter, r *http.Request) {
 }
 
 func (d *websocketDelivery) HandleRequest(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Got in Handle request  ", r.URL.String())
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
