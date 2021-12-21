@@ -31,8 +31,6 @@ type TripGatewayDelivery interface {
 	AddTripUser(ctx *fasthttp.RequestCtx)
 	ShareLink(ctx *fasthttp.RequestCtx)
 	AddUserByLink(ctx *fasthttp.RequestCtx)
-	SendUpdateMessage(tripId int)
-	SendDeleteMessage(tripId int, users []int)
 }
 
 type tripGatewayDelivery struct {
@@ -65,12 +63,7 @@ func (s *tripGatewayDelivery) Trip(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	bytes, err := json.Marshal(trip)
-	if err != nil {
-		ctx.SetStatusCode(fasthttp.StatusBadRequest)
-		return
-	}
-
+	bytes, _ := json.Marshal(trip)
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	_, _ = ctx.Write(bytes)
 }
@@ -165,12 +158,7 @@ func (s *tripGatewayDelivery) Album(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	bytes, err := json.Marshal(album)
-	if err != nil {
-		ctx.SetStatusCode(fasthttp.StatusBadRequest)
-		return
-	}
-
+	bytes, _ := json.Marshal(album)
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	_, _ = ctx.Write(bytes)
 }
@@ -190,12 +178,7 @@ func (s *tripGatewayDelivery) AddAlbum(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	bytes, err := json.Marshal(album)
-	if err != nil {
-		ctx.SetStatusCode(fasthttp.StatusBadRequest)
-		return
-	}
-
+	bytes, _ := json.Marshal(album)
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	_, _ = ctx.Write(bytes)
 }

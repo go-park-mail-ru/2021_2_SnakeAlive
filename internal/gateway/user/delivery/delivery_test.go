@@ -24,6 +24,7 @@ type Test struct {
 
 const (
 	defaultUserID = 1
+	cookie = "cookie"
 
 	defaultUserName        = "defaultUserName"
 	defaultUserSurname     = "defaultUserSurname"
@@ -31,7 +32,6 @@ const (
 	defaultUserImage       = "defaultUserImage"
 	defaultUserDescription = "defaultUserDescription"
 	pass = "pass"
-	cookie = "cookie"
 )
 
 var (
