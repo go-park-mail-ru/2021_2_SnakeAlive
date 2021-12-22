@@ -208,3 +208,68 @@ func TestHandler_GetUserInfo(t *testing.T) {
 
 	assert.Equal(t, expectedResponce, responce)
 }
+
+func TestHandler_Register(t *testing.T) {
+	ctx := &fasthttp.RequestCtx{}
+
+	user := &models.User{
+		Email:    "email@mail.ru",
+		Password: "",
+	}
+
+	newUser := &models.User{
+		ID:    1,
+		Email: "email@mail.ru",
+	}
+
+	request := &auth_service.RegisterRequest{
+		Email:    user.Email,
+		Password: "",
+	}
+
+	c := gomock.NewController(t)
+	defer c.Finish()
+
+	userRepo := service_mocks.NewMockAuthRepository(c)
+	userRepo.EXPECT().CreateUser(ctx, gomock.Any()).Return(newUser, nil).AnyTimes()
+	userRepo.EXPECT().CreateUserSession(ctx, newUser.ID, gomock.Any()).Return(nil).AnyTimes()
+
+	userUsecase := user_usecase.NewAuthUseCase(hasher.NewHasher(1), userRepo)
+	userDelivery := NewAuthDelivery(userUsecase, error_adapter.NewErrorAdapter(grpc_errors.PreparedAuthServiceErrorMap))
+
+	_, err := userDelivery.RegisterUser(ctx, request)
+
+	assert.Nil(t, err)
+}
+
+func TestHandler_UpdateUser(t *testing.T) {
+	ctx := &fasthttp.RequestCtx{}
+
+	user := &models.User{
+		Email:    "email@mail.ru",
+		Password: "",
+	}
+
+	request := &auth_service.UpdateUserRequest{
+		Email:    user.Email,
+		Password: "",
+	}
+
+	expectedResponce := &auth_service.GetUserResponse{
+		Email: "email@mail.ru",
+	}
+
+	c := gomock.NewController(t)
+	defer c.Finish()
+
+	userRepo := service_mocks.NewMockAuthRepository(c)
+	userRepo.EXPECT().UpdateUser(ctx, user).Return(user, nil).AnyTimes()
+
+	userUsecase := user_usecase.NewAuthUseCase(hasher.NewHasher(1), userRepo)
+	userDelivery := NewAuthDelivery(userUsecase, error_adapter.NewErrorAdapter(grpc_errors.PreparedAuthServiceErrorMap))
+
+	responce, err := userDelivery.UpdateUser(ctx, request)
+
+	assert.Equal(t, expectedResponce, responce)
+	assert.Nil(t, err)
+}

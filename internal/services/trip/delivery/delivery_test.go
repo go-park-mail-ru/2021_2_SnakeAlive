@@ -114,11 +114,21 @@ func TestHandler_AddTrip(t *testing.T) {
 
 	userID := 1
 	tripID := 1
+
+	tag := models.Tag{
+		Id:   1,
+		Name: "tag",
+	}
+	protoTag := &trip_service.Tag{
+		Id:   1,
+		Name: tag.Name,
+	}
+
 	trip := models.Trip{
 		Title:       "Best trip",
 		Description: "So cool",
 		Sights: []models.Place{
-			{Id: 1, Name: "Heh"},
+			{Id: 1, Name: "Heh", Tags: []models.Tag{tag}},
 		},
 	}
 	tripWithId := models.Trip{
@@ -126,7 +136,7 @@ func TestHandler_AddTrip(t *testing.T) {
 		Title:       "Best trip",
 		Description: "So cool",
 		Sights: []models.Place{
-			{Id: 1, Name: "Heh"},
+			{Id: 1, Name: "Heh", Tags: []models.Tag{tag}},
 		},
 		Users: []int{userID},
 	}
@@ -134,7 +144,7 @@ func TestHandler_AddTrip(t *testing.T) {
 		Title:       "Best trip",
 		Description: "So cool",
 		Sights: []*trip_service.Sight{
-			{Id: 1, Name: "Heh"},
+			{Id: 1, Name: "Heh", Tags: []*trip_service.Tag{protoTag}},
 		},
 	}
 	expectedTripWithId := &trip_service.Trip{
@@ -142,7 +152,7 @@ func TestHandler_AddTrip(t *testing.T) {
 		Title:       "Best trip",
 		Description: "So cool",
 		Sights: []*trip_service.Sight{
-			{Id: 1, Name: "Heh"},
+			{Id: 1, Name: "Heh", Tags: []*trip_service.Tag{protoTag}},
 		},
 		Users: []int64{int64(userID)},
 	}
