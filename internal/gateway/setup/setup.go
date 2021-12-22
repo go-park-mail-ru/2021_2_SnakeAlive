@@ -37,7 +37,7 @@ import (
 func Setup(cfg config.Config) (p fasthttpprom.Router, stopFunc func(), err error) {
 	pgxConn, err := helpers.CreatePGXPool(cfg.Ctx, cfg.DBUrl, cfg.Logger)
 	if err != nil {
-		return  p, stopFunc, err
+		return p, stopFunc, err
 	}
 
 	countryRepo := repository.NewLoggingMiddleware(
@@ -51,7 +51,7 @@ func Setup(cfg config.Config) (p fasthttpprom.Router, stopFunc func(), err error
 
 	conn, err := grpc.Dial(cfg.AuthServiceEndpoint, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
-		return  p, stopFunc, err
+		return p, stopFunc, err
 	}
 	userGRPC := auth_service.NewAuthServiceClient(conn)
 	userUsecase := uu.NewUserUsecase(userGRPC)
@@ -77,7 +77,7 @@ func Setup(cfg config.Config) (p fasthttpprom.Router, stopFunc func(), err error
 
 	tripConn, err := grpc.Dial(cfg.TripServiceEndpoint, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
-		return  p, stopFunc, err
+		return p, stopFunc, err
 	}
 	tripGRPC := trip_service.NewTripServiceClient(tripConn)
 	tripGatewayUseCase := tu.NewTripGatewayUseCase(tripGRPC, sightGRPC, userGRPC)
@@ -90,7 +90,7 @@ func Setup(cfg config.Config) (p fasthttpprom.Router, stopFunc func(), err error
 
 	reviewConn, err := grpc.Dial(cfg.ReviewServiceEndpoint, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
-		return  p, stopFunc, err
+		return p, stopFunc, err
 	}
 	reviewGRPC := review_service.NewReviewServiceClient(reviewConn)
 	reviewUsecase := review_usecase.NewReviewGatewayUseCase(reviewGRPC)

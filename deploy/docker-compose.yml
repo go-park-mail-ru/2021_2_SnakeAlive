@@ -100,9 +100,3 @@ services:
       - GATEWAY_S3_SECRET_ID=${S3_ID}
     extra_hosts:
       - "host.docker.internal:172.17.0.1"
-    networks:
-      - mynet
-
-networks:
-  mynet:
-    driver: bridge

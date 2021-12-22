@@ -23,7 +23,7 @@ type Test struct {
 
 const (
 	defaultCountry = "a"
-	defaultID = 1
+	defaultID      = 1
 )
 
 var (
@@ -80,29 +80,29 @@ var (
 	}
 	respSights = []models.Sight{
 		{
-			Description:   "1",
+			Description: "1",
 			SightMetadata: models.SightMetadata{
-				Id:          1,
-				Name:        "1",
-				Tags:        []string{},
-				Photos:      []string{},
-				Country:     "1",
-				Rating:      1,
-				Lat:         1,
-				Lng:         1,
+				Id:      1,
+				Name:    "1",
+				Tags:    []string{},
+				Photos:  []string{},
+				Country: "1",
+				Rating:  1,
+				Lat:     1,
+				Lng:     1,
 			},
 		},
 		{
-			Description:   "2",
+			Description: "2",
 			SightMetadata: models.SightMetadata{
-				Id:          2,
-				Name:        "2",
-				Tags:        []string{},
-				Photos:      []string{},
-				Country:     "2",
-				Rating:      2,
-				Lat:         2,
-				Lng:         2,
+				Id:      2,
+				Name:    "2",
+				Tags:    []string{},
+				Photos:  []string{},
+				Country: "2",
+				Rating:  2,
+				Lat:     2,
+				Lng:     2,
 			},
 		},
 	}
@@ -131,7 +131,7 @@ var (
 	}
 
 	searchReq = models.SearchSights{
-		Tags:      []int64{1,2,3},
+		Tags:      []int64{1, 2, 3},
 		Countries: []string{},
 		Skip:      1,
 		Limit:     2,
@@ -139,7 +139,6 @@ var (
 	}
 )
 var (
-
 	tests = []Test{
 		{
 			Prepare: func(cli *mock_sight_service.MockSightServiceClient) {
@@ -243,7 +242,7 @@ var (
 			Prepare: func(cli *mock_sight_service.MockSightServiceClient) {},
 			Run: func(d SightDelivery, t *testing.T) {
 				ctx := getCtx()
-				ctx.QueryArgs().Add("tag",defaultCountry)
+				ctx.QueryArgs().Add("tag", defaultCountry)
 				d.GetSightByTag(ctx)
 
 				assert.Equal(t, ctx.Response.StatusCode(), http.StatusBadRequest)
@@ -255,7 +254,7 @@ var (
 			},
 			Run: func(d SightDelivery, t *testing.T) {
 				ctx := getCtx()
-				ctx.QueryArgs().Add("tag","1")
+				ctx.QueryArgs().Add("tag", "1")
 				d.GetSightByTag(ctx)
 
 				assert.Equal(t, ctx.Response.StatusCode(), http.StatusTeapot)
@@ -268,7 +267,7 @@ var (
 			},
 			Run: func(d SightDelivery, t *testing.T) {
 				ctx := getCtx()
-				ctx.QueryArgs().Add("tag","1")
+				ctx.QueryArgs().Add("tag", "1")
 				d.GetSightByTag(ctx)
 
 				var resp []models.Sight
@@ -281,7 +280,7 @@ var (
 			Prepare: func(cli *mock_sight_service.MockSightServiceClient) {},
 			Run: func(d SightDelivery, t *testing.T) {
 				ctx := getCtx()
-				ctx.SetUserValue("id","abc")
+				ctx.SetUserValue("id", "abc")
 				d.GetSightByID(ctx)
 
 				assert.Equal(t, ctx.Response.StatusCode(), http.StatusBadRequest)
@@ -293,7 +292,7 @@ var (
 			},
 			Run: func(d SightDelivery, t *testing.T) {
 				ctx := getCtx()
-				ctx.SetUserValue("id","1")
+				ctx.SetUserValue("id", "1")
 				d.GetSightByID(ctx)
 
 				assert.Equal(t, ctx.Response.StatusCode(), http.StatusTeapot)
@@ -306,7 +305,7 @@ var (
 			},
 			Run: func(d SightDelivery, t *testing.T) {
 				ctx := getCtx()
-				ctx.SetUserValue("id","1")
+				ctx.SetUserValue("id", "1")
 				d.GetSightByID(ctx)
 
 				var resp models.SightMetadata

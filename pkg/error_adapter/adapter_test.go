@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	firstError = errors.New("some text")
+	firstError  = errors.New("some text")
 	secondError = errors.New("some text too")
 
 	notExistingError = errors.New("does not exist")

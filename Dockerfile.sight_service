@@ -1,5 +1,5 @@
 # build binary
-FROM golang:1.14.4-alpine AS build
+FROM golang:1.17.1-alpine AS build
 
 ARG GOOS
 ENV CGO_ENABLED=0 \
@@ -16,8 +16,10 @@ WORKDIR /go/src/$APP_PKG_NAME
 COPY ./cmd ./cmd
 COPY ./internal ./internal
 COPY ./pkg ./pkg
-COPY ./vendor ./vendor
 COPY ./third_party ./third_party
+COPY go.mod go.mod
+
+RUN go mod vendor
 
 
 RUN go build -v \

@@ -24,14 +24,14 @@ type Test struct {
 
 const (
 	defaultUserID = 1
-	cookie = "cookie"
+	cookie        = "cookie"
 
 	defaultUserName        = "defaultUserName"
 	defaultUserSurname     = "defaultUserSurname"
 	defaultUserEmail       = "defaultUserEmail"
 	defaultUserImage       = "defaultUserImage"
 	defaultUserDescription = "defaultUserDescription"
-	pass = "pass"
+	pass                   = "pass"
 )
 
 var (
@@ -90,7 +90,7 @@ var (
 				d.GetProfile(ctx)
 
 				var profile = models.Profile{
-					Id: defaultUserID,
+					Id:          defaultUserID,
 					Name:        defaultUserName,
 					Surname:     defaultUserSurname,
 					Avatar:      defaultUserImage,
@@ -169,7 +169,7 @@ var (
 				cli.EXPECT().LogoutUser(gomock.Any(), &auth_service.Session{
 					Token:  "??",
 					Cookie: cookie,
-				}).Return(nil,nil)
+				}).Return(nil, nil)
 			},
 			Run: func(d UserDelivery, t *testing.T) {
 				ctx := getCtx()

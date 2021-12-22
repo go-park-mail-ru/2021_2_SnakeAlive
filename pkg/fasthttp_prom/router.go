@@ -37,19 +37,19 @@ func (r *router) GET(path string, handler fasthttp.RequestHandler) {
 }
 
 func (r *router) POST(path string, handler fasthttp.RequestHandler) {
-	r.r.GET(path, r.metricMw(handler, path, http.MethodPost))
+	r.r.POST(path, r.metricMw(handler, path, http.MethodPost))
 }
 
 func (r *router) PATCH(path string, handler fasthttp.RequestHandler) {
-	r.r.GET(path, r.metricMw(handler, path, http.MethodPatch))
+	r.r.PATCH(path, r.metricMw(handler, path, http.MethodPatch))
 }
 
 func (r *router) DELETE(path string, handler fasthttp.RequestHandler) {
-	r.r.GET(path, r.metricMw(handler, path, http.MethodDelete))
+	r.r.DELETE(path, r.metricMw(handler, path, http.MethodDelete))
 }
 
 func (r *router) PUT(path string, handler fasthttp.RequestHandler) {
-	r.r.GET(path, r.metricMw(handler, path, http.MethodPut))
+	r.r.PUT(path, r.metricMw(handler, path, http.MethodPut))
 }
 
 func (r *router) GetHandler() fasthttp.RequestHandler {

@@ -25,13 +25,13 @@ type Test struct {
 		trip *mock_trip_service.MockTripServiceClient,
 		sight *mock_sight_service.MockSightServiceClient,
 		auth *mock_auth_service.MockAuthServiceClient,
-		)
-	Run     func(d TripGatewayDelivery, t *testing.T)
+	)
+	Run func(d TripGatewayDelivery, t *testing.T)
 }
 
 const (
 	defaultUserID = 1
-	cookie = "cookie"
+	cookie        = "cookie"
 
 	defaultCountry = "a"
 	defaultID      = 1
@@ -49,7 +49,7 @@ var (
 		Id:          1,
 		Title:       "1",
 		Description: "1",
-		Sights:      []*trip_service.Sight{
+		Sights: []*trip_service.Sight{
 			{
 				Id:          1,
 				Name:        "1",
@@ -59,7 +59,7 @@ var (
 				Day:         1,
 			},
 		},
-		Albums:      []*trip_service.Album{
+		Albums: []*trip_service.Album{
 			{
 				Id:          1,
 				TripId:      1,
@@ -68,13 +68,13 @@ var (
 				Description: "1",
 			},
 		},
-		Users:       []int64{1},
+		Users: []int64{1},
 	}
-	tripResp =models.TripWithUserInfo{
+	tripResp = models.TripWithUserInfo{
 		Id:          1,
 		Title:       "1",
 		Description: "1",
-		Sights:      []models.Place{
+		Sights: []models.Place{
 			{
 				Id:          1,
 				Name:        "1",
@@ -84,7 +84,7 @@ var (
 				Day:         1,
 			},
 		},
-		Albums:      []models.Album{
+		Albums: []models.Album{
 			{
 				Id:          1,
 				TripId:      0,
@@ -93,7 +93,7 @@ var (
 				Description: "1",
 			},
 		},
-		Users:       []models.UserInfo{
+		Users: []models.UserInfo{
 			{
 				Id:      1,
 				Name:    "1",
@@ -116,7 +116,8 @@ var (
 var (
 	tests = []Test{
 		{
-			Prepare: func(trip *mock_trip_service.MockTripServiceClient, sight *mock_sight_service.MockSightServiceClient, auth *mock_auth_service.MockAuthServiceClient) {			},
+			Prepare: func(trip *mock_trip_service.MockTripServiceClient, sight *mock_sight_service.MockSightServiceClient, auth *mock_auth_service.MockAuthServiceClient) {
+			},
 			Run: func(d TripGatewayDelivery, t *testing.T) {
 				ctx := getCtx()
 				ctx.SetUserValue("id", "asd")
@@ -193,7 +194,7 @@ var (
 
 				var trip models.TripWithUserInfo
 				assert.Equal(t, ctx.Response.StatusCode(), http.StatusOK)
-				getResp(ctx,t,  &trip)
+				getResp(ctx, t, &trip)
 				assert.Equal(t, trip, tripResp)
 			},
 		},
@@ -213,7 +214,7 @@ var (
 			},
 			Run: func(d TripGatewayDelivery, t *testing.T) {
 				ctx := getCtx()
-				setBody(ctx ,t, album)
+				setBody(ctx, t, album)
 				d.AddAlbum(ctx)
 
 				assert.Equal(t, ctx.Response.StatusCode(), http.StatusBadRequest)
@@ -232,7 +233,7 @@ var (
 			},
 			Run: func(d TripGatewayDelivery, t *testing.T) {
 				ctx := getCtx()
-				setBody(ctx ,t, album)
+				setBody(ctx, t, album)
 				d.AddAlbum(ctx)
 
 				assert.Equal(t, ctx.Response.StatusCode(), http.StatusOK)
