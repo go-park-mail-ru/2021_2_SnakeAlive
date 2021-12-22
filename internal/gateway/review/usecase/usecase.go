@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 
 	"snakealive/m/internal/models"
 	review_service "snakealive/m/pkg/services/review"
@@ -44,9 +43,7 @@ func (u *reviewGatewayUseCase) Add(ctx context.Context, review *models.Review, u
 		Review: protoReview,
 		UserId: int64(userID),
 	})
-
 	if err != nil {
-		fmt.Println(err, addedReview)
 		return nil, err
 	}
 

@@ -47,7 +47,7 @@ func (d *reviewGatewayDelivery) ReviewsByPlace(ctx *fasthttp.RequestCtx) {
 
 	limit, err := strconv.Atoi(string(ctx.QueryArgs().Peek("limit")))
 	if err != nil {
-		limit = cnst.DefaultSkip
+		limit = cnst.DefaultLimit
 	}
 
 	review, err := d.manager.GetReviewsListByPlaceId(ctx, param, limit, skip)
@@ -56,12 +56,7 @@ func (d *reviewGatewayDelivery) ReviewsByPlace(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	bytes, err := json.Marshal(review)
-	if err != nil {
-		ctx.SetStatusCode(fasthttp.StatusBadRequest)
-		return
-	}
-
+	bytes, _ := json.Marshal(review)
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	_, _ = ctx.Write(bytes)
 }
@@ -81,12 +76,7 @@ func (d *reviewGatewayDelivery) AddReviewToPlace(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	bytes, err := json.Marshal(review)
-	if err != nil {
-		ctx.SetStatusCode(fasthttp.StatusBadRequest)
-		return
-	}
-
+	bytes, _ := json.Marshal(review)
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	_, _ = ctx.Write(bytes)
 }
