@@ -204,7 +204,7 @@ func TestDelivery(t *testing.T) {
 	for i := range tests {
 		d, cli := prepare(t)
 		tests[i].Prepare(cli)
-		tests[i].Run(t,d)
+		tests[i].Run(t, d)
 	}
 }
 
@@ -214,7 +214,7 @@ func prepare(t *testing.T) (d ReviewGatewayDelivery, cli *mock_review_service.Mo
 	d = NewReviewGatewayDelivery(
 		error_adapter.NewErrorToHttpAdapter(map[error]error_adapter.HttpError{}, defaultError),
 		usecase.NewReviewGatewayUseCase(cli),
-		)
+	)
 	return
 }
 

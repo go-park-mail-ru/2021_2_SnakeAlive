@@ -40,7 +40,7 @@ var (
 			Prepare: func(repo *mock_repository.MockCountryStorage) {
 				repo.EXPECT().GetCountriesList(gomock.Any()).Return(models.Countries{}, someError)
 			},
-			Run: func(t *testing.T,d CountryDelivery) {
+			Run: func(t *testing.T, d CountryDelivery) {
 				ctx := getCtx()
 				d.ListCountries(ctx)
 
@@ -52,7 +52,7 @@ var (
 			Prepare: func(repo *mock_repository.MockCountryStorage) {
 				repo.EXPECT().GetCountriesList(gomock.Any()).Return(models.Countries{}, nil)
 			},
-			Run: func(t *testing.T,d CountryDelivery) {
+			Run: func(t *testing.T, d CountryDelivery) {
 				ctx := getCtx()
 				d.ListCountries(ctx)
 
@@ -63,7 +63,7 @@ var (
 			Prepare: func(repo *mock_repository.MockCountryStorage) {
 				repo.EXPECT().GetById(gomock.Any(), 1).Return(models.Country{}, someError)
 			},
-			Run: func(t *testing.T,d CountryDelivery) {
+			Run: func(t *testing.T, d CountryDelivery) {
 				ctx := getCtx()
 				ctx.SetUserValue("id", "1")
 				d.GetCountryByID(ctx)
@@ -76,7 +76,7 @@ var (
 			Prepare: func(repo *mock_repository.MockCountryStorage) {
 				repo.EXPECT().GetById(gomock.Any(), 1).Return(models.Country{}, nil)
 			},
-			Run: func(t *testing.T,d CountryDelivery) {
+			Run: func(t *testing.T, d CountryDelivery) {
 				ctx := getCtx()
 				ctx.SetUserValue("id", "1")
 				d.GetCountryByID(ctx)
@@ -88,7 +88,7 @@ var (
 			Prepare: func(repo *mock_repository.MockCountryStorage) {
 				repo.EXPECT().GetById(gomock.Any(), 1).Return(models.Country{}, someError)
 			},
-			Run: func(t *testing.T,d CountryDelivery) {
+			Run: func(t *testing.T, d CountryDelivery) {
 				ctx := getCtx()
 				ctx.SetUserValue("name", "1")
 				d.GetCountryByName(ctx)
@@ -101,7 +101,7 @@ var (
 			Prepare: func(repo *mock_repository.MockCountryStorage) {
 				repo.EXPECT().GetById(gomock.Any(), 1).Return(models.Country{}, nil)
 			},
-			Run: func(t *testing.T,d CountryDelivery) {
+			Run: func(t *testing.T, d CountryDelivery) {
 				ctx := getCtx()
 				ctx.SetUserValue("name", "1")
 				d.GetCountryByName(ctx)
@@ -116,7 +116,7 @@ func TestDelivery(t *testing.T) {
 	for i := range tests {
 		d, cli := prepare(t)
 		tests[i].Prepare(cli)
-		tests[i].Run(t,d)
+		tests[i].Run(t, d)
 	}
 }
 

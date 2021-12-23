@@ -30,6 +30,7 @@ type router struct {
 	r          *fst_http.Router
 	subsystem  string
 	metricPath string
+	reqDur     *prometheus.HistogramVec
 }
 
 func (r *router) GET(path string, handler fasthttp.RequestHandler) {
@@ -62,17 +63,6 @@ func (r *router) Use(fR *fst_http.Router) {
 }
 
 func (r *router) metricMw(next fasthttp.RequestHandler, path, method string) fasthttp.RequestHandler {
-	reqDur := prometheus.NewHistogramVec(
-		prometheus.HistogramOpts{
-			Subsystem: r.subsystem,
-			Name:      "request_duration_seconds",
-			Help:      "request latencies",
-			Buckets:   []float64{.005, .01, .02, 0.04, .06, 0.08, .1, 0.15, .25, 0.4, .6, .8, 1, 1.5, 2, 3, 5},
-		},
-		[]string{"code", "path", "method"},
-	)
-	_ = prometheus.Register(reqDur)
-
 	return func(ctx *fasthttp.RequestCtx) {
 		start := time.Now()
 
@@ -84,15 +74,27 @@ func (r *router) metricMw(next fasthttp.RequestHandler, path, method string) fas
 
 		status := strconv.Itoa(ctx.Response.StatusCode())
 		elapsed := float64(time.Since(start)) / float64(time.Second)
-		reqDur.WithLabelValues(status, path, method).Observe(elapsed)
+		r.reqDur.WithLabelValues(status, path, method).Observe(elapsed)
 
 	}
 }
 
 func NewRouter(subsystem string) Router {
+	reqDur := prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Subsystem: subsystem,
+			Name:      "request_duration_seconds",
+			Help:      "request latencies",
+			Buckets:   []float64{.005, .01, .02, 0.04, .06, 0.08, .1, 0.15, .25, 0.4, .6, .8, 1, 1.5, 2, 3, 5},
+		},
+		[]string{"code", "path", "method"},
+	)
+	_ = prometheus.Register(reqDur)
+
 	return &router{
 		subsystem:  subsystem,
 		metricPath: defaultMetricPath,
+		reqDur:     reqDur,
 	}
 }
 
