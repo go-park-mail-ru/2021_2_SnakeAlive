@@ -140,12 +140,11 @@ func (s *sightRepository) SearchSights(ctx context.Context, req *models.SightsSe
 	}
 
 	filteredSights := make([]models.Sight, 0)
-	if req.MinRating != 0 {
-		for _, sight := range sights {
-			if req.MinRating != 0 && sight.Rating < float32(req.MinRating) {
-				filteredSights = append(filteredSights, sight)
-			}
+	for _, sight := range sights {
+		if req.MinRating != 0 && sight.Rating < float32(req.MinRating) {
+			continue
 		}
+		filteredSights = append(filteredSights, sight)
 	}
 
 	return filteredSights, nil
