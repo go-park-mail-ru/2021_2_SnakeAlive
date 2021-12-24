@@ -88,3 +88,14 @@ func (r *reviewDelivery) Delete(ctx context.Context, request *review_service.Del
 
 	return &empty.Empty{}, nil
 }
+
+func (r *reviewDelivery) GetAmountOfReviewsBySight(ctx context.Context, request *review_service.AmountRequest) (*review_service.Amount, error) {
+	amount, err := r.reviewUsecase.GetReviewsAmount(ctx, int(request.Id))
+	if err != nil {
+		return nil, r.errorAdapter.AdaptError(err)
+	}
+
+	return &review_service.Amount{
+		Amount: int64(amount),
+	}, nil
+}

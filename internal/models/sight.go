@@ -32,9 +32,11 @@ type Tag struct {
 }
 
 type SearchSights struct {
-	Tags      []int64  `json:"tags"`
-	Countries []string `json:"countries"`
-	Skip      int      `json:"skip"`
-	Limit     int      `json:"limit"`
-	Search    string   `json:"search"`
+	Tags       []int64  `json:"tags"`
+	Countries  []string `json:"countries"`
+	Skip       int      `json:"skip"`
+	Limit      int      `json:"limit"`
+	Search     string   `json:"search"`
+	MinRating  int      `json:"min_rating"`
+	MinReviews int      `json:"min_amount_reviews"`
 }

@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"context"
+	"fmt"
 
 	"snakealive/m/internal/services/sight/models"
 	"snakealive/m/internal/services/sight/usecase"
@@ -63,16 +64,20 @@ func (s *sightDelivery) GetSightsByIDs(
 func (s *sightDelivery) SearchSights(
 	ctx context.Context, request *sight_service.SearchSightRequest,
 ) (response *sight_service.SearchSightResponse, err error) {
+	fmt.Println(request.Search)
 	sights, err := s.usecase.SearchSights(ctx, &models.SightsSearch{
-		Skip:      int(request.Skip),
-		Limit:     int(request.Limit),
-		Search:    request.Search,
-		Tags:      request.Tags,
-		Countries: request.Countries,
+		Skip:       int(request.Skip),
+		Limit:      int(request.Limit),
+		Search:     request.Search,
+		Tags:       request.Tags,
+		Countries:  request.Countries,
+		MinReviews: int(request.MinReviews),
+		MinRating:  int(request.MinRating),
 	})
 	if err != nil {
 		return &sight_service.SearchSightResponse{}, err
 	}
+	fmt.Println(sights)
 
 	adapted := &sight_service.SearchSightResponse{Sights: make([]*sight_service.Sight, len(sights))}
 	for i := range sights {

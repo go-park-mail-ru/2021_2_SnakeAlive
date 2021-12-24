@@ -62,12 +62,25 @@ func Setup(cfg config.Config) (p fasthttpprom.Router, stopFunc func(), err error
 		userUsecase,
 	)
 
+	reviewConn, err := grpc.Dial(cfg.ReviewServiceEndpoint, grpc.WithInsecure(), grpc.WithBlock())
+	if err != nil {
+		return p, stopFunc, err
+	}
+	reviewGRPC := review_service.NewReviewServiceClient(reviewConn)
+	reviewUsecase := review_usecase.NewReviewGatewayUseCase(reviewGRPC)
+	reviewDelivery := review_delivery.NewReviewGatewayDelivery(
+		error_adapter.NewGrpcToHttpAdapter(
+			grpc_errors.UserGatewayError, grpc_errors.CommonError,
+		),
+		reviewUsecase,
+	)
+
 	sightConn, err := grpc.Dial(cfg.SightServiceEndpoint, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		return p, stopFunc, err
 	}
 	sightGRPC := sight_service.NewSightServiceClient(sightConn)
-	sightUsecase := sight_usecase.NewSightGatewayUseCase(sightGRPC)
+	sightUsecase := sight_usecase.NewSightGatewayUseCase(sightGRPC, reviewGRPC)
 	sightDelivery := delivery.NewSightDelivery(
 		error_adapter.NewGrpcToHttpAdapter(
 			grpc_errors.UserGatewayError, grpc_errors.CommonError,
@@ -86,19 +99,6 @@ func Setup(cfg config.Config) (p fasthttpprom.Router, stopFunc func(), err error
 			grpc_errors.UserGatewayError, grpc_errors.CommonError,
 		),
 		tripGatewayUseCase,
-	)
-
-	reviewConn, err := grpc.Dial(cfg.ReviewServiceEndpoint, grpc.WithInsecure(), grpc.WithBlock())
-	if err != nil {
-		return p, stopFunc, err
-	}
-	reviewGRPC := review_service.NewReviewServiceClient(reviewConn)
-	reviewUsecase := review_usecase.NewReviewGatewayUseCase(reviewGRPC)
-	reviewDelivery := review_delivery.NewReviewGatewayDelivery(
-		error_adapter.NewGrpcToHttpAdapter(
-			grpc_errors.UserGatewayError, grpc_errors.CommonError,
-		),
-		reviewUsecase,
 	)
 
 	s3Client := s3.New(

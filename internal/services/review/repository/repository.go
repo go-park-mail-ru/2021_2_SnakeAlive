@@ -14,6 +14,7 @@ type ReviewRepository interface {
 	GetListByPlace(ctx context.Context, id int, limit int, skip int) (*[]models.Review, error)
 	Delete(ctx context.Context, id int) error
 	GetReviewAuthor(ctx context.Context, id int) int
+	GetReviewsAmount(ctx context.Context, id int) (int, error)
 }
 
 type reviewRepository struct {
@@ -125,4 +126,23 @@ func (r *reviewRepository) GetReviewAuthor(ctx context.Context, id int) int {
 		return 0
 	}
 	return author
+}
+
+func (r *reviewRepository) GetReviewsAmount(ctx context.Context, id int) (int, error) {
+	conn, err := r.dataHolder.Acquire(context.Background())
+	if err != nil {
+		return 0, err
+	}
+	defer conn.Release()
+
+	var amount int
+	err = conn.QueryRow(context.Background(),
+		GetReviewAmount,
+		id,
+	).Scan(&amount)
+
+	if err != nil {
+		return 0, err
+	}
+	return amount, nil
 }

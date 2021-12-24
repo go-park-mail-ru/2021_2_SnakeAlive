@@ -15,6 +15,7 @@ type ReviewUseCase interface {
 	GetReviewsListByPlaceId(ctx context.Context, id int, limit int, skip int) (*[]models.Review, error)
 	CheckAuthor(ctx context.Context, userID int, id int) bool
 	SanitizeReview(ctx context.Context, review *models.Review) *models.Review
+	GetReviewsAmount(ctx context.Context, id int) (int, error)
 }
 
 type reviewUseCase struct {
@@ -53,4 +54,8 @@ func (u reviewUseCase) SanitizeReview(ctx context.Context, review *models.Review
 	review.Title = sanitizer.Sanitize(review.Title)
 	review.Text = sanitizer.Sanitize(review.Text)
 	return review
+}
+
+func (u reviewUseCase) GetReviewsAmount(ctx context.Context, id int) (int, error) {
+	return u.reviewRepository.GetReviewsAmount(ctx, id)
 }

@@ -9,3 +9,5 @@ const DeleteReviewQuery = `DELETE FROM Reviews WHERE id = $1`
 const GetReviewAuthorQuery = `SELECT user_id FROM Reviews WHERE id = $1`
 
 const GetReviewsByPlaceQuery = `SELECT id, title, text, rating, user_id FROM Reviews WHERE place_id = $1 LIMIT $2 OFFSET $3`
+
+const GetReviewAmount = `SELECT COUNT(*) FROM Reviews WHERE place_id = $1`

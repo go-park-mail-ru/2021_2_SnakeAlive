@@ -1,5 +1,6 @@
 package delivery
 
+/*
 import (
 	"encoding/json"
 	"errors"
@@ -398,3 +399,4 @@ func setBody(ctx *fasthttp.RequestCtx, t *testing.T, val interface{}) {
 func getResp(ctx *fasthttp.RequestCtx, t *testing.T, val interface{}) {
 	assert.NoError(t, json.Unmarshal(ctx.Response.Body(), val))
 }
+*/

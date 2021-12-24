@@ -22,4 +22,6 @@ type SightsSearch struct {
 	Search      string
 	Tags        []int64
 	Countries   []string
+	MinReviews  int
+	MinRating   int
 }

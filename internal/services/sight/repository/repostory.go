@@ -139,7 +139,16 @@ func (s *sightRepository) SearchSights(ctx context.Context, req *models.SightsSe
 		sights = append(sights, sight)
 	}
 
-	return sights, nil
+	filteredSights := make([]models.Sight, 0)
+	if req.MinRating != 0 {
+		for _, sight := range sights {
+			if req.MinRating != 0 && sight.Rating < float32(req.MinRating) {
+				filteredSights = append(filteredSights, sight)
+			}
+		}
+	}
+
+	return filteredSights, nil
 }
 
 func (s *sightRepository) GetTags(ctx context.Context) ([]models.Tag, error) {

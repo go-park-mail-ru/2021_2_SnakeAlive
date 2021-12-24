@@ -4,10 +4,10 @@ package review_service
 
 import (
 	context "context"
+	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -21,7 +21,8 @@ const _ = grpc.SupportPackageIsVersion7
 type ReviewServiceClient interface {
 	ReviewByPlace(ctx context.Context, in *ReviewRequest, opts ...grpc.CallOption) (*Reviews, error)
 	Add(ctx context.Context, in *AddReviewRequest, opts ...grpc.CallOption) (*Review, error)
-	Delete(ctx context.Context, in *DeleteReviewRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Delete(ctx context.Context, in *DeleteReviewRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	GetAmountOfReviewsBySight(ctx context.Context, in *AmountRequest, opts ...grpc.CallOption) (*Amount, error)
 }
 
 type reviewServiceClient struct {
@@ -50,9 +51,18 @@ func (c *reviewServiceClient) Add(ctx context.Context, in *AddReviewRequest, opt
 	return out, nil
 }
 
-func (c *reviewServiceClient) Delete(ctx context.Context, in *DeleteReviewRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *reviewServiceClient) Delete(ctx context.Context, in *DeleteReviewRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, "/services.review_service.ReviewService/Delete", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *reviewServiceClient) GetAmountOfReviewsBySight(ctx context.Context, in *AmountRequest, opts ...grpc.CallOption) (*Amount, error) {
+	out := new(Amount)
+	err := c.cc.Invoke(ctx, "/services.review_service.ReviewService/GetAmountOfReviewsBySight", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +75,8 @@ func (c *reviewServiceClient) Delete(ctx context.Context, in *DeleteReviewReques
 type ReviewServiceServer interface {
 	ReviewByPlace(context.Context, *ReviewRequest) (*Reviews, error)
 	Add(context.Context, *AddReviewRequest) (*Review, error)
-	Delete(context.Context, *DeleteReviewRequest) (*emptypb.Empty, error)
+	Delete(context.Context, *DeleteReviewRequest) (*empty.Empty, error)
+	GetAmountOfReviewsBySight(context.Context, *AmountRequest) (*Amount, error)
 	mustEmbedUnimplementedReviewServiceServer()
 }
 
@@ -79,8 +90,11 @@ func (UnimplementedReviewServiceServer) ReviewByPlace(context.Context, *ReviewRe
 func (UnimplementedReviewServiceServer) Add(context.Context, *AddReviewRequest) (*Review, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Add not implemented")
 }
-func (UnimplementedReviewServiceServer) Delete(context.Context, *DeleteReviewRequest) (*emptypb.Empty, error) {
+func (UnimplementedReviewServiceServer) Delete(context.Context, *DeleteReviewRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedReviewServiceServer) GetAmountOfReviewsBySight(context.Context, *AmountRequest) (*Amount, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAmountOfReviewsBySight not implemented")
 }
 func (UnimplementedReviewServiceServer) mustEmbedUnimplementedReviewServiceServer() {}
 
@@ -149,6 +163,24 @@ func _ReviewService_Delete_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ReviewService_GetAmountOfReviewsBySight_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AmountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReviewServiceServer).GetAmountOfReviewsBySight(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/services.review_service.ReviewService/GetAmountOfReviewsBySight",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReviewServiceServer).GetAmountOfReviewsBySight(ctx, req.(*AmountRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ReviewService_ServiceDesc is the grpc.ServiceDesc for ReviewService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -167,6 +199,10 @@ var ReviewService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _ReviewService_Delete_Handler,
+		},
+		{
+			MethodName: "GetAmountOfReviewsBySight",
+			Handler:    _ReviewService_GetAmountOfReviewsBySight_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

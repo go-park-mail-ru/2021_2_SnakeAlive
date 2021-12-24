@@ -36,8 +36,17 @@ message Reviews {
     repeated Review reviews = 1;
 }
 
+message AmountRequest {
+    int64 Id = 1;
+}
+
+message Amount {
+    int64 Amount = 1;
+}
+
 service ReviewService {
     rpc ReviewByPlace(ReviewRequest) returns (Reviews) {};
     rpc Add(AddReviewRequest) returns (Review) {};
     rpc Delete(DeleteReviewRequest) returns (google.protobuf.Empty) {}
+    rpc GetAmountOfReviewsBySight(AmountRequest) returns (Amount) {}
 }

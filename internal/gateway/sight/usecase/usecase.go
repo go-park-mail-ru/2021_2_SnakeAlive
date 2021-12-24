@@ -2,8 +2,11 @@ package usecase
 
 import (
 	"context"
+	"fmt"
+	"log"
 
 	"snakealive/m/internal/models"
+	review_service "snakealive/m/pkg/services/review"
 	sight_service "snakealive/m/pkg/services/sight"
 )
 
@@ -18,23 +21,42 @@ type SightUseCase interface {
 }
 
 type sightUseCase struct {
-	sightGRPC sightGRPC
+	sightGRPC  sightGRPC
+	reviewGRPC reviewGRPC
 }
 
 func (t *sightUseCase) SearchSights(ctx context.Context, req *models.SearchSights) ([]models.SightSearch, error) {
+	log.Print(req.Search)
+
 	response, err := t.sightGRPC.SearchSights(ctx, &sight_service.SearchSightRequest{
-		Search:    req.Search,
-		Skip:      int64(req.Skip),
-		Limit:     int64(req.Limit),
-		Countries: req.Countries,
-		Tags:      req.Tags,
+		Search:     req.Search,
+		Skip:       int64(req.Skip),
+		Limit:      int64(req.Limit),
+		Countries:  req.Countries,
+		Tags:       req.Tags,
+		MinReviews: int64(req.MinReviews),
+		MinRating:  int64(req.MinRating),
 	})
 	if err != nil {
 		return []models.SightSearch{}, err
 	}
+	fmt.Println(response)
 
-	adapted := make([]models.SightSearch, len(response.Sights))
-	for i, sight := range response.Sights {
+	var filteredSights []*sight_service.Sight
+	if req.MinReviews != 0 {
+		for _, sight := range response.Sights {
+			amount, err := t.reviewGRPC.GetAmountOfReviewsBySight(ctx, &review_service.AmountRequest{
+				Id: sight.Id,
+			})
+
+			if err == nil && int(amount.Amount) >= req.MinReviews {
+				filteredSights = append(filteredSights, sight)
+			}
+		}
+	}
+
+	adapted := make([]models.SightSearch, len(filteredSights))
+	for i, sight := range filteredSights {
 		adapted[i] = models.SightSearch{
 			Id:     int(sight.Id),
 			Name:   sight.Name,
@@ -139,6 +161,7 @@ func (t *sightUseCase) adaptSightMeta(sight *sight_service.Sight) models.SightMe
 	}
 }
 
-func NewSightGatewayUseCase(grpc sightGRPC) SightUseCase {
-	return &sightUseCase{sightGRPC: grpc}
+func NewSightGatewayUseCase(grpc sightGRPC, review reviewGRPC) SightUseCase {
+	return &sightUseCase{sightGRPC: grpc,
+		reviewGRPC: review}
 }

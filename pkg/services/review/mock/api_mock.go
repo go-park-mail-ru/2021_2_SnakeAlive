@@ -10,8 +10,8 @@ import (
 	review_service "snakealive/m/pkg/services/review"
 
 	gomock "github.com/golang/mock/gomock"
+	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // MockReviewServiceClient is a mock of ReviewServiceClient interface.
@@ -58,14 +58,14 @@ func (mr *MockReviewServiceClientMockRecorder) Add(ctx, in interface{}, opts ...
 }
 
 // Delete mocks base method.
-func (m *MockReviewServiceClient) Delete(ctx context.Context, in *review_service.DeleteReviewRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (m *MockReviewServiceClient) Delete(ctx context.Context, in *review_service.DeleteReviewRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "Delete", varargs...)
-	ret0, _ := ret[0].(*emptypb.Empty)
+	ret0, _ := ret[0].(*empty.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -75,6 +75,26 @@ func (mr *MockReviewServiceClientMockRecorder) Delete(ctx, in interface{}, opts 
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockReviewServiceClient)(nil).Delete), varargs...)
+}
+
+// GetAmountOfReviewsBySight mocks base method.
+func (m *MockReviewServiceClient) GetAmountOfReviewsBySight(ctx context.Context, in *review_service.AmountRequest, opts ...grpc.CallOption) (*review_service.Amount, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetAmountOfReviewsBySight", varargs...)
+	ret0, _ := ret[0].(*review_service.Amount)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAmountOfReviewsBySight indicates an expected call of GetAmountOfReviewsBySight.
+func (mr *MockReviewServiceClientMockRecorder) GetAmountOfReviewsBySight(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAmountOfReviewsBySight", reflect.TypeOf((*MockReviewServiceClient)(nil).GetAmountOfReviewsBySight), varargs...)
 }
 
 // ReviewByPlace mocks base method.
@@ -136,10 +156,10 @@ func (mr *MockReviewServiceServerMockRecorder) Add(arg0, arg1 interface{}) *gomo
 }
 
 // Delete mocks base method.
-func (m *MockReviewServiceServer) Delete(arg0 context.Context, arg1 *review_service.DeleteReviewRequest) (*emptypb.Empty, error) {
+func (m *MockReviewServiceServer) Delete(arg0 context.Context, arg1 *review_service.DeleteReviewRequest) (*empty.Empty, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", arg0, arg1)
-	ret0, _ := ret[0].(*emptypb.Empty)
+	ret0, _ := ret[0].(*empty.Empty)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -148,6 +168,21 @@ func (m *MockReviewServiceServer) Delete(arg0 context.Context, arg1 *review_serv
 func (mr *MockReviewServiceServerMockRecorder) Delete(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockReviewServiceServer)(nil).Delete), arg0, arg1)
+}
+
+// GetAmountOfReviewsBySight mocks base method.
+func (m *MockReviewServiceServer) GetAmountOfReviewsBySight(arg0 context.Context, arg1 *review_service.AmountRequest) (*review_service.Amount, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAmountOfReviewsBySight", arg0, arg1)
+	ret0, _ := ret[0].(*review_service.Amount)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAmountOfReviewsBySight indicates an expected call of GetAmountOfReviewsBySight.
+func (mr *MockReviewServiceServerMockRecorder) GetAmountOfReviewsBySight(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAmountOfReviewsBySight", reflect.TypeOf((*MockReviewServiceServer)(nil).GetAmountOfReviewsBySight), arg0, arg1)
 }
 
 // ReviewByPlace mocks base method.

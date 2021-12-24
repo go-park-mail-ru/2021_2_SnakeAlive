@@ -61,6 +61,8 @@ message SearchSightRequest {
   }];
   repeated string countries = 4;
   repeated int64 tags = 5;
+  int64 minReviews = 6;
+  int64 minRating = 7;
 }
 
 message SearchSightResponse {
