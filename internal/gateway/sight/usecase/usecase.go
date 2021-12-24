@@ -38,17 +38,15 @@ func (t *sightUseCase) SearchSights(ctx context.Context, req *models.SearchSight
 	}
 
 	var filteredSights []*sight_service.Sight
-	if req.MinReviews != 0 {
-		for _, sight := range response.Sights {
-			amount, _ := t.reviewGRPC.GetAmountOfReviewsBySight(ctx, &review_service.AmountRequest{
-				Id: sight.Id,
-			})
+	for _, sight := range response.Sights {
+		amount, _ := t.reviewGRPC.GetAmountOfReviewsBySight(ctx, &review_service.AmountRequest{
+			Id: sight.Id,
+		})
 
-			if int(amount.Amount) < req.MinReviews {
-				continue
-			}
-			filteredSights = append(filteredSights, sight)
+		if req.MinReviews != 0 && int(amount.Amount) < req.MinReviews {
+			continue
 		}
+		filteredSights = append(filteredSights, sight)
 	}
 
 	adapted := make([]models.SightSearch, len(filteredSights))
