@@ -46,8 +46,13 @@ func (q *queryFactory) CreateSearchSights(req *models.SightsSearch) *query.Query
 		params = append(params, strings.ToLower(req.Search), strings.ToLower(req.Search)+"%")
 	}
 
+	reqw := SearchSights + " WHERE " + strings.Join(statements, " AND ") + " " + Offset + strconv.Itoa(1) + " " + Limit + strconv.Itoa(2)
+	if len(req.Countries) == 0 && len(req.Tags) == 0 && req.Search != "" {
+		reqw = SearchSights + " " + Offset + strconv.Itoa(1) + " " + Limit + strconv.Itoa(2)
+	}
+
 	return &query.Query{
-		Request: SearchSights + strings.Join(statements, " AND ") + " " + Offset + strconv.Itoa(1) + " " + Limit + strconv.Itoa(2),
+		Request: reqw,
 		Params:  params,
 	}
 }

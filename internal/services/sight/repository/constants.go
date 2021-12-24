@@ -25,7 +25,7 @@ const (
 								select name
 								from Tags t
 								where t.id = ANY(tags)
-								) as tag_arr, description, photos, lng, lat FROM Places WHERE `
+								) as tag_arr, description, photos, lng, lat FROM Places `
 	Tags           = "tags && $"
 	Offset         = "OFFSET $"
 	Limit          = "LIMIT $"
