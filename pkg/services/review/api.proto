@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package services.review_service;
+option go_package = "snakealive/m/pkg/services/review;review_service";
+
+import "google/protobuf/empty.proto";
+
+message Review {
+    int64 id = 1;
+	string title = 2;
+	string text = 3;
+	int64 rating = 4;
+	int64 user_id = 5;
+	int64 place_id = 6;
+	string created_at = 7;
+}
+
+message ReviewRequest {
+    int64 place_id = 1;
+    int64 user_id = 2;
+    int64 limit = 3;
+    int64 skip = 4;
+}
+
+message AddReviewRequest {
+    Review review = 1;
+    int64 user_id = 2;
+}
+
+message DeleteReviewRequest {
+    int64 review_id = 1;
+    int64 user_id = 2;
+}
+
+message Reviews {
+    repeated Review reviews = 1;
+}
+
+message AmountRequest {
+    int64 Id = 1;
+}
+
+message Amount {
+    int64 Amount = 1;
+}
+
+service ReviewService {
+    rpc ReviewByPlace(ReviewRequest) returns (Reviews) {};
+    rpc Add(AddReviewRequest) returns (Review) {};
+    rpc Delete(DeleteReviewRequest) returns (google.protobuf.Empty) {}
+    rpc GetAmountOfReviewsBySight(AmountRequest) returns (Amount) {}
+}

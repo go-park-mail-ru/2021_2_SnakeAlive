@@ -1,0 +1,764 @@
+openapi: 3.0.0
+info:
+  version: 1.0-oas3
+  title: ''
+  description: ''
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: SnakeAlive
+  schemas:
+    publicUser:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        surname:
+          type: string
+        avatar:
+          type: string
+
+paths:
+  /login:
+    post:
+      description: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Successfull login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '400':
+          description: Wrong password
+        '404':
+          description: No user with this email
+  /register:
+    post:
+      description: Registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                surname:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Successfull registration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '400':
+          description: User with this email already exists
+  /logout:
+    delete:
+      security:
+        - cookieAuth: [ ]
+      description: Logout
+      responses:
+        '200':
+          description: Successfully logged out
+        '400':
+          description: User isn't logged in
+  /profile:
+    get:
+      security:
+        - cookieAuth: [ ]
+      description: User profile
+      responses:
+        '200':
+          description: Found user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  surname:
+                    type: string
+                  email:
+                    type: string
+                  avatar:
+                    type: string
+                  description:
+                    type: string
+        '401':
+          description: Authorization needed
+    patch:
+      security:
+        - cookieAuth: [ ]
+      description: Update user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                avatar:
+                  type: string
+                surname:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '200':
+          description: Successfully updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  surname:
+                    type: string
+                  email:
+                    type: string
+                  avatar:
+                    type: string
+        '400':
+          description: User with this email already exists
+        '401':
+          description: Authorization need
+    delete:
+      security:
+        - cookieAuth: [ ]
+      description: Delete user
+      responses:
+        '200':
+          description: Successfully deleted user
+        '401':
+          description: Authorization needed
+  /sights/{name}:
+    get:
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: The name of the country
+      responses:
+        '200':
+          description: List of places
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    photos:
+                      type: array
+                      items:
+                        type: string
+                    tags:
+                      type: array
+                      items:
+                        type: string
+                    user_id:
+                      type: integer
+                    review:
+                      type: string
+        '404':
+          description: No such country
+  /sight/{id}:
+    get:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Id of sight
+      responses:
+        '200':
+          description: Found sight
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  country:
+                    type: string
+                  rating:
+                    type: string
+                  tags:
+                    type: array
+                    items:
+                      type: string
+                  photos:
+                    type: array
+                    items:
+                      type: string
+        '401':
+          description: Authorization needed
+  /sights/search:
+    patch:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                search:
+                  type: string
+                skip:
+                  type: integer
+                limit:
+                  type: integer
+                tags:
+                  type: array
+                  items:
+                    type: integer
+                countries:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Found sight
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    lng:
+                      type: number
+                    lat:
+                      type: number
+        '400':
+          description: Bad request params
+  /trip:
+    post:
+      security:
+        - cookieAuth: [ ]
+      description: Adding trip
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                days:
+                  type: array
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+      responses:
+        '200':
+          description: Successfully added trip
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  days:
+                    type: array
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          description:
+                            type: string
+                          country:
+                            type: string
+                          rating:
+                            type: string
+                          tags:
+                            type: array
+                            items:
+                              type: string
+                          photos:
+                            type: array
+                            items:
+                              type: string
+        '401':
+          description: Authorization needed
+        '400':
+          description: Bad request
+
+  /trip/{id}:
+    get:
+      security:
+        - cookieAuth: [ ]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Id of trip
+      responses:
+        '200':
+          description: Successfully found trip
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  days:
+                    type: array
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          description:
+                            type: string
+                          country:
+                            type: string
+                          rating:
+                            type: string
+                          tags:
+                            type: array
+                            items:
+                              type: string
+                          photos:
+                            type: array
+                            items:
+                              type: string
+        '401':
+          description: Authorization needed
+        '404':
+          description: No such trip
+    patch:
+      security:
+        - cookieAuth: [ ]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Id of trip
+      description: Updating trip
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                days:
+                  type: array
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+      responses:
+        '200':
+          description: Successfully added trip
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  days:
+                    type: array
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          description:
+                            type: string
+                          country:
+                            type: string
+                          rating:
+                            type: string
+                          tags:
+                            type: array
+                            items:
+                              type: string
+                          photos:
+                            type: array
+                            items:
+                              type: string
+        '401':
+          description: Authorization needed
+        '400':
+          description: Bad request
+    delete:
+      security:
+        - cookieAuth: [ ]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Id of trip
+      description: Deleting trip
+      responses:
+        '200':
+          description: Successfully deleted
+        '401':
+          description: Authorization needed
+        '404':
+          description: Trip not found
+
+  /review/{id}:
+    get:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Id of place
+      responses:
+        '200':
+          description: Found places
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    user:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        surname:
+                          type: string
+                        avatar:
+                          type: string
+                    review:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        title:
+                          type: string
+                        text:
+                          type: string
+                        rating:
+                          type: integer
+                        user_id:
+                          type: integer
+                        created_at:
+                          type: string
+                    owner:
+                      type: boolean
+
+        '404':
+          description: Place not found
+    delete:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Id of review
+      responses:
+        '200':
+          description: Found place
+        '404':
+          description: review not found
+  /review:
+    post:
+      security:
+        - cookieAuth: [ ]
+      description: Adding review
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                text:
+                  type: string
+                rating:
+                  type: integer
+                place_id:
+                  type: integer
+      responses:
+        '200':
+          description: Successfully added review
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: review id
+        '401':
+          description: Authorization needed
+        '400':
+          description: Bad request
+  /upload:
+    post:
+      security:
+        - cookieAuth: [ ]
+      description: Adding review
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Successfully uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  avatar:
+                    type: string
+        '401':
+          description: Authorization needed
+        '400':
+          description: Bad request
+  /country/list:
+    get:
+      description: Get countries list
+      responses:
+        '200':
+          description: Successfully uploaded
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    photo:
+                      type: string
+        '500':
+          description: Internal db error
+  /country/{name}:
+    get:
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+            minimum: 1
+          description: Country name
+      description: Get country
+      responses:
+        '200':
+          description: Successfully get country
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  photo:
+                    type: string
+        '500':
+          description: Internal db error
+        '404':
+          description: Country not found
+  /country/id/{id}:
+    get:
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Country id
+      description: Get country
+      responses:
+        '200':
+          description: Successfully get country
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  photo:
+                    type: string
+        '500':
+          description: Internal db error
+        '404':
+          description: Country not found
+
+  /tags:
+    get:
+      description: Get tags
+      responses:
+        '200':
+          description: Successfully get tags
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+        '500':
+          description: Internal db error
+        '404':
+          description: Country not found
+
+  /random/tags:
+    get:
+      description: Get 5 random tags
+      responses:
+        '200':
+          description: Successfully get tags
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+        '500':
+          description: Internal db error
+        '404':
+          description: Country not found
+
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/kravtandr/TripAdvisor/1.0

@@ -1,0 +1,102 @@
+version: '3.7'
+services:
+  auth_service:
+    image: znajderko/snake_auth
+    build:
+      dockerfile: Dockerfile.auth_service
+      context: ../.
+      args:
+        - APP_PKG_NAME=snakealive/m
+        - GOOS=linux
+    ports:
+      - "10123:10123"
+      - "11123:8080"
+    environment:
+      - USER_DB_URL=${PSQL_CONN}
+      - USER_GRPC_PORT=10123
+      - USER_PREFIX_LEN=3
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+
+  sight_service:
+    image: znajderko/snake_sight
+    build:
+      dockerfile: Dockerfile.sight_service
+      context: ../.
+      args:
+        - APP_PKG_NAME=snakealive/m
+        - GOOS=linux
+    ports:
+      - "10124:10124"
+      - "11124:8080"
+    environment:
+      - SIGHT_DB_URL=${PSQL_CONN}
+      - SIGHT_GRPC_PORT=10124
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+
+  trip_service:
+    image: znajderko/snake_trip
+    build:
+      dockerfile: Dockerfile.trip_service
+      context: ../.
+      args:
+        - APP_PKG_NAME=snakealive/m
+        - GOOS=linux
+    ports:
+      - "6666:6666"
+      - "16666:8080"
+    environment:
+      - TRIP_DB_URL=${PSQL_CONN}
+      - TRIP_GRPC_PORT=6666
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+
+  review_service:
+    image: znajderko/snake_review
+    build:
+      dockerfile: Dockerfile.review_service
+      context: ../.
+      args:
+        - APP_PKG_NAME=snakealive/m
+        - GOOS=linux
+    ports:
+      - "9090:9090"
+      - "19090:8080"
+    environment:
+      - REVIEW_DB_URL=${PSQL_CONN}
+      - REVIEW_GRPC_PORT=9090
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+
+
+  gateway:
+    image: znajderko/snake_gateway
+    depends_on:
+      - trip_service
+      - auth_service
+      - sight_service
+      - review_service
+    build:
+      dockerfile: Dockerfile.gateway
+      context: ../.
+      args:
+        - APP_PKG_NAME=snakealive/m
+        - GOOS=linux
+    ports:
+      - "8080:8081"
+      - "18080:8080"
+    environment:
+      - GATEWAY_HTTP_PORT=:8081
+      - GATEWAY_AUTH_ENDPOINT=host.docker.internal:10123
+      - GATEWAY_TRIP_ENDPOINT=host.docker.internal:6666
+      - GATEWAY_SIGHT_ENDPOINT=host.docker.internal:10124
+      - GATEWAY_REVIEW_ENDPOINT=host.docker.internal:9090
+      - GATEWAY_DB_URL=${PSQL_CONN}
+      - GATEWAY_S3_BUCKET=snakehastrip
+      - GATEWAY_S3_ENDPOINT=http://hb.bizmrg.com
+      - GATEWAY_S3_PUBLIC_ENDPOINT=https://snakehastrip.hb.bizmrg.com/
+      - GATEWAY_S3_SECRET_KEY=${S3_KEY}
+      - GATEWAY_S3_SECRET_ID=${S3_ID}
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"

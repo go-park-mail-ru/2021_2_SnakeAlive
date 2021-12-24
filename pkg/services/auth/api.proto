@@ -1,0 +1,123 @@
+syntax = "proto3";
+
+package services.auth_service;
+option go_package = "snakealive/m/pkg/services/auth;auth_service";
+
+import "third_party/go-proto-validators/validator.proto";
+import "google/protobuf/empty.proto";
+
+
+message LoginRequest {
+  string email = 1 [(validate.rules).string = {
+    email: true,
+    max_len: 128,
+  }];
+  string password = 2 [(validate.rules).string = {
+    min_len: 8,
+    max_len: 128,
+  }];
+}
+
+message LoginResponse {
+  string cookie = 1;
+  string token = 2;
+}
+
+message RegisterRequest {
+  string email = 1 [(validate.rules).string = {
+    email: true,
+    max_len: 128,
+  }];
+  string password = 2 [(validate.rules).string = {
+    min_len: 8,
+    max_len: 128,
+    min_bytes: 1,
+  }];
+  string name = 3 [(validate.rules).string = {
+    max_len: 128,
+    min_bytes: 1,
+  }];;
+  string surname = 4 [(validate.rules).string = {
+    max_len: 128,
+    min_bytes: 1,
+  }];;
+}
+
+message GetUserRequest {
+  int64 id = 1 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+}
+
+message GetUserResponse {
+  string name = 1;
+  string surname = 2;
+  string email = 3;
+  string image = 4;
+  string description = 5;
+}
+
+message UpdateUserRequest {
+  int64 id = 1 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+  string name = 2;
+  string surname = 3;
+  string email = 4;
+  string description = 5;
+  string password = 6;
+  string image = 7;
+}
+
+message Session {
+  string token = 1 [(validate.rules).string = {
+    min_len: 1,
+    min_bytes: 1,
+  }];
+  string cookie = 2 [(validate.rules).string = {
+    min_len: 1,
+    min_bytes: 1,
+  }];
+}
+
+message ValidateSessionResponse {
+  int64 user_id = 1;
+}
+
+message UserInfo {
+  int64 user_id = 1;
+  string name = 3 [(validate.rules).string = {
+    max_len: 128,
+    min_bytes: 1,
+  }];;
+  string surname = 4 [(validate.rules).string = {
+    max_len: 128,
+    min_bytes: 1,
+  }];;
+  string image = 2;
+}
+
+message UserEmailRequest {
+  string email = 1 [(validate.rules).string = {
+    email: true,
+    max_len: 128,
+  }];
+}
+
+message UserId {
+  int64 id = 1 ;
+}
+
+service AuthService {
+  rpc ValidateSession (Session) returns (ValidateSessionResponse) {}
+  rpc LogoutUser(Session) returns (google.protobuf.Empty) {}
+  rpc LoginUser(LoginRequest) returns (LoginResponse) {}
+
+  rpc RegisterUser(RegisterRequest) returns (LoginResponse) {}
+  rpc GetUser(GetUserRequest) returns (GetUserResponse) {}
+  rpc UpdateUser(UpdateUserRequest) returns (GetUserResponse) {}
+  rpc GetUserInfo(GetUserRequest) returns (UserInfo) {}
+
+
+  rpc GetUserByEmail(UserEmailRequest) returns (UserId) {}
+}

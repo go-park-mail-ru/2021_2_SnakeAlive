@@ -2,33 +2,22 @@
 
 _Проект команды "Змея Живая!"_ 
 
-Сайт
+Ссылочка
 ----
 
-http://194.58.104.204 
+[snakehastrip.ru](https://snakehastrip.ru/)
 
-Swagger 
--------
-https://app.swaggerhub.com/apis/Snake_alive/TripAdvisor/1.0-oas3
-
-Тестирование
--------
-```
-sh ./test.sh
-```
 Участники команды
 -------
-Волынец Александра - @TheAntiAlex
+|   |  |  |
+| ------------- | ------------- | ------------- |
+|Волынец Александра|[github](https://github.com/theantialex "Anti Alex")|[telegram](https://t.me/TheAntiAlex "@TheAntiAlex")|
+|Кравцов Андрей|[github](https://github.com/kravtandr "Andrew")|[telegram](https://t.me/Kravtandr "@Kravtandr")|
+|Самойлова Ксения|[github](https://github.com/somebody-kseny "Kseny")|[telegram](https://t.me/somebody_kseny "@somebody_kseny")|
+|Черных Никита|[github](https://github.com/znjuko "znjuko")|[telegram](https://t.me/znjuko "@znjuko")|
 
-Кравцов Андрей - @kravtandr
-
-Самойлова Ксения - @somebody-kseny
-
-Черных Никита - @znjuko
-
-
-Менторы
+Ментор
 -------
-Трущелев Михаил -  @ThePsina
-
-Миронов Григорий - @migregal
+|   |  |  |
+| ------------- | ------------- | ------------- |
+|Михаил Трущелев|[github](https://github.com/ThePsina "Михаил Трущелев")|[telegram](https://t.me/MichaelPsi "@MichaelPsi")|

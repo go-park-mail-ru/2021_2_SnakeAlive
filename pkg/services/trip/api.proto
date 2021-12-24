@@ -1,0 +1,152 @@
+syntax = "proto3";
+
+package services.trip_service;
+option go_package = "snakealive/m/pkg/services/trip;trip_service";
+
+import "third_party/go-proto-validators/validator.proto";
+import "google/protobuf/empty.proto";
+
+message TripRequest {
+  int64 trip_id = 1 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+  int64 user_id = 2 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+}
+
+message Tag {
+  int64 id = 1;
+  string name = 2;
+}
+
+message Sight {
+  int64 id = 1;
+  string name = 2;
+  string country = 3;
+  float rating = 4;
+  repeated Tag tags = 5;
+  string description = 6;
+  repeated string photos = 7;
+  int64 day = 8;
+}
+
+message Trip {
+  int64 id = 1;
+  string title = 2 [(validate.rules).string = {
+    min_len: 1,
+    min_bytes: 1,
+  }];
+  string description = 3;
+  repeated Sight sights = 4;
+  repeated Album albums = 5;
+  repeated int64 users = 9;
+}
+
+message ModifyTripRequest {
+  Trip trip = 1;
+  int64 user_id = 2 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+}
+
+message AlbumRequest {
+  int64 album_id = 1 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+  int64 user_id = 2 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+}
+
+message Album {
+  int64 id = 1;
+  int64 trip_id = 2;
+  int64 author = 7;
+  string title = 3;
+  string description = 4;
+  repeated string photos = 6;
+}
+
+message ModifyAlbumRequest {
+  Album album = 1;
+  int64 user_id = 2;
+}
+
+message SightsRequest {
+  int64 trip_id = 1;
+}
+
+message Sights {
+  repeated int64 ids = 1;
+}
+
+message ByUserRequest {
+  int64 user_id = 1;
+}
+
+message Trips {
+  repeated Trip trips = 1;
+}
+message Albums {
+  repeated Album albums = 1;
+}
+
+message AddTripUserRequest {
+  int64 trip_id = 1 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+  int64 user_id = 2 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+  int64 author = 3 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+}
+
+message ShareRequest {
+  int64 trip_id = 1 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+  int64 user_id = 2 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+}
+
+message AddByShareRequest {
+  int64 trip_id = 1 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+  int64 user_id = 2 [(validate.rules).int64 = {
+    gt: 0,
+  }];
+
+  string uuid = 3;
+}
+
+message Link {
+  string link = 1;
+}
+
+message Users {
+  repeated int64 users = 1;
+}
+
+service TripService {
+  rpc GetTrip(TripRequest) returns (Trip) {}
+  rpc AddTrip(ModifyTripRequest) returns (Trip) {}
+  rpc UpdateTrip(ModifyTripRequest) returns (Trip) {}
+  rpc DeleteTrip(TripRequest) returns (Users) {}
+  rpc GetTripsByUser(ByUserRequest) returns (Trips) {}
+
+  rpc GetAlbum(AlbumRequest) returns (Album) {}
+  rpc AddAlbum(ModifyAlbumRequest) returns (Album) {}
+  rpc UpdateAlbum(ModifyAlbumRequest) returns (Album) {}
+  rpc DeleteAlbum(AlbumRequest) returns (google.protobuf.Empty) {}
+  rpc SightsByTrip(SightsRequest) returns (Sights) {}
+  rpc GetAlbumsByUser(ByUserRequest) returns (Albums) {}
+  rpc AddTripUser(AddTripUserRequest) returns (google.protobuf.Empty) {}
+
+  rpc ShareLink(ShareRequest) returns (Link) {}
+  rpc AddUserByLink(AddByShareRequest) returns (Link) {}
+}

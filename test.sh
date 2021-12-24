@@ -1,6 +1,3 @@
-go test -count=1 -coverprofile=cover -v -race -timeout 30s ./...
-
-grep -F -v "mock" cover > cover_wo_mock
-go tool cover -func cover_wo_mock
-
-rm cover cover_wo_mock
+go test -v -coverpkg=./... -coverprofile=cover.out.tmp ./...
+cat cover.out.tmp | grep -v "_test.go" | grep -v "main.go" | grep -v "_mock.go" | grep -v "mock_" | grep -v ".pb.go" | grep -v ".pb.validate.go" | grep -v "_easyjson.go" | grep -v "logging.go" | grep -v "config.go" | grep -v "setup.go" | grep -v "router.go"  > cover.out
+go tool cover -func cover.out
