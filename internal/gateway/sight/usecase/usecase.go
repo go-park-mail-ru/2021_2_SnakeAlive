@@ -40,13 +40,14 @@ func (t *sightUseCase) SearchSights(ctx context.Context, req *models.SearchSight
 	var filteredSights []*sight_service.Sight
 	if req.MinReviews != 0 {
 		for _, sight := range response.Sights {
-			amount, err := t.reviewGRPC.GetAmountOfReviewsBySight(ctx, &review_service.AmountRequest{
+			amount, _ := t.reviewGRPC.GetAmountOfReviewsBySight(ctx, &review_service.AmountRequest{
 				Id: sight.Id,
 			})
 
-			if err == nil && int(amount.Amount) >= req.MinReviews {
-				filteredSights = append(filteredSights, sight)
+			if int(amount.Amount) < req.MinReviews {
+				continue
 			}
+			filteredSights = append(filteredSights, sight)
 		}
 	}
 
