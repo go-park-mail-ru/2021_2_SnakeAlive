@@ -34,5 +34,5 @@ const (
 							JOIN TripsUsers tu on tr.id = tu.trip_id
 							WHERE  tu.user_id = $1 GROUP BY tr.id`
 	AlbumsByUserQuery    = `SELECT id, title, description, trip_id, author, photos FROM Albums WHERE author = $1`
-	GetAlbumsByTripQuery = `SELECT id, title, description, photos FROM Albums WHERE trip_id = $1`
+	GetAlbumsByTripQuery = `SELECT id, title, description, photos, author FROM Albums WHERE trip_id = $1`
 )

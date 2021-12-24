@@ -123,7 +123,7 @@ func (t *tripRepository) GetTripById(ctx context.Context, id int) (*models.Trip,
 
 	var album models.Album
 	for rows.Next() {
-		_ = rows.Scan(&album.Id, &album.Title, &album.Description, &album.Photos)
+		_ = rows.Scan(&album.Id, &album.Title, &album.Description, &album.Photos, &album.UserId)
 		trip.Albums = append(trip.Albums, album)
 	}
 
@@ -291,7 +291,7 @@ func (t *tripRepository) GetTripsByUser(ctx context.Context, id int) (*[]models.
 
 		var album models.Album
 		for rows.Next() {
-			_ = rows.Scan(&album.Id, &album.Title, &album.Description, &album.Photos)
+			_ = rows.Scan(&album.Id, &album.Title, &album.Description, &album.Photos, &album.UserId)
 			trips[i].Albums = append(trips[i].Albums, album)
 		}
 

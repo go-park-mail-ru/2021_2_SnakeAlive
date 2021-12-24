@@ -446,6 +446,7 @@ func ProtoAlbumsFromAlbums(albums []models.Album) []*trip_service.Album {
 			Title:       album.Title,
 			Description: album.Description,
 			Photos:      album.Photos,
+			Author:      int64(album.UserId),
 		}
 		protoAlbums = append(protoAlbums, &protoAlbum)
 	}
@@ -460,6 +461,7 @@ func AlbumsFromProtoAlbums(protoAlbums []*trip_service.Album) []models.Album {
 			Title:       album.Title,
 			Description: album.Description,
 			Photos:      album.Photos,
+			UserId:      int(album.Author),
 		}
 		albums = append(albums, modelAlbum)
 	}
