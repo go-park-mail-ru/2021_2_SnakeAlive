@@ -698,6 +698,10 @@ func easyjsonEe053225DecodeSnakealiveMInternalModels4(in *jlexer.Lexer, out *Sea
 			out.Limit = int(in.Int())
 		case "search":
 			out.Search = string(in.String())
+		case "min_rating":
+			out.MinRating = int(in.Int())
+		case "min_amount_reviews":
+			out.MinReviews = int(in.Int())
 		default:
 			in.SkipRecursive()
 		}
@@ -758,6 +762,16 @@ func easyjsonEe053225EncodeSnakealiveMInternalModels4(out *jwriter.Writer, in Se
 		const prefix string = ",\"search\":"
 		out.RawString(prefix)
 		out.String(string(in.Search))
+	}
+	{
+		const prefix string = ",\"min_rating\":"
+		out.RawString(prefix)
+		out.Int(int(in.MinRating))
+	}
+	{
+		const prefix string = ",\"min_amount_reviews\":"
+		out.RawString(prefix)
+		out.Int(int(in.MinReviews))
 	}
 	out.RawByte('}')
 }
