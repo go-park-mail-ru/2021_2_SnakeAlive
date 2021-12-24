@@ -319,6 +319,11 @@ func (s *tripDelivery) AddTripUser(ctx context.Context, request *trip_service.Ad
 		return &empty.Empty{}, errors.DeniedAccess
 	}
 
+	userIsAuthor, err := s.tripUsecase.CheckTripAuthor(ctx, int(request.UserId), int(request.TripId))
+	if userIsAuthor || err != nil {
+		return &empty.Empty{}, errors.UserIsAlreadyAuthor
+	}
+
 	err = s.tripUsecase.AddTripUser(ctx, int(request.TripId), int(request.UserId))
 	if err != nil {
 		return &empty.Empty{}, s.errorAdapter.AdaptError(err)
