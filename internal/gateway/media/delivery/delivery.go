@@ -2,15 +2,15 @@ package delivery
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"path/filepath"
 
-	"github.com/valyala/fasthttp"
 	"snakealive/m/internal/gateway/media/usecase"
 	"snakealive/m/internal/models"
 	"snakealive/m/pkg/constants"
 	"snakealive/m/pkg/error_adapter"
+
+	"github.com/valyala/fasthttp"
 )
 
 type MediaDelivery interface {
@@ -36,7 +36,6 @@ func (m *mediaDelivery) UploadFile(ctx *fasthttp.RequestCtx) {
 	defer file.Close()
 
 	filename, err := m.manager.UploadFile(ctx, file, filepath.Ext(form.Filename))
-	fmt.Println(err)
 	if err != nil {
 		ctx.SetStatusCode(http.StatusTeapot)
 		return

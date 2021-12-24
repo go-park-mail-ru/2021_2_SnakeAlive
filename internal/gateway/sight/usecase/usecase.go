@@ -2,8 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
-	"log"
 
 	"snakealive/m/internal/models"
 	review_service "snakealive/m/pkg/services/review"
@@ -26,8 +24,6 @@ type sightUseCase struct {
 }
 
 func (t *sightUseCase) SearchSights(ctx context.Context, req *models.SearchSights) ([]models.SightSearch, error) {
-	log.Print(req.Search)
-
 	response, err := t.sightGRPC.SearchSights(ctx, &sight_service.SearchSightRequest{
 		Search:     req.Search,
 		Skip:       int64(req.Skip),
@@ -40,7 +36,6 @@ func (t *sightUseCase) SearchSights(ctx context.Context, req *models.SearchSight
 	if err != nil {
 		return []models.SightSearch{}, err
 	}
-	fmt.Println(response)
 
 	var filteredSights []*sight_service.Sight
 	if req.MinReviews != 0 {

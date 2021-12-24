@@ -2,7 +2,6 @@ package delivery
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 
 	"snakealive/m/internal/gateway/trip/usecase"
@@ -73,7 +72,6 @@ func (s *tripGatewayDelivery) AddTrip(ctx *fasthttp.RequestCtx) {
 		ctx.SetStatusCode(fasthttp.StatusBadRequest)
 		return
 	}
-	fmt.Println(trip)
 
 	responceTrip, err := s.manager.AddTrip(ctx, trip, userID)
 	if err != nil {
